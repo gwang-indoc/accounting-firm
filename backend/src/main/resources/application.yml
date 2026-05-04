@@ -25,3 +25,5 @@ app:
   cookie:
     secure: true
     same-site: Strict
+  oauth2:
+    redirect-uri: ${OAUTH2_REDIRECT_URI:http://localhost:4200/portal/dashboard}
