@@ -1,0 +1,78 @@
+schema: spec-driven
+
+# Project context — injected into every artifact's instruction prompt.
+context: |
+  Tech stack: Spring Boot 3.5 (Java 21) backend + Angular 21 frontend,
+  PostgreSQL database, Google OAuth2 authentication via Spring Security.
+
+  Backend structure (package root: com.gwhaitech.accountingfirm):
+    - Layered architecture: Controller → Service → Repository.
+    - Spring Data JPA repositories; schema managed by Flyway migrations
+      under src/main/resources/db/migration/.
+    - Config: application.yml (defaults), application-dev.yml (local),
+      application-prod.yml (prod). Secrets via env vars
+      (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, SPRING_DATASOURCE_*).
+    - REST controllers annotated @RestController under the .web package;
+      DTOs in .dto; domain entities in .domain.
+
+  Backend tests: JUnit 5 + Spring Boot Test. Use @WebMvcTest for
+  controller slices, @DataJpaTest for repository slices, @SpringBootTest
+  for integration tests. Tests mirror src/main/java layout under
+  src/test/java. Run with `cd backend && ./mvnw test` (all) or
+  `./mvnw test -Dtest=ClassName` (single class).
+
+  Frontend structure (Angular 21, standalone components):
+    - Feature-based lazy-loaded routing under src/app/.
+    - HTTP services in src/app/core/services/; auth state via AuthService;
+      HTTP interceptor attaches session credentials to API requests.
+    - Backend base URL configured in environment.ts; dev server proxies
+      /api/** to localhost:8080.
+    - Component filenames use kebab-case (e.g., invoice-list.component.ts).
+
+  Frontend tests: Jasmine + Angular TestBed. Run with
+  `cd frontend && npm test` (watch) or
+  `npx ng test --no-watch` (CI). Single file:
+  `npx ng test --include='**/my.component.spec.ts'`.
+
+  Conventions:
+    - Database changes MUST be a new Flyway migration file; never edit
+      existing migrations.
+    - Validate inputs at REST boundaries (Bean Validation / @Valid);
+      never trust client-supplied IDs beyond what Spring Security permits.
+    - Angular components should be standalone; use signals for local state
+      where Angular 21 supports it.
+    - Lint frontend with `cd frontend && npm run lint`.
+
+  Superpowers integration:
+    - This project pairs OpenSpec with Anthropic superpowers skills.
+    - /opsx:propose triggers superpowers:brainstorming BEFORE artifact
+      generation (see .claude/commands/opsx/propose.md).
+    - /opsx:apply runs superpowers:test-driven-development at session
+      start, superpowers:subagent-driven-development to dispatch a fresh
+      subagent per [parallel] task with a two-stage review (spec
+      compliance, then code quality), and superpowers:requesting-code-review
+      at task-group checkpoints (see .claude/commands/opsx/apply.md).
+    - tasks.md MUST scaffold TDD discipline + review checkpoints so the
+      apply phase has the hooks it needs.
+
+# Per-artifact rules — appended to artifact-specific instructions.
+# Each rule must be a quoted scalar to avoid YAML multi-line ambiguity.
+rules:
+  proposal:
+    - 'Always include a Non-Goals (or Out-of-Scope) section.'
+    - 'Capabilities section MUST list which existing capability is modified. Look in openspec/specs/ first; do not invent capability names.'
+    - 'Every proposal must reference the brainstorming spec produced under docs/superpowers/specs/. /opsx:propose ALWAYS runs superpowers:brainstorming first regardless of whether the change has UI surface, so the spec exists for every change.'
+
+  design:
+    - 'Reference the brainstorming spec doc under docs/superpowers/specs/ as a primary input when one exists for this change.'
+    - 'Decisions section MUST cover alternatives considered, not just the choice made.'
+
+  tasks:
+    - "Each implementation task that introduces NEW behavior MUST be preceded by a RED-failing-test task. Pattern: '- [ ] N.X RED — write failing test for <behavior>' followed by '- [ ] N.X+1 GREEN — minimal impl to pass the test'. Use JUnit 5 + Spring Boot Test for backend (controller/service/repository slices) and Jasmine + Angular TestBed for frontend components."
+    - 'Bug fixes MUST be preceded by a regression test that reproduces the bug (RED), then the fix (GREEN).'
+    - "Within a '## N' group, when 2+ task units (a unit = one RED+GREEN pair, or one standalone non-test task) touch disjoint files with no read/write dependency on one another, append ' [parallel]' to each independent unit's first task AND insert as task N.0: '- [ ] N.0 Invoke superpowers:subagent-driven-development to dispatch the [parallel] units in this group; one subagent owns one RED+GREEN pair (or one standalone task) end-to-end including self-review.' If no units within the group are independent, omit N.0 — sequential execution is the default."
+    - "Across groups, when 2+ '## N' groups touch disjoint files with no cross-group read/write dependency, prepend tasks.md (above '## 1') with a top-level line: 'Invoke superpowers:subagent-driven-development to dispatch groups <comma-separated list> in parallel; one subagent per group.' Only add this when group independence is genuinely true; default is sequential. The per-group review checkpoint (N.Z) still applies inside each parallel group."
+    - "Each '## N' task group MUST end with a checkpoint task: '- [ ] N.Z Run superpowers:requesting-code-review on the diff for group N; address CRITICAL/HIGH findings before moving on'."
+    - "The final task group MUST include a verification task: '- [ ] M.K Run superpowers:verification-before-completion (cd backend && ./mvnw test; cd frontend && npx ng test --no-watch; grep for System.out.println + console.log; diff review)'."
+    - "If the change touches the UI surface (any route or component under src/app/, or any client-rendered behavior), the final task group MUST include an E2E test task placed IMMEDIATELY BEFORE the verification-before-completion task. Pattern: '- [ ] M.K E2E test — start backend (`./mvnw spring-boot:run -Dspring-boot.run.profiles=dev`) and frontend (`npm start`), then <explicit URL + user actions + expected outcomes>' for a manual end-to-end walkthrough, OR '- [ ] M.K Automated E2E test via mcp__plugin_playwright_playwright__* tools — <explicit flow>' when the runner can drive a headless browser. Pure backend/migration/test-only changes are exempt."
+    - "Tasks SHOULD explicitly name the superpowers skill to invoke when relevant (e.g., 'Invoke superpowers:test-driven-development to scaffold tests for the new service method')."
