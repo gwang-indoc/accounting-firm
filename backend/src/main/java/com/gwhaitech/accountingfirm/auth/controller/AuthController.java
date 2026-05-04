@@ -4,6 +4,7 @@ import com.gwhaitech.accountingfirm.auth.domain.User;
 import com.gwhaitech.accountingfirm.common.dto.UserDto;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
+    @Value("${app.cookie.secure:true}")
+    private boolean cookieSecure;
 
     @GetMapping("/me")
     public ResponseEntity<UserDto> me(@AuthenticationPrincipal User user) {
@@ -26,7 +30,9 @@ public class AuthController {
         Cookie cookie = new Cookie("jwt", "");
         cookie.setHttpOnly(true);
         cookie.setPath("/");
+        cookie.setSecure(cookieSecure);
         cookie.setMaxAge(0);
+        cookie.setAttribute("SameSite", "Strict");
         response.addCookie(cookie);
         return ResponseEntity.ok().build();
     }

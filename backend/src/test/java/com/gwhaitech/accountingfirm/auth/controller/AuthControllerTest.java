@@ -36,8 +36,9 @@ class AuthControllerTest {
             http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/oauth2/**", "/login/oauth2/**", "/api/auth/**").permitAll()
                     .requestMatchers("/api/**").authenticated()
-                    .anyRequest().permitAll()
+                    .anyRequest().denyAll()
                 )
                 .exceptionHandling(ex -> ex
                     .authenticationEntryPoint((req, res, e) ->
@@ -92,6 +93,7 @@ class AuthControllerTest {
         mockMvc.perform(post("/api/auth/logout")
                 .with(user("test@example.com").roles("USER")))
                 .andExpect(status().isOk())
-                .andExpect(header().exists(HttpHeaders.SET_COOKIE));
+                .andExpect(header().string(HttpHeaders.SET_COOKIE, org.hamcrest.Matchers.containsString("jwt=")))
+                .andExpect(header().string(HttpHeaders.SET_COOKIE, org.hamcrest.Matchers.containsString("Max-Age=0")));
     }
 }

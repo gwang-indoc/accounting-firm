@@ -83,6 +83,8 @@ class OAuth2SuccessHandlerTest {
         assertThat(cookie.getName()).isEqualTo("jwt");
         assertThat(cookie.isHttpOnly()).isTrue();
         assertThat(cookie.getPath()).isEqualTo("/");
+        assertThat(cookie.getAttribute("SameSite")).isEqualTo("Strict");
+        assertThat(cookie.getMaxAge()).isGreaterThan(0);
 
         verify(mockResponse).sendRedirect("http://localhost:4200/portal/dashboard");
     }
