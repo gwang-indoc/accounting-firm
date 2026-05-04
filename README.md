@@ -11,15 +11,24 @@ Web application for an accounting firm. Monorepo containing a Spring Boot backen
 
 ### 1. PostgreSQL
 
-Start PostgreSQL locally and create the database:
+**Option A — Homebrew (native macOS):**
 
 ```bash
+# Install
+brew install postgresql@16
+
+# Start the service
+brew services start postgresql@16
+
+# Create the database
 createdb accounting_firm
 ```
 
-Or with Docker:
+**Option B — Docker:**
 
 ```bash
+# Install Docker Desktop from https://www.docker.com/products/docker-desktop/
+# Then run:
 docker run -d --name accounting-pg \
   -e POSTGRES_DB=accounting_firm \
   -e POSTGRES_USER=postgres \
