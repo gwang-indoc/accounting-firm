@@ -1,0 +1,10 @@
+<div class="dashboard">
+  <header class="dashboard-header">
+    <h1>Client Portal</h1>
+    <button class="logout-btn" (click)="logout()">Logout</button>
+  </header>
+  <main class="dashboard-content">
+    <h2>Welcome, {{ authService.currentUser()?.name }}</h2>
+    <p>You are logged in as {{ authService.currentUser()?.email }}</p>
+  </main>
+</div>
