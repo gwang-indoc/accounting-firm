@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope: openid,email,profile
+  flyway:
+    enabled: true
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-ms: 86400000
+  cookie:
+    secure: true
+    same-site: Strict

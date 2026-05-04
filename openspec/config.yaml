@@ -47,6 +47,11 @@ context: |
     - This project pairs OpenSpec with Anthropic superpowers skills.
     - /opsx:propose triggers superpowers:brainstorming BEFORE artifact
       generation (see .claude/commands/opsx/propose.md).
+    - IMPORTANT: After brainstorming completes inside /opsx:propose, ALWAYS
+      return to the opsx:propose flow to generate OpenSpec artifacts
+      (proposal.md, design.md, tasks.md). Do NOT follow brainstorming's
+      default terminal state of invoking superpowers:writing-plans — that
+      applies only when brainstorming is run standalone.
     - /opsx:apply runs superpowers:test-driven-development at session
       start, superpowers:subagent-driven-development to dispatch a fresh
       subagent per [parallel] task with a two-stage review (spec

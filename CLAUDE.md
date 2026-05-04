@@ -48,6 +48,13 @@ accounting-firm/
 Change proposals and tasks live in `openspec/`. Use `/opsx:propose` to create a new change, `/opsx:apply` to implement it, and `/opsx:archive` when done.
 All changes, specs, and archives live under `openspec/` at the project root.
 
+**Important — `/opsx:propose` + brainstorming:** `/opsx:propose` triggers `superpowers:brainstorming` first. When brainstorming finishes, it will try to invoke `superpowers:writing-plans` as its terminal state — **ignore that**. Return to the `/opsx:propose` flow and generate the OpenSpec artifacts (`proposal.md`, `design.md`, `tasks.md`). The `writing-plans` terminal state only applies when brainstorming is run standalone.
+
+**Important — `/opsx:apply` required skills:** Before implementing any task, ALWAYS invoke these skills in order:
+1. `superpowers:test-driven-development` — at session start, before writing any code
+2. `superpowers:subagent-driven-development` — to dispatch a fresh subagent per `[parallel]` task with two-stage review (spec compliance, then code quality)
+3. `superpowers:requesting-code-review` — at each task-group checkpoint (`N.Z` tasks)
+
 ## Coding Guidelines
 
 Behavioral guidelines to reduce common LLM coding mistakes.

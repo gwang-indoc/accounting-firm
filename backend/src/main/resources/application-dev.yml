@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/accounting_firm
+    username: postgres
+    password: postgres
+  flyway:
+    url: jdbc:postgresql://localhost:5432/accounting_firm
+    user: postgres
+    password: postgres
+
+app:
+  cookie:
+    secure: false
+  frontend-url: http://localhost:4200
+
+logging:
+  level:
+    com.gwhaitech: DEBUG
+    org.springframework.security: DEBUG
