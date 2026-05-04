@@ -19,7 +19,11 @@ public class JwtService {
     private final long expirationMs;
 
     public JwtService(JwtConfig config) {
-        this.key = Keys.hmacShaKeyFor(config.getSecret().getBytes(StandardCharsets.UTF_8));
+        byte[] keyBytes = config.getSecret() != null ? config.getSecret().getBytes(StandardCharsets.UTF_8) : new byte[0];
+        if (keyBytes.length < 32) {
+            throw new IllegalStateException("app.jwt.secret must be at least 32 bytes for HS256; got " + keyBytes.length);
+        }
+        this.key = Keys.hmacShaKeyFor(keyBytes);
         this.expirationMs = config.getExpirationMs();
     }
 
