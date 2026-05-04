@@ -12,15 +12,15 @@ spring:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
+            client-id: ${GOOGLE_CLIENT_ID:placeholder-set-in-env}
+            client-secret: ${GOOGLE_CLIENT_SECRET:placeholder-set-in-env}
             scope: openid,email,profile
   flyway:
     enabled: true
 
 app:
   jwt:
-    secret: ${JWT_SECRET}
+    secret: ${JWT_SECRET:local-dev-secret-change-in-production-min32chars}
     expiration-ms: 86400000
   cookie:
     secure: true
