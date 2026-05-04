@@ -1,9 +1,8 @@
 import { Component, HostListener, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-client-portal-login',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './client-portal-login.component.html',
   styleUrl: './client-portal-login.component.css',
 })
