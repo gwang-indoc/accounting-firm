@@ -3,10 +3,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/accounting_firm
     username: postgres
     password: postgres
-  flyway:
-    url: jdbc:postgresql://localhost:5432/accounting_firm
-    user: postgres
-    password: postgres
+  jpa:
+    show-sql: true
 
 app:
   cookie:

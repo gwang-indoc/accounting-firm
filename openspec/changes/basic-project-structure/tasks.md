@@ -1,14 +1,14 @@
 ## 1. Backend Foundation
 
-- [ ] 1.1 Fix `groupId` in `backend/pom.xml` from `com.indocsystems` to `com.gwhaitech`
-- [ ] 1.2 Add `jjwt-api`, `jjwt-impl`, `jjwt-jackson` dependencies to `pom.xml`
-- [ ] 1.3 Create `backend/src/main/java/com/gwhaitech/accountingfirm/AccountingFirmApplication.java`
-- [ ] 1.4 Create `backend/src/main/resources/application.yml` with datasource (env vars), OAuth2 client registration, JWT config placeholders
-- [ ] 1.5 Create `backend/src/main/resources/application-dev.yml` with local Postgres URL, CORS origin `http://localhost:4200`, cookie secure=false
-- [ ] 1.6 Create Flyway migration `backend/src/main/resources/db/migration/V1__create_users.sql` with the `users` table
-- [ ] 1.7 RED — write `@DataJpaTest` that tries to load the `User` entity and fails (class not found)
-- [ ] 1.8 GREEN — create `User.java` entity (`com.gwhaitech.accountingfirm.auth.domain`) mapped to `users` table; test passes
-- [ ] 1.9 Create `UserRepository.java` with `findByGoogleSub(String googleSub)` and `findByEmail(String email)`
+- [x] 1.1 Fix `groupId` in `backend/pom.xml` from `com.indocsystems` to `com.gwhaitech`
+- [x] 1.2 Add `jjwt-api`, `jjwt-impl`, `jjwt-jackson` dependencies to `pom.xml`
+- [x] 1.3 Create `backend/src/main/java/com/gwhaitech/accountingfirm/AccountingFirmApplication.java`
+- [x] 1.4 Create `backend/src/main/resources/application.yml` with datasource (env vars), OAuth2 client registration, JWT config placeholders
+- [x] 1.5 Create `backend/src/main/resources/application-dev.yml` with local Postgres URL, CORS origin `http://localhost:4200`, cookie secure=false
+- [x] 1.6 Create Flyway migration `backend/src/main/resources/db/migration/V1__create_users.sql` with the `users` table
+- [x] 1.7 RED — write `@DataJpaTest` that tries to load the `User` entity and fails (class not found)
+- [x] 1.8 GREEN — create `User.java` entity (`com.gwhaitech.accountingfirm.auth.domain`) mapped to `users` table; test passes
+- [x] 1.9 Create `UserRepository.java` with `findByGoogleSub(String googleSub)` and `findByEmail(String email)`
 - [ ] 1.Z Run superpowers:requesting-code-review on the diff for group 1; address CRITICAL/HIGH findings before moving on
 
 ## 2. JWT Service & Filter

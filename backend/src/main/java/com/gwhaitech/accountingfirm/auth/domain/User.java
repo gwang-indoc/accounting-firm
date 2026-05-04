@@ -19,7 +19,7 @@ public class User {
     @Column(name = "google_sub", nullable = false, unique = true)
     private String googleSub;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String role = "USER";
 
     @Column(name = "created_at", nullable = false, updatable = false)
