@@ -13,11 +13,11 @@
 
 ## 2. JWT Service & Filter
 
-- [ ] 2.1 Create `JwtConfig.java` (`com.gwhaitech.accountingfirm.config`) — binds `app.jwt.secret` and `app.jwt.expiration-ms` from `application.yml`
-- [ ] 2.2 RED — write unit test for `JwtService`: `issueToken(user)` produces a parseable JWT; `validateToken(token)` returns claims; expired token throws
-- [ ] 2.3 GREEN — create `JwtService.java` (`com.gwhaitech.accountingfirm.auth.service`) using `jjwt`; all tests pass
-- [ ] 2.4 RED — write `@WebMvcTest` for `JwtAuthFilter`: request with valid cookie sets principal; request without cookie returns 401 on a protected endpoint
-- [ ] 2.5 GREEN — create `JwtAuthFilter.java` (`com.gwhaitech.accountingfirm.auth.filter`) reading the `jwt` cookie, validating via `JwtService`, setting `SecurityContextHolder`; tests pass
+- [x] 2.1 Create `JwtConfig.java` (`com.gwhaitech.accountingfirm.config`) — binds `app.jwt.secret` and `app.jwt.expiration-ms` from `application.yml`
+- [x] 2.2 RED — write unit test for `JwtService`: `issueToken(user)` produces a parseable JWT; `validateToken(token)` returns claims; expired token throws
+- [x] 2.3 GREEN — create `JwtService.java` (`com.gwhaitech.accountingfirm.auth.service`) using `jjwt`; all tests pass
+- [x] 2.4 RED — write `@WebMvcTest` for `JwtAuthFilter`: request with valid cookie sets principal; request without cookie returns 401 on a protected endpoint
+- [x] 2.5 GREEN — create `JwtAuthFilter.java` (`com.gwhaitech.accountingfirm.auth.filter`) reading the `jwt` cookie, validating via `JwtService`, setting `SecurityContextHolder`; tests pass
 - [x] 2.Z Run superpowers:requesting-code-review on the diff for group 2; address CRITICAL/HIGH findings before moving on
 
 ## 3. OAuth2 Success Handler & Auth Controller
