@@ -9,10 +9,65 @@ Web application for an accounting firm. Monorepo containing a Spring Boot backen
 
 ## Development Setup
 
-1. Start PostgreSQL locally and create the `accounting_firm` database.
-2. Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` environment variables (obtain from Google Cloud Console).
-3. Start the backend: `cd backend && ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev`
-4. Start the frontend: `cd frontend && npm start`
+### 1. PostgreSQL
+
+Start PostgreSQL locally and create the database:
+
+```bash
+createdb accounting_firm
+```
+
+Or with Docker:
+
+```bash
+docker run -d --name accounting-pg \
+  -e POSTGRES_DB=accounting_firm \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  postgres:16
+```
+
+### 2. Environment variables
+
+Create a `.env` file at the project root (already gitignored):
+
+```bash
+# Google OAuth2 — from console.cloud.google.com
+# Create a project → APIs & Services → Credentials → OAuth 2.0 Client ID
+# Application type: Web application
+# Authorized redirect URI: http://localhost:8080/login/oauth2/code/google
+GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-client-secret
+
+# JWT signing key — any random string, at least 32 characters
+JWT_SECRET=change-me-to-a-random-32-char-string
+
+# PostgreSQL
+SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/accounting_firm
+SPRING_DATASOURCE_USERNAME=postgres
+SPRING_DATASOURCE_PASSWORD=postgres
+```
+
+Load the file before starting the backend:
+
+```bash
+set -a && source .env && set +a
+```
+
+Or set them directly in **IntelliJ → Run → Edit Configurations → Environment variables**.
+
+### 3. Start the backend
+
+```bash
+cd backend && ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+```
+
+### 4. Start the frontend
+
+```bash
+cd frontend && npm start
+```
 
 The Angular dev server proxies `/api/**` to the Spring Boot server at `localhost:8080`.
 
