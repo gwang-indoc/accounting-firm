@@ -93,14 +93,6 @@ cd backend && ./mvnw test -Dtest=MyServiceTest
 cd backend && ./mvnw test -Dtest=MyServiceTest#methodName
 ```
 
-### Database connection
-
-```
-SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/accounting_firm
-SPRING_DATASOURCE_USERNAME=...
-SPRING_DATASOURCE_PASSWORD=...
-```
-
 ## Frontend Commands
 
 ```bash
