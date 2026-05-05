@@ -13,6 +13,15 @@
   font-family: inherit;
 }
 
+:host(.drawer-item) .login-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 14px 8px;
+  font-size: 15px;
+  color: #e2e8f0;
+}
+
 .login-dropdown {
   position: absolute;
   top: 100%;

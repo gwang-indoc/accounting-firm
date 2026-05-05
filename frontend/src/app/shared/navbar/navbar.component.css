@@ -128,14 +128,13 @@
 .mobile-drawer a.cta-btn {
   background: #ffffff;
   color: #0f172a;
-  padding: 12px 16px;
+  padding: 8px 16px;
   border-radius: 6px;
   font-weight: 700;
   font-size: 15px;
-  text-align: center;
-  margin-top: 12px;
+  display: inline-block;
+  margin: 14px 8px;
   border-bottom: none;
-  display: block;
 }
 
 .mobile-drawer app-client-portal-login {
