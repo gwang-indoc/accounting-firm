@@ -11,4 +11,4 @@ fi
 set -a && source "$SCRIPT_DIR/.env" && set +a
 
 cd "$SCRIPT_DIR/backend"
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+./mvnw spring-boot:run
