@@ -3,6 +3,7 @@ import { test, expect } from '@playwright/test';
 test('navbar is visible with logo and nav links', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('app-navbar')).toBeVisible();
+  await expect(page.locator('.logo-icon')).toContainText('税');
   await expect(page.locator('app-navbar')).toContainText('GWH Accounting');
   await expect(page.locator('app-navbar')).toContainText('Services');
   await expect(page.locator('app-navbar')).toContainText('Security');
@@ -12,10 +13,10 @@ test('navbar is visible with logo and nav links', async ({ page }) => {
 
 test('language toggle switches active pill', async ({ page }) => {
   await page.goto('/');
-  await page.click('button:has-text("中文")');
-  await expect(page.locator('button.lang-pill.active')).toContainText('中文');
-  await page.click('button:has-text("EN")');
-  await expect(page.locator('button.lang-pill.active')).toContainText('EN');
+  await page.click('[data-testid="lang-zh"]');
+  await expect(page.locator('[data-testid="lang-zh"]')).toHaveClass(/active/);
+  await page.click('[data-testid="lang-en"]');
+  await expect(page.locator('[data-testid="lang-en"]')).toHaveClass(/active/);
 });
 
 test('Client Portal shows dropdown on click', async ({ page }) => {
@@ -34,13 +35,13 @@ test('clicking outside closes Client Portal dropdown', async ({ page }) => {
 
 test('Book Consultation navigates to /contact', async ({ page }) => {
   await page.goto('/');
-  await page.click('a[routerLink="/contact"]:has-text("Book Consultation")');
+  await page.click('.nav-links a.cta-btn');
   await expect(page).toHaveURL(/\/contact/);
 });
 
 test('Contact link navigates to /contact', async ({ page }) => {
   await page.goto('/');
-  await page.click('a[routerLink="/contact"]:has-text("Contact")');
+  await page.click('.nav-links a:has-text("Contact"):not(.cta-btn)');
   await expect(page).toHaveURL(/\/contact/);
 });
 
