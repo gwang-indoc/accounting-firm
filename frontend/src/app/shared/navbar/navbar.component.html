@@ -29,4 +29,30 @@
       (click)="setLang('zh')"
     >中文</button>
   </div>
+
+  <button class="hamburger" data-testid="hamburger" (click)="menuOpen.update(v => !v)">☰</button>
 </nav>
+
+@if (menuOpen()) {
+  <div class="mobile-drawer">
+    <a href="#services">Services</a>
+    <a href="#security">Security</a>
+    <app-client-portal-login />
+    <a routerLink="/contact">Contact</a>
+    <a routerLink="/contact" class="cta-btn">Book Consultation</a>
+    <div class="lang-toggle">
+      <button
+        data-testid="lang-en-mobile"
+        class="lang-pill"
+        [class.active]="lang() === 'en'"
+        (click)="setLang('en')"
+      >EN</button>
+      <button
+        data-testid="lang-zh-mobile"
+        class="lang-pill"
+        [class.active]="lang() === 'zh'"
+        (click)="setLang('zh')"
+      >中文</button>
+    </div>
+  </div>
+}

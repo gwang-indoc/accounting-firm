@@ -11,6 +11,7 @@ import { ClientPortalLoginComponent } from '../../features/client-portal/client-
 })
 export class NavbarComponent {
   lang = signal<'en' | 'zh'>('en');
+  menuOpen = signal(false);
 
   setLang(value: 'en' | 'zh'): void {
     this.lang.set(value);

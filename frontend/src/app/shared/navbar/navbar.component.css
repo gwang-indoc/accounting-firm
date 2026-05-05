@@ -66,3 +66,41 @@
   border-color: #38bdf8;
   font-weight: 600;
 }
+
+.hamburger {
+  display: none;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.mobile-drawer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: #0f172a;
+  padding: 16px 24px;
+}
+
+.mobile-drawer a {
+  color: #e2e8f0;
+  text-decoration: none;
+  font-size: 15px;
+}
+
+@media (max-width: 767px) {
+  .nav-links {
+    display: none;
+  }
+
+  .lang-toggle {
+    display: none;
+  }
+
+  .hamburger {
+    display: block;
+  }
+}

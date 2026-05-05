@@ -95,4 +95,32 @@ describe('NavbarComponent', () => {
     const dropdown = nativeEl.querySelector('.login-dropdown');
     expect(dropdown).not.toBeNull();
   });
+
+  it('hamburger button exists in the DOM', () => {
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    const hamburger = nativeEl.querySelector('[data-testid="hamburger"]');
+    expect(hamburger).not.toBeNull();
+  });
+
+  it('menuOpen() is false by default', () => {
+    expect(component.menuOpen()).toBe(false);
+  });
+
+  it('clicking the hamburger button sets menuOpen() to true', () => {
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    const hamburger = nativeEl.querySelector('[data-testid="hamburger"]') as HTMLElement;
+    hamburger.click();
+    fixture.detectChanges();
+    expect(component.menuOpen()).toBe(true);
+  });
+
+  it('clicking the hamburger button again sets menuOpen() back to false', () => {
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    const hamburger = nativeEl.querySelector('[data-testid="hamburger"]') as HTMLElement;
+    hamburger.click();
+    fixture.detectChanges();
+    hamburger.click();
+    fixture.detectChanges();
+    expect(component.menuOpen()).toBe(false);
+  });
 });
