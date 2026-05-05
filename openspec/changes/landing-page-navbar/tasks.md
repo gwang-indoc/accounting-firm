@@ -24,10 +24,10 @@
 
 ## 4. Responsive hamburger menu
 
-- [ ] 4.1 RED — write Jasmine test for `NavbarComponent`: on narrow viewport nav links are hidden and hamburger is visible; clicking hamburger sets `menuOpen()` to true; clicking again sets it to false
-- [ ] 4.2 GREEN — add `menuOpen = signal(false)` to `NavbarComponent`; add CSS media query hiding nav links below 768px and showing hamburger; drawer toggles on click; tests pass
-- [ ] 4.Z Run superpowers:requesting-code-review on the diff for group 4; address CRITICAL/HIGH findings before moving on
-- [ ] 4.Z+1 Update `docs/log/YYYY-MM-DD.md` — add entry for group 4 with commit hash, feature bullet points, code review findings, and test count
+- [x] 4.1 RED — write Jasmine test for `NavbarComponent`: on narrow viewport nav links are hidden and hamburger is visible; clicking hamburger sets `menuOpen()` to true; clicking again sets it to false
+- [x] 4.2 GREEN — add `menuOpen = signal(false)` to `NavbarComponent`; add CSS media query hiding nav links below 768px and showing hamburger; drawer toggles on click; tests pass
+- [x] 4.Z Run superpowers:requesting-code-review on the diff for group 4; address CRITICAL/HIGH findings before moving on
+- [x] 4.Z+1 Update `docs/log/YYYY-MM-DD.md` — add entry for group 4 with commit hash, feature bullet points, code review findings, and test count
 
 ## 5. Wire NavbarComponent into HomeComponent and add section anchors
 
