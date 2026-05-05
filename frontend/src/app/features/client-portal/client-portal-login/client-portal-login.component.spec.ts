@@ -39,12 +39,12 @@ describe('ClientPortalLoginComponent', () => {
     expect(dropdown).toBeNull();
   });
 
-  it('"Sign in with Google" link href is /api/auth/login', async () => {
+  it('"Sign in with Google" link href is /oauth2/authorization/google', async () => {
     const button = fixture.nativeElement.querySelector('[data-testid="client-login-btn"]');
     button.click();
     fixture.detectChanges();
     const link = fixture.nativeElement.querySelector('[data-testid="google-signin-link"]');
     expect(link).not.toBeNull();
-    expect(link.getAttribute('href')).toBe('/api/auth/login');
+    expect(link.getAttribute('href')).toBe('/oauth2/authorization/google');
   });
 });

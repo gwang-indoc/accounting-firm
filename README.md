@@ -58,19 +58,13 @@ SPRING_DATASOURCE_USERNAME=postgres
 SPRING_DATASOURCE_PASSWORD=postgres
 ```
 
-Load the file before starting the backend:
-
-```bash
-set -a && source .env && set +a
-```
-
-Or set them directly in **IntelliJ → Run → Edit Configurations → Environment variables**.
-
 ### 3. Start the backend
 
 ```bash
-cd backend && ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+./start.sh
 ```
+
+`start.sh` loads `.env` automatically and starts the backend. Make sure the `.env` file exists at the project root before running it.
 
 ### 4. Start the frontend
 
@@ -83,11 +77,8 @@ The Angular dev server proxies `/api/**` to the Spring Boot server at `localhost
 ## Backend Commands
 
 ```bash
-# Run the application
-cd backend && ./mvnw spring-boot:run
-
-# Run with a specific profile
-cd backend && ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+# Run the application (loads .env automatically)
+./start.sh
 
 # Build (skip tests)
 cd backend && ./mvnw clean package -DskipTests
