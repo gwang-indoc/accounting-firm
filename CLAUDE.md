@@ -105,6 +105,8 @@ All changes, specs, and archives live under `openspec/` at the project root.
 
 **Important — `/opsx:propose` + brainstorming:** `/opsx:propose` triggers `superpowers:brainstorming` first. When brainstorming finishes, it will try to invoke `superpowers:writing-plans` as its terminal state — **ignore that**. Return to the `/opsx:propose` flow and generate the OpenSpec artifacts (`proposal.md`, `design.md`, `tasks.md`). The `writing-plans` terminal state only applies when brainstorming is run standalone.
 
+**Important — confirmation before artifacts:** After brainstorming finishes and the design spec is written and committed, **stop and ask the user to confirm** before generating any OpenSpec artifacts. Do not auto-proceed. Wait for an explicit "yes" / "go ahead" before calling `openspec new change` or writing `proposal.md`, `design.md`, specs, or `tasks.md`.
+
 **Important — `/opsx:apply` required skills:** Before implementing any task, ALWAYS invoke these skills in order:
 1. `superpowers:test-driven-development` — at session start, before writing any code
 2. `superpowers:subagent-driven-development` — to dispatch a fresh subagent per `[parallel]` task with two-stage review (spec compliance, then code quality)
@@ -115,7 +117,14 @@ All changes, specs, and archives live under `openspec/` at the project root.
 - [ ] N.Z   Run superpowers:requesting-code-review on the diff for group N
 - [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — commit hash, feature bullets, review findings, test count
 ```
-For the final group, also include an E2E task (if UI is touched) and a verification task immediately before closing.
+For the final group (if UI is touched), include these two tasks immediately before `N.Z`:
+```
+- [ ] M.J Write/update Playwright E2E test under `e2e/` for the affected user flow; commit the file. Run:
+         1. ./start.sh                          # start backend
+         2. cd frontend && npm start            # start frontend
+         3. cd e2e && npx playwright test       # run E2E suite
+- [ ] M.K Run superpowers:verification-before-completion (cd backend && ./mvnw test; cd frontend && npx ng test --no-watch; grep for System.out.println + console.log; diff review)
+```
 
 ## Coding Guidelines
 
