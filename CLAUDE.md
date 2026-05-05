@@ -119,7 +119,11 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ## Dev Log Practice
 
-After completing each feature batch, the development log for that day must be updated.
+Every task group in `tasks.md` MUST include a log update step. When generating `tasks.md` (during `/opsx:propose`), add this task at the end of each `## N` group, after the code-review checkpoint:
+
+```
+- [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — add entry for group N with commit hash, feature bullet points, code review findings, and test count
+```
 
 Log file path: `docs/log/YYYY-MM-DD.md` — name the file by date. If the file for that day does not exist, create it.
 
@@ -143,7 +147,6 @@ Log file path: `docs/log/YYYY-MM-DD.md` — name the file by date. If the file f
 
 ### Rules
 
-- Update the log after each commit, or at the end of each feature batch.
+- Log update is a required task in every group — not optional, not deferred.
 - Use `- [ ]` for pending items and `- [x]` for completed items.
 - Keep a **To Do** section at the end of the log, listing the next batch of work or known issues.
-- The task checklist should always include an **update log** step.
