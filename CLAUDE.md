@@ -17,6 +17,8 @@ Web application for an accounting firm. Monorepo containing a Spring Boot backen
 accounting-firm/
 ├── backend/          # Spring Boot application
 ├── frontend/         # Angular application
+├── e2e/              # Playwright end-to-end tests
+├── docs/log/         # Daily dev logs (YYYY-MM-DD.md)
 └── openspec/         # OpenSpec change artifacts
 ```
 
@@ -27,21 +29,74 @@ accounting-firm/
 ### Key Architecture
 
 - **Package structure**: `com.gwhaitech.accountingfirm`
-- **Authentication**: Spring Security with Google OAuth2 (`spring-boot-starter-oauth2-client`). Google client ID/secret are in `application.yml` via environment variables `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.
-- **Database**: PostgreSQL with Spring Data JPA. Schema managed via Flyway migrations in `src/main/resources/db/migration/`.
-- **Configuration**: `application.yml` for defaults, `application-dev.yml` for local dev, `application-prod.yml` for production.
+- **Layers**: Controller → Service → Repository (Spring Data JPA)
+- **Authentication**: Spring Security with Google OAuth2 (`spring-boot-starter-oauth2-client`). OAuth2 entry point is `GET /oauth2/authorization/google` — **not** `/api/auth/login`. Google client ID/secret via env vars `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.
+- **JWT**: Issued as an `httpOnly`, `SameSite=Strict` cookie after OAuth2 success. Secret via `JWT_SECRET` env var — **must be at least 32 characters**.
+- **Database**: PostgreSQL with Spring Data JPA. Schema managed via Flyway migrations in `src/main/resources/db/migration/`. Never edit existing migrations — always create a new versioned file.
+- **Configuration**: `application.yml` (defaults), `application-dev.yml` (local dev), `application-prod.yml` (prod). All secrets via env vars — no hardcoded values.
+
+### Backend Tests
+
+- Tests live in `backend/src/test/java/` mirroring the main source layout.
+- Use `@DataJpaTest` for repository/entity slices, `@WebMvcTest` for controller slices, `@SpringBootTest` for integration tests.
+- **No Testcontainers** — Docker Desktop on macOS has API compatibility issues. Use `@DataJpaTest` + `@AutoConfigureTestDatabase(replace = NONE)` + `@TestPropertySource` pointing to the local PostgreSQL at `localhost:5432`.
+- **`useTestClasspath=false`** is set in the spring-boot-maven-plugin. This prevents `src/test/resources/application.yml` from leaking onto the `spring-boot:run` classpath.
+- Run all tests: `cd backend && ./mvnw test`
+- Run single class: `./mvnw test -Dtest=ClassName`
+
+### TDD Discipline
+
+Write the failing test first. **The RED phase must be verified** — run the test, confirm it fails with the expected message, then implement. Do not mark a RED task complete without running the test and seeing it fail.
+
+```
+- [ ] N.X RED  — write failing test → run ./mvnw test -Dtest=X → confirm FAILURE
+- [ ] N.X+1 GREEN — write minimal impl → run ./mvnw test -Dtest=X → confirm PASS
+```
 
 ## Frontend (Angular)
 
 ### Key Architecture
 
-- **Auth**: Angular integrates with the backend's Google OAuth2 flow. Auth state managed via a dedicated `AuthService`; HTTP interceptor attaches the session cookie or token to API requests.
-- **API communication**: `HttpClient` services under `src/app/core/services/`. Backend base URL configured via `environment.ts`.
-- **Routing**: Feature-based lazy-loaded modules.
+- **Angular version**: 21, standalone components, **zoneless** change detection (`provideZonelessChangeDetection()`). Do not use `provideZoneChangeDetection()` — Zone.js is not installed.
+- **Auth**: `AuthService` manages auth state via signals (`currentUser = signal<UserDto | null>(null)`, `isAuthenticated = computed(...)`). Bootstrapped via `APP_INITIALIZER` calling `loadCurrentUser()` before first render.
+- **HTTP**: `CredentialsInterceptor` attaches `withCredentials: true` to every request so the JWT cookie is sent automatically.
+- **Routing**: Feature-based lazy-loaded routes. `AuthGuard` protects `/portal/**` — redirects unauthenticated users to `/`.
+- **API communication**: `HttpClient` services under `src/app/core/services/`. Backend base URL in `environment.ts`.
+
+### Angular Dev Proxy
+
+`proxy.conf.json` forwards these paths to `http://localhost:8080`:
+
+| Path prefix | Purpose |
+|---|---|
+| `/api` | REST API calls |
+| `/oauth2` | OAuth2 authorization entry point |
+| `/login/oauth2` | OAuth2 callback handler |
+
+**All three are required.** Omitting `/oauth2` breaks the login flow — the browser stays on `localhost:4200` and never reaches Spring Security.
+
+### Frontend Tests
+
+- Vitest + Angular TestBed (not Karma/Jasmine). Use `vi.fn()` for mocks, `toBe(true)` not `toBeTrue()`.
+- Run all tests: `cd frontend && npx ng test --no-watch`
+- Run single file: `npx ng test --include='**/my.component.spec.ts'`
+
+## E2E Tests (Playwright)
+
+E2E tests live under `e2e/` at the project root. Run with:
+
+```bash
+cd e2e && npx playwright test          # all tests
+npx playwright test --grep "login"     # single test
+```
+
+**Requirements before running:** backend must be started (`./start.sh`) and frontend must be started (`cd frontend && npm start`).
+
+**When to add E2E tests:** every change that introduces or modifies a UI flow must include a Playwright test in `e2e/` covering that flow. Ad-hoc browser automation that is not saved to disk does not count — the test must be committed.
 
 ## Skills Available
 
-- `/git-commit-push` - Atomic git workflow
+- `/git-command-push` - Stage all, commit, and push in one step
 
 ## OpenSpec Workflow
 
@@ -55,9 +110,14 @@ All changes, specs, and archives live under `openspec/` at the project root.
 2. `superpowers:subagent-driven-development` — to dispatch a fresh subagent per `[parallel]` task with two-stage review (spec compliance, then code quality)
 3. `superpowers:requesting-code-review` — at each task-group checkpoint (`N.Z` tasks)
 
-## Coding Guidelines
+**Important — `tasks.md` required steps per group:** Every `## N` group must end with:
+```
+- [ ] N.Z   Run superpowers:requesting-code-review on the diff for group N
+- [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — commit hash, feature bullets, review findings, test count
+```
+For the final group, also include an E2E task (if UI is touched) and a verification task immediately before closing.
 
-Behavioral guidelines to reduce common LLM coding mistakes.
+## Coding Guidelines
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
@@ -67,7 +127,7 @@ Behavioral guidelines to reduce common LLM coding mistakes.
 
 Before implementing:
 - State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them - don't pick silently.
+- If multiple interpretations exist, present them — don't pick silently.
 - If a simpler approach exists, say so. Push back when warranted.
 - If something is unclear, stop. Name what's confusing. Ask.
 
@@ -91,7 +151,7 @@ When editing existing code:
 - Don't "improve" adjacent code, comments, or formatting.
 - Don't refactor things that aren't broken.
 - Match existing style, even if you'd do it differently.
-- If you notice unrelated dead code, mention it - don't delete it.
+- If you notice unrelated dead code, mention it — don't delete it.
 
 When your changes create orphans:
 - Remove imports/variables/functions that YOUR changes made unused.
@@ -116,6 +176,15 @@ For multi-step tasks, state a brief plan:
 ```
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+### 5. Checkbox Discipline
+
+**Mark each task complete immediately after finishing it. Never batch updates.**
+
+When working through `tasks.md`:
+- Update `- [ ]` to `- [x]` as soon as the task is done, before moving to the next one.
+- If a subagent completes work, the coordinator must update every checkbox that subagent finished before dispatching the next subagent.
+- A checkbox marked `[x]` means the work is done AND verified — not just "I think it's done".
 
 ## Dev Log Practice
 

@@ -34,6 +34,14 @@ context: |
   `npx ng test --no-watch` (CI). Single file:
   `npx ng test --include='**/my.component.spec.ts'`.
 
+  E2E tests: Playwright test suite under `e2e/` at the project root.
+  Run with `cd e2e && npx playwright test` (all) or
+  `npx playwright test --grep "<test name>"` (single test).
+  Tests require the backend (`./start.sh`) and frontend (`cd frontend && npm start`)
+  to be running before execution. E2E tests cover the full user flow for any
+  UI change introduced — each feature or bug fix that touches the UI surface
+  must have a corresponding Playwright test in `e2e/`.
+
   Conventions:
     - Database changes MUST be a new Flyway migration file; never edit
       existing migrations.
@@ -79,6 +87,6 @@ rules:
     - "Across groups, when 2+ '## N' groups touch disjoint files with no cross-group read/write dependency, prepend tasks.md (above '## 1') with a top-level line: 'Invoke superpowers:subagent-driven-development to dispatch groups <comma-separated list> in parallel; one subagent per group.' Only add this when group independence is genuinely true; default is sequential. The per-group review checkpoint (N.Z) still applies inside each parallel group."
     - "Each '## N' task group MUST end with a checkpoint task: '- [ ] N.Z Run superpowers:requesting-code-review on the diff for group N; address CRITICAL/HIGH findings before moving on'."
     - "The final task group MUST include a verification task: '- [ ] M.K Run superpowers:verification-before-completion (cd backend && ./mvnw test; cd frontend && npx ng test --no-watch; grep for System.out.println + console.log; diff review)'."
-    - "If the change touches the UI surface (any route or component under src/app/, or any client-rendered behavior), the final task group MUST include an E2E test task placed IMMEDIATELY BEFORE the verification-before-completion task. Pattern: '- [ ] M.K E2E test — start backend (`./mvnw spring-boot:run -Dspring-boot.run.profiles=dev`) and frontend (`npm start`), then <explicit URL + user actions + expected outcomes>' for a manual end-to-end walkthrough, OR '- [ ] M.K Automated E2E test via mcp__plugin_playwright_playwright__* tools — <explicit flow>' when the runner can drive a headless browser. Pure backend/migration/test-only changes are exempt."
+    - "If the change touches the UI surface (any route or component under src/app/, or any client-rendered behavior), the final task group MUST include an E2E test task placed IMMEDIATELY BEFORE the verification-before-completion task. Add or update a Playwright test file under `e2e/` covering the affected user flow (explicit URL + user actions + expected outcomes). Run with `cd e2e && npx playwright test`. The test must be committed to the repo — ad-hoc browser automation that is not saved to disk does NOT count. Pure backend/migration/test-only changes are exempt."
     - "Tasks SHOULD explicitly name the superpowers skill to invoke when relevant (e.g., 'Invoke superpowers:test-driven-development to scaffold tests for the new service method')."
     - "CHECKBOX DISCIPLINE: After completing each task, immediately update its checkbox from '- [ ]' to '- [x]' in tasks.md before moving on to the next task. Never batch checkbox updates. If a subagent completes the work, the coordinator MUST update the checkboxes for every task that subagent finished before dispatching the next subagent."
