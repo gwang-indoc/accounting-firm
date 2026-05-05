@@ -7,13 +7,13 @@
 
 ## 2. Navigation links — scroll and routing [parallel]
 
-- [ ] 2.0 Invoke superpowers:subagent-driven-development to dispatch the [parallel] units in this group; one subagent owns one RED+GREEN pair end-to-end including self-review
-- [ ] 2.1 RED — write Jasmine test for `NavbarComponent`: Services and Security links have correct `href` anchors (`#services`, `#security`); Contact and Book Consultation links navigate to `/contact` [parallel]
-- [ ] 2.2 GREEN — add nav links to `NavbarComponent` template with `[routerLink]` for Contact/Book Consultation and `href` anchors for Services/Security; tests pass [parallel]
-- [ ] 2.3 RED — create `ContactComponent` spec: navigating to `/contact` renders "Contact Us" heading [parallel]
-- [ ] 2.4 GREEN — create `src/app/features/contact/contact.component.{ts,html,css}`; add lazy-loaded `/contact` route in `app.routes.ts`; tests pass [parallel]
-- [ ] 2.Z Run superpowers:requesting-code-review on the diff for group 2; address CRITICAL/HIGH findings before moving on
-- [ ] 2.Z+1 Update `docs/log/YYYY-MM-DD.md` — add entry for group 2 with commit hash, feature bullet points, code review findings, and test count
+- [x] 2.0 Invoke superpowers:subagent-driven-development to dispatch the [parallel] units in this group; one subagent owns one RED+GREEN pair end-to-end including self-review
+- [x] 2.1 RED — write Jasmine test for `NavbarComponent`: Services and Security links have correct `href` anchors (`#services`, `#security`); Contact and Book Consultation links navigate to `/contact` [parallel]
+- [x] 2.2 GREEN — add nav links to `NavbarComponent` template with `[routerLink]` for Contact/Book Consultation and `href` anchors for Services/Security; tests pass [parallel]
+- [x] 2.3 RED — create `ContactComponent` spec: navigating to `/contact` renders "Contact Us" heading [parallel]
+- [x] 2.4 GREEN — create `src/app/features/contact/contact.component.{ts,html,css}`; add lazy-loaded `/contact` route in `app.routes.ts`; tests pass [parallel]
+- [x] 2.Z Run superpowers:requesting-code-review on the diff for group 2; address CRITICAL/HIGH findings before moving on
+- [x] 2.Z+1 Update `docs/log/YYYY-MM-DD.md` — add entry for group 2 with commit hash, feature bullet points, code review findings, and test count
 
 ## 3. Client Portal nav link — wire ClientPortalLoginComponent into NavbarComponent
 
