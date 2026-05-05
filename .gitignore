@@ -34,7 +34,7 @@ Thumbs.db
 
 # Testing
 coverage/
-
+temp/
 # Package manager lock files (keep one, remove others as appropriate)
 # yarn.lock
 # package-lock.json
