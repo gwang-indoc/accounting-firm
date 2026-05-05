@@ -30,7 +30,7 @@
     >中文</button>
   </div>
 
-  <button class="hamburger" data-testid="hamburger" (click)="menuOpen.update(v => !v)">☰</button>
+  <button class="hamburger" data-testid="hamburger" (click)="menuOpen.update(v => !v)">{{ menuOpen() ? '✕' : '☰' }}</button>
 </nav>
 
 @if (menuOpen()) {

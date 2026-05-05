@@ -106,17 +106,48 @@
 }
 
 .mobile-drawer {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  position: fixed;
+  top: 68px;
+  left: 0;
+  right: 0;
+  z-index: 99;
   background-color: #0f172a;
-  padding: 16px 24px;
+  padding: 16px;
+  border-top: 1px solid #1e293b;
 }
 
 .mobile-drawer a {
   color: #e2e8f0;
   text-decoration: none;
   font-size: 15px;
+  padding: 14px 8px;
+  border-bottom: 1px solid #1e293b;
+  display: block;
+}
+
+.mobile-drawer a.cta-btn {
+  background: #ffffff;
+  color: #0f172a;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 15px;
+  text-align: center;
+  margin-top: 12px;
+  border-bottom: none;
+  display: block;
+}
+
+.mobile-drawer app-client-portal-login {
+  display: block;
+  border-bottom: 1px solid #1e293b;
+}
+
+.mobile-drawer .lang-toggle {
+  display: flex;
+  gap: 8px;
+  padding: 14px 8px;
+  border-top: 1px solid #1e293b;
 }
 
 @media (max-width: 767px) {
@@ -126,6 +157,10 @@
 
   .lang-toggle {
     display: none;
+  }
+
+  .mobile-drawer .lang-toggle {
+    display: flex;
   }
 
   .hamburger {
