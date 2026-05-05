@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { ClientPortalLoginComponent } from '../client-portal/client-portal-login/client-portal-login.component';
+import { NavbarComponent } from '../../shared/navbar/navbar.component';
 
 @Component({
   selector: 'app-home',
-  imports: [ClientPortalLoginComponent],
+  imports: [NavbarComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
