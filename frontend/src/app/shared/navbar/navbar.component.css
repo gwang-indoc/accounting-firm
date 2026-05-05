@@ -1,4 +1,10 @@
 .navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -42,6 +48,29 @@
   color: #38bdf8;
   font-size: 12px;
   line-height: 1.2;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-links a {
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.cta-btn {
+  background: #ffffff;
+  color: #0f172a;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .lang-toggle {

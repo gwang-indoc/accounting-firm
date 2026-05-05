@@ -1,5 +1,29 @@
 import { test, expect } from '@playwright/test';
 
+test('navbar is fixed to the top', async ({ page }) => {
+  await page.goto('/');
+  const position = await page.locator('.navbar').evaluate(el =>
+    getComputedStyle(el).position
+  );
+  expect(position).toBe('fixed');
+});
+
+test('nav-links are displayed horizontally', async ({ page }) => {
+  await page.goto('/');
+  const display = await page.locator('.nav-links').evaluate(el =>
+    getComputedStyle(el).display
+  );
+  expect(display).toBe('flex');
+});
+
+test('Book Consultation renders as white button', async ({ page }) => {
+  await page.goto('/');
+  const bg = await page.locator('a.cta-btn').evaluate(el =>
+    getComputedStyle(el).backgroundColor
+  );
+  expect(bg).toBe('rgb(255, 255, 255)');
+});
+
 test('navbar is visible with logo and nav links', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('app-navbar')).toBeVisible();

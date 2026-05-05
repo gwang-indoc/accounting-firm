@@ -8,7 +8,7 @@ Pure CSS bug fix: add 4 missing rules to `navbar.component.css` so the running a
 
 ## 1. Fix Missing CSS Rules
 
-- [ ] 1.1 RED — extend `e2e/navbar.spec.ts` with a test asserting the navbar is fixed and the CTA button is styled. The test should:
+- [x] 1.1 RED — extend `e2e/navbar.spec.ts` with a test asserting the navbar is fixed and the CTA button is styled. The test should:
   - Navigate to `http://localhost:4200`
   - Assert `position: fixed` on `.navbar` via `page.evaluate(() => getComputedStyle(document.querySelector('.navbar')).position)` → `'fixed'`
   - Assert `display: flex` on `.nav-links` via computed style
@@ -41,11 +41,11 @@ Pure CSS bug fix: add 4 missing rules to `navbar.component.css` so the running a
   });
   ```
 
-- [ ] 1.2 Verify RED: Start frontend (`cd frontend && npm start`), then run
+- [x] 1.2 Verify RED: Start frontend (`cd frontend && npm start`), then run
   `cd e2e && npx playwright test --grep "fixed|horizontally|white button"`
   Confirm all 3 new tests FAIL before the CSS is added.
 
-- [ ] 1.3 GREEN — add the 4 missing CSS rules to `frontend/src/app/shared/navbar/navbar.component.css`:
+- [x] 1.3 GREEN — add the 4 missing CSS rules to `frontend/src/app/shared/navbar/navbar.component.css`:
 
   **Rule 1 — Fixed positioning (add to existing `.navbar` block):**
   ```css
@@ -89,7 +89,7 @@ Pure CSS bug fix: add 4 missing rules to `navbar.component.css` so the running a
   }
   ```
 
-- [ ] 1.4 Verify GREEN (unit tests): `cd frontend && npx ng test --no-watch`
+- [x] 1.4 Verify GREEN (unit tests): `cd frontend && npx ng test --no-watch`
   Expected: all 30 existing tests pass (CSS rules have no bearing on TestBed assertions).
 
 - [ ] 1.5 Commit: `git add frontend/src/app/shared/navbar/navbar.component.css e2e/navbar.spec.ts && git commit -m "fix: add 4 missing CSS rules to NavbarComponent"`
