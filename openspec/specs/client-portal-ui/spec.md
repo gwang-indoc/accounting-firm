@@ -1,22 +1,23 @@
 ## ADDED Requirements
 
-### Requirement: Landing page displays a persistent navbar with Client Login button
-The system SHALL render a landing page at `/` with a navbar that is always visible. The navbar SHALL contain the firm name on the left and a "Client Login" button on the right.
+### Requirement: Client Portal login entry point is a navbar nav link
+The `ClientPortalLoginComponent` is rendered as the "Client Portal" nav link inside `NavbarComponent`. The component itself — its dropdown, Google OAuth2 link, open/close behaviour, and all tests — is unchanged. Only its host location changed from `HomeComponent` to `NavbarComponent`.
 
-#### Scenario: Navbar visible on landing page
-- **WHEN** a user navigates to `/`
-- **THEN** the navbar is rendered with the firm name and "Client Login" button visible
+#### Scenario: Client Portal nav link opens login dropdown
+- **WHEN** the user clicks "Client Portal" in the navbar
+- **THEN** the `ClientPortalLoginComponent` dropdown opens showing "Sign in with Google"
+- **THEN** clicking "Sign in with Google" navigates to `GET /oauth2/authorization/google`
 
-#### Scenario: Navbar visible when scrolling
-- **WHEN** the user scrolls down the landing page
-- **THEN** the navbar remains fixed at the top of the viewport
+#### Scenario: Click outside closes dropdown
+- **WHEN** the dropdown is open and the user clicks outside it
+- **THEN** the dropdown closes
 
-### Requirement: Client Login button opens a dropdown popover
-The system SHALL display a dropdown popover directly below the "Client Login" navbar button when it is clicked. The popover SHALL contain a portal title, brief description, "Sign in with Google" button, and a security label.
+### Requirement: Client Portal dropdown popover
+The system SHALL display a dropdown popover directly below the "Client Portal" nav link when it is clicked. The popover SHALL contain a portal title, brief description, "Sign in with Google" button, and a security label.
 
 #### Scenario: Click opens the dropdown
-- **WHEN** the user clicks the "Client Login" button
-- **THEN** a dropdown popover appears below the button
+- **WHEN** the user clicks the "Client Portal" nav link
+- **THEN** a dropdown popover appears below the link
 - **THEN** the popover contains a "Sign in with Google" button
 
 #### Scenario: Click outside dismisses the dropdown
