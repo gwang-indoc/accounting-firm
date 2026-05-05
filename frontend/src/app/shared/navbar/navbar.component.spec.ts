@@ -79,4 +79,20 @@ describe('NavbarComponent', () => {
     const ctaLink = ctaLinks.find((a) => a.textContent?.trim() === 'Book Consultation');
     expect(ctaLink).not.toBeUndefined();
   });
+
+  it('"Client Portal" renders <app-client-portal-login> inside navbar', () => {
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    const clientPortalEl = nativeEl.querySelector('app-client-portal-login');
+    expect(clientPortalEl).not.toBeNull();
+  });
+
+  it('clicking "Client Login" button inside <app-client-portal-login> shows the login dropdown', () => {
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    const loginBtn = nativeEl.querySelector('[data-testid="client-login-btn"]') as HTMLElement;
+    expect(loginBtn).not.toBeNull();
+    loginBtn.click();
+    fixture.detectChanges();
+    const dropdown = nativeEl.querySelector('.login-dropdown');
+    expect(dropdown).not.toBeNull();
+  });
 });
