@@ -1,0 +1,68 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #0f172a;
+  padding: 0 24px;
+  height: 64px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  width: 42px;
+  height: 42px;
+  background-color: #1e293b;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.company-name {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.tagline {
+  color: #38bdf8;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.lang-toggle {
+  display: flex;
+  gap: 4px;
+}
+
+.lang-pill {
+  padding: 4px 12px;
+  border-radius: 9999px;
+  border: 1px solid #334155;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.lang-pill.active {
+  background-color: #38bdf8;
+  color: #0f172a;
+  border-color: #38bdf8;
+  font-weight: 600;
+}
