@@ -123,6 +123,8 @@ For the final group (if UI is touched), include these two tasks immediately befo
          1. ./start.sh                          # start backend
          2. cd frontend && npm start            # start frontend
          3. cd e2e && npx playwright test       # run E2E suite
+         4. kill $(lsof -ti :4200)              # stop frontend
+         5. kill $(lsof -ti :8080)              # stop backend
 - [ ] M.K Run superpowers:verification-before-completion (cd backend && ./mvnw test; cd frontend && npx ng test --no-watch; grep for System.out.println + console.log; diff review)
 ```
 
