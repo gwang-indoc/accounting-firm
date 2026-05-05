@@ -17,10 +17,10 @@
 
 ## 3. Client Portal nav link — wire ClientPortalLoginComponent into NavbarComponent
 
-- [ ] 3.1 RED — write Jasmine test for `NavbarComponent`: "Client Portal" renders `<app-client-portal-login />`; clicking it opens the dropdown; clicking outside closes it
-- [ ] 3.2 GREEN — import `ClientPortalLoginComponent` into `NavbarComponent`; render as "Client Portal" nav item; tests pass
-- [ ] 3.Z Run superpowers:requesting-code-review on the diff for group 3; address CRITICAL/HIGH findings before moving on
-- [ ] 3.Z+1 Update `docs/log/YYYY-MM-DD.md` — add entry for group 3 with commit hash, feature bullet points, code review findings, and test count
+- [x] 3.1 RED — write Jasmine test for `NavbarComponent`: "Client Portal" renders `<app-client-portal-login />`; clicking it opens the dropdown; clicking outside closes it
+- [x] 3.2 GREEN — import `ClientPortalLoginComponent` into `NavbarComponent`; render as "Client Portal" nav item; tests pass
+- [x] 3.Z Run superpowers:requesting-code-review on the diff for group 3; address CRITICAL/HIGH findings before moving on
+- [x] 3.Z+1 Update `docs/log/YYYY-MM-DD.md` — add entry for group 3 with commit hash, feature bullet points, code review findings, and test count
 
 ## 4. Responsive hamburger menu
 
