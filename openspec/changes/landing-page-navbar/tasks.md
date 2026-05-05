@@ -31,10 +31,10 @@
 
 ## 5. Wire NavbarComponent into HomeComponent and add section anchors
 
-- [ ] 5.1 RED — update `HomeComponent` spec: renders `<app-navbar />`; landing page has `id="services"` and `id="security"` section anchors
-- [ ] 5.2 GREEN — replace inline `<nav>` in `home.component.html` with `<app-navbar />`; import `NavbarComponent`; remove old navbar CSS; add `id="services"` to services section, add `<section id="security">` placeholder; tests pass
-- [ ] 5.Z Run superpowers:requesting-code-review on the diff for group 5; address CRITICAL/HIGH findings before moving on
-- [ ] 5.Z+1 Update `docs/log/YYYY-MM-DD.md` — add entry for group 5 with commit hash, feature bullet points, code review findings, and test count
+- [x] 5.1 RED — update `HomeComponent` spec: renders `<app-navbar />`; landing page has `id="services"` and `id="security"` section anchors
+- [x] 5.2 GREEN — replace inline `<nav>` in `home.component.html` with `<app-navbar />`; import `NavbarComponent`; remove old navbar CSS; add `id="services"` to services section, add `<section id="security">` placeholder; tests pass
+- [x] 5.Z Run superpowers:requesting-code-review on the diff for group 5; address CRITICAL/HIGH findings before moving on
+- [x] 5.Z+1 Update `docs/log/YYYY-MM-DD.md` — add entry for group 5 with commit hash, feature bullet points, code review findings, and test count
 
 ## 6. E2E, verification, and styling polish
 
