@@ -18,21 +18,24 @@ test('nav-links are displayed horizontally', async ({ page }) => {
 
 test('Book Consultation renders as white button', async ({ page }) => {
   await page.goto('/');
-  const bg = await page.locator('a.cta-btn').evaluate(el =>
-    getComputedStyle(el).backgroundColor
-  );
-  expect(bg).toBe('rgb(255, 255, 255)');
+  const styles = await page.locator('a.cta-btn').evaluate(el => {
+    const cs = getComputedStyle(el);
+    return { backgroundColor: cs.backgroundColor, color: cs.color };
+  });
+  expect(styles.backgroundColor).toBe('rgb(255, 255, 255)');
+  expect(styles.color).toBe('rgb(15, 23, 42)');
 });
 
 test('navbar is visible with logo and nav links', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('app-navbar')).toBeVisible();
+  // Use .navbar (the fixed inner element) not app-navbar (host has 0 height when fixed)
+  await expect(page.locator('.navbar')).toBeVisible();
   await expect(page.locator('.logo-icon')).toContainText('税');
-  await expect(page.locator('app-navbar')).toContainText('GWH Accounting');
-  await expect(page.locator('app-navbar')).toContainText('Services');
-  await expect(page.locator('app-navbar')).toContainText('Security');
-  await expect(page.locator('app-navbar')).toContainText('Contact');
-  await expect(page.locator('app-navbar')).toContainText('Book Consultation');
+  await expect(page.locator('.navbar')).toContainText('GWH Accounting');
+  await expect(page.locator('.navbar')).toContainText('Services');
+  await expect(page.locator('.navbar')).toContainText('Security');
+  await expect(page.locator('.navbar')).toContainText('Contact');
+  await expect(page.locator('.navbar')).toContainText('Book Consultation');
 });
 
 test('language toggle switches active pill', async ({ page }) => {

@@ -92,15 +92,15 @@ Pure CSS bug fix: add 4 missing rules to `navbar.component.css` so the running a
 - [x] 1.4 Verify GREEN (unit tests): `cd frontend && npx ng test --no-watch`
   Expected: all 30 existing tests pass (CSS rules have no bearing on TestBed assertions).
 
-- [ ] 1.5 Commit: `git add frontend/src/app/shared/navbar/navbar.component.css e2e/navbar.spec.ts && git commit -m "fix: add 4 missing CSS rules to NavbarComponent"`
+- [x] 1.5 Commit: `git add frontend/src/app/shared/navbar/navbar.component.css e2e/navbar.spec.ts && git commit -m "fix: add 4 missing CSS rules to NavbarComponent"`
 
-- [ ] 1.6 Write/update full Playwright E2E test suite in `e2e/navbar.spec.ts` — confirm the new layout tests are included. Run the full E2E suite:
+- [x] 1.6 Write/update full Playwright E2E test suite in `e2e/navbar.spec.ts` — confirm the new layout tests are included. Run the full E2E suite:
   1. `./start.sh`                        ← start backend
   2. `cd frontend && npm start`          ← start frontend
   3. `cd e2e && npx playwright test`     ← run full E2E suite
   Expected: all tests pass including the 3 new navbar layout tests.
 
-- [ ] 1.7 Run superpowers:verification-before-completion:
+- [x] 1.7 Run superpowers:verification-before-completion:
   - `cd backend && ./mvnw test`
   - `cd frontend && npx ng test --no-watch`
   - `grep -r "console\.log\|System\.out\.println" frontend/src backend/src --include="*.ts" --include="*.java"`
