@@ -108,4 +108,4 @@ Pure CSS bug fix: add 4 missing rules to `navbar.component.css` so the running a
 
 - [x] 1.8 Run superpowers:requesting-code-review on the diff for group 1; address CRITICAL/HIGH findings before moving on
 
-- [ ] 1.9 Update `docs/log/2026-05-05.md` — add entry for group 1 with commit hash, feature bullet points, code review findings, and test count
+- [x] 1.9 Update `docs/log/2026-05-05.md` — add entry for group 1 with commit hash, feature bullet points, code review findings, and test count
