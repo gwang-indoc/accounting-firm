@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterModule } from '@angular/router';
 import { NavbarComponent } from './navbar.component';
 
 describe('NavbarComponent', () => {
@@ -7,7 +8,7 @@ describe('NavbarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NavbarComponent],
+      imports: [NavbarComponent, RouterModule.forRoot([])],
     }).compileComponents();
     fixture = TestBed.createComponent(NavbarComponent);
     component = fixture.componentInstance;
@@ -49,5 +50,33 @@ describe('NavbarComponent', () => {
     enBtn.click();
     fixture.detectChanges();
     expect(component.lang()).toBe('en');
+  });
+
+  it('"Services" link has href="#services"', () => {
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    const link = nativeEl.querySelector('a[href="#services"]');
+    expect(link).not.toBeNull();
+    expect(link!.textContent).toContain('Services');
+  });
+
+  it('"Security" link has href="#security"', () => {
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    const link = nativeEl.querySelector('a[href="#security"]');
+    expect(link).not.toBeNull();
+    expect(link!.textContent).toContain('Security');
+  });
+
+  it('"Contact" link has routerLink="/contact"', () => {
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    const contactLink = nativeEl.querySelector('a[routerLink="/contact"]');
+    expect(contactLink).not.toBeNull();
+    expect(contactLink!.textContent?.trim()).toBe('Contact');
+  });
+
+  it('"Book Consultation" link has routerLink="/contact"', () => {
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    const ctaLinks = Array.from(nativeEl.querySelectorAll('a[routerLink="/contact"]'));
+    const ctaLink = ctaLinks.find((a) => a.textContent?.trim() === 'Book Consultation');
+    expect(ctaLink).not.toBeUndefined();
   });
 });
