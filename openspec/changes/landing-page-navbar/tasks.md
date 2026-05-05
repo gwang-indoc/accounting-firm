@@ -38,8 +38,8 @@
 
 ## 6. E2E, verification, and styling polish
 
-- [ ] 6.1 Set up Playwright under `e2e/` if not already present (`cd e2e && npm init playwright@latest` or equivalent); configure `baseURL: http://localhost:4200`
-- [ ] 6.2 Write Playwright E2E test `e2e/navbar.spec.ts`:
+- [x] 6.1 Set up Playwright under `e2e/` if not already present (`cd e2e && npm init playwright@latest` or equivalent); configure `baseURL: http://localhost:4200`
+- [x] 6.2 Write Playwright E2E test `e2e/navbar.spec.ts`:
   - Navigate to `http://localhost:4200` — assert navbar visible with logo, nav links, language toggle, Book Consultation button
   - Click "Services" — assert page scrolls to `#services`
   - Click "Client Portal" — assert dropdown appears with "Sign in with Google"
@@ -49,7 +49,7 @@
   - Click "Book Consultation" — assert URL becomes `/contact`
   - Resize to 375px width — assert hamburger visible, nav links hidden
   - Click hamburger — assert drawer opens with nav links
-- [ ] 6.3 Run `cd frontend && npm run lint` — fix any lint errors
-- [ ] 6.4 Run superpowers:verification-before-completion (`cd backend && ./mvnw test`; `cd frontend && npx ng test --no-watch`; `cd e2e && npx playwright test`; grep for `System.out.println` + `console.log`; diff review)
-- [ ] 6.Z Run superpowers:requesting-code-review on the diff for group 6; address CRITICAL/HIGH findings before moving on
-- [ ] 6.Z+1 Update `docs/log/YYYY-MM-DD.md` — add entry for group 6 with commit hash, feature bullet points, code review findings, and test count
+- [x] 6.3 Run `cd frontend && npm run lint` — fix any lint errors (no lint script configured — skipped)
+- [x] 6.4 Run superpowers:verification-before-completion (`cd backend && ./mvnw test`; `cd frontend && npx ng test --no-watch`; `cd e2e && npx playwright test`; grep for `System.out.println` + `console.log`; diff review)
+- [x] 6.Z Run superpowers:requesting-code-review on the diff for group 6; address CRITICAL/HIGH findings before moving on
+- [x] 6.Z+1 Update `docs/log/YYYY-MM-DD.md` — add entry for group 6 with commit hash, feature bullet points, code review findings, and test count
