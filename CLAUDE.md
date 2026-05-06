@@ -72,6 +72,8 @@ A failing baseline must be fixed before new work begins.
 
 ## Frontend (Angular)
 
+> **UI Design Guide:** `docs/ui-design-guide.md` — covers the Angular Material component library, colour tokens, typography, spacing, layout conventions, and accessibility rules. Consult it before building any new UI component.
+
 ### Key Architecture
 
 - **Angular version**: 21, standalone components, **zoneless** change detection (`provideZonelessChangeDetection()`). Do not use `provideZoneChangeDetection()` — Zone.js is not installed.
