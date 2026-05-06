@@ -19,7 +19,7 @@ public class User {
     @Column(name = "google_sub", nullable = true, unique = true)
     private String googleSub;
 
-    @Column(name = "password_hash", nullable = true)
+    @Column(name = "password_hash")
     private String passwordHash;
 
     @Column(nullable = false, length = 50)
