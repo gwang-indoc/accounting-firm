@@ -9,11 +9,12 @@ import { AuthService } from '../../../core/services/auth.service';
 describe('LoginEmailComponent', () => {
   let fixture: ComponentFixture<LoginEmailComponent>;
   let component: LoginEmailComponent;
-  const authServiceMock = { loginWithEmail: vi.fn() };
+  const authServiceMock = { loginWithEmail: vi.fn(), loadCurrentUser: vi.fn().mockResolvedValue(undefined) };
   const routerMock = { navigate: vi.fn() };
 
   beforeEach(async () => {
     authServiceMock.loginWithEmail.mockReset();
+    authServiceMock.loadCurrentUser.mockReset().mockResolvedValue(undefined);
     routerMock.navigate.mockReset();
 
     await TestBed.configureTestingModule({
@@ -47,12 +48,13 @@ describe('LoginEmailComponent', () => {
     expect(errorDiv).not.toBeNull();
   });
 
-  it('(b) successful login navigates to /portal', () => {
+  it('(b) successful login navigates to /portal/dashboard', async () => {
     authServiceMock.loginWithEmail.mockReturnValue(of(undefined));
 
     component.form.setValue({ email: 'user@example.com', password: 'correctpass' });
     component.submit();
+    await fixture.whenStable();
 
-    expect(routerMock.navigate).toHaveBeenCalledWith(['/portal']);
+    expect(routerMock.navigate).toHaveBeenCalledWith(['/portal/dashboard']);
   });
 });

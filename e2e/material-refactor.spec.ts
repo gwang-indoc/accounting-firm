@@ -19,19 +19,10 @@ test.describe('Material refactor — desktop', () => {
     await expect(toolbar).toContainText('Book Consultation');
   });
 
-  test('Client Login MatMenu opens on click', async ({ page }) => {
+  test('Client Login link navigates to /login', async ({ page }) => {
     await page.goto('/');
     await page.click('[data-testid="client-login-btn"]');
-    await expect(page.locator('[data-testid="google-signin-link"]')).toBeVisible();
-    await expect(page.locator('[data-testid="google-signin-link"]')).toContainText('Sign in with Google');
-  });
-
-  test('Client Login MatMenu closes on Escape', async ({ page }) => {
-    await page.goto('/');
-    await page.click('[data-testid="client-login-btn"]');
-    await expect(page.locator('[data-testid="google-signin-link"]')).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(page.locator('[data-testid="google-signin-link"]')).not.toBeVisible();
+    await expect(page).toHaveURL(/\/login$/);
   });
 
   test('Book Consultation navigates to /contact', async ({ page }) => {
@@ -63,16 +54,12 @@ test.describe('Material refactor — mobile (375px)', () => {
     await expect(page.locator('mat-sidenav')).toContainText('Book Consultation');
   });
 
-  test('Client Login inline expansion toggles inside sidenav', async ({ page }) => {
+  test('Client Login in sidenav navigates to /login', async ({ page }) => {
     await page.goto('/');
     await page.click('[data-testid="hamburger"]');
     await expect(page.locator('.mat-drawer-backdrop')).toHaveClass(/mat-drawer-shown/);
-    // Expand Client Login
-    await page.locator('mat-sidenav mat-list-item:has-text("Client Login")').click();
-    await expect(page.locator('mat-sidenav .sidenav-google-signin-btn')).toBeVisible();
-    // Collapse
-    await page.locator('mat-sidenav mat-list-item:has-text("Client Login")').click();
-    await expect(page.locator('mat-sidenav .sidenav-google-signin-btn')).not.toBeVisible();
+    await page.locator('mat-sidenav a[routerLink="/login"]').click();
+    await expect(page).toHaveURL(/\/login$/);
   });
 
   test('tapping scrim closes MatSidenav', async ({ page }) => {

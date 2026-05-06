@@ -23,7 +23,7 @@ app:
     secret: ${JWT_SECRET}
     expiration-ms: 86400000
   cookie:
-    secure: true
+    secure: false
     same-site: Strict
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}

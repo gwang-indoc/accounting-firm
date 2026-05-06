@@ -30,7 +30,10 @@ export class LoginEmailComponent {
     if (this.form.invalid) return;
     this.loginError.set(false);
     this.authService.loginWithEmail(this.form.value).subscribe({
-      next: () => this.router.navigate(['/portal']),
+      next: async () => {
+        await this.authService.loadCurrentUser();
+        this.router.navigate(['/portal/dashboard']);
+      },
       error: (err: HttpErrorResponse) => {
         if (err.status === 401) {
           this.loginError.set(true);
