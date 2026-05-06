@@ -5,7 +5,7 @@
 - [x] 1.1 RED — write failing test: `npx ng test --include='**/app.config.spec.ts'` asserts `provideAnimationsAsync` is in the providers array → confirm FAILURE; paste RED output into dev log
 - [x] 1.2 Run `ng add @angular/material` in `frontend/` — select "Custom" theme, enable animations; verify `@angular/material` and `@angular/cdk` appear in `package.json`
 - [x] 1.3 GREEN — add `provideAnimationsAsync()` to `app.config.ts` providers → `npx ng test --include='**/app.config.spec.ts'` → confirm PASS
-- [ ] 1.4 RED — write failing E2E test in `e2e/material-theme.spec.ts`: assert `getComputedStyle(document.querySelector('body')).backgroundColor` equals `rgb(241, 245, 249)` → confirm FAILURE; paste RED output into dev log
+- [x] 1.4 RED — write failing E2E test in `e2e/material-theme.spec.ts`: assert `getComputedStyle(document.querySelector('body')).backgroundColor` equals `rgb(241, 245, 249)` → confirm FAILURE; paste RED output into dev log
 - [x] 1.5 Define custom Material theme in `styles.css`: `mat.define-theme()` with `$azure-palette` primary, light type; `mat-toolbar.mat-primary { background: #0f172a; color: #fff }`; `body { background: #f1f5f9 }` → GREEN: `npx ng test --no-watch` all pass
 - [x] 1.6 Run superpowers:requesting-code-review on the diff for group 1; address CRITICAL/HIGH findings before moving on
 - [x] 1.7 Update `docs/log/2026-05-06.md` — commit hash, feature bullets, review findings, test count, TDD evidence (RED failure lines for new tests)

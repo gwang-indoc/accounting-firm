@@ -2,15 +2,14 @@
 
 ### Requirement: NavbarComponent renders full navigation bar
 
-The system SHALL render a `NavbarComponent` (`<app-navbar />`) at the top of every page that uses it. The navbar SHALL be fixed at the top of the viewport with a dark navy (`#0f172a`) background and a height of 68px. The navbar SHALL use `position: fixed; top: 0; left: 0; right: 0; z-index: 100` (no `width: 100%` — `left: 0; right: 0` already constrains the element to viewport width without causing padding overflow) so it remains visible as the user scrolls.
+The system SHALL render a `NavbarComponent` (`<app-navbar />`) at the top of every page. The navbar SHALL use `<mat-toolbar color="primary">` with `position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 68px`. The toolbar background SHALL be `#0f172a` (dark navy) via the Material custom theme. Navigation links SHALL be `mat-button` elements with `color` defaulting to white. The "Book Consultation" CTA SHALL be an `<a mat-flat-button>` with `background: #fff; color: #0f172a`.
 
 #### Scenario: Navbar structure on desktop
 
 - **WHEN** the viewport width is ≥ 768px
-- **THEN** the navbar displays left-to-right: logo section, navigation links (Services · Security · Client Portal · Contact), Book Consultation CTA button, language toggle
-- **THEN** navigation links are laid out horizontally in a single row using `display: flex; align-items: center; gap: 20px`
-- **THEN** each navigation link (including the "Client Login" trigger button) has colour `#cbd5e1`, `text-decoration: none`, `font-size: 14px`, `font-weight: 500`, `background: transparent`, `border: none`
-- **THEN** the "Book Consultation" link renders as a white button with `background: #fff; color: #0f172a; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 700`
+- **THEN** the navbar displays inside a `mat-toolbar`: logo section, `mat-button` nav links (Services · Security · Client Login · Contact), Book Consultation `mat-flat-button`, language toggle pills
+- **THEN** the "Client Login" trigger is a `mat-button` with `[matMenuTrigger]` attached
+- **THEN** the "Book Consultation" renders as a white flat button with `color: #0f172a`
 - **THEN** the navbar stays fixed at the top as the user scrolls
 
 #### Scenario: Logo section
@@ -40,7 +39,7 @@ The system SHALL render a `NavbarComponent` (`<app-navbar />`) at the top of eve
 
 #### Scenario: Default language is English
 - **WHEN** the navbar first renders
-- **THEN** the "EN" pill is active (white background) and "中文" is inactive
+- **THEN** the "EN" pill is active (sky-blue background `#38bdf8`) and "中文" is inactive
 
 #### Scenario: Clicking 中文 activates Chinese
 - **WHEN** the user clicks "中文"
@@ -51,30 +50,35 @@ The system SHALL render a `NavbarComponent` (`<app-navbar />`) at the top of eve
 - **WHEN** `lang()` is `'zh'` and the user clicks "EN"
 - **THEN** `lang()` returns `'en'` and "EN" pill is active
 
-### Requirement: Navbar collapses to hamburger menu on mobile
+### Requirement: Navbar collapses to hamburger menu on mobile using MatSidenav
 
-The system SHALL collapse the navbar to a hamburger menu on narrow screens, with a drawer that matches the approved visual companion design.
+The system SHALL collapse the navbar to a hamburger `mat-icon-button` on narrow screens. The mobile drawer SHALL be a `MatSidenav` (mode `over`, position `start`) defined in `app.html`, wrapping `<router-outlet>`. The sidenav SHALL slide in from the left with a dark scrim over the page content. `NavbarComponent` SHALL receive the `MatSidenav` instance as an `@Input()` and call `sidenav.toggle()` from the hamburger button.
 
-#### Scenario: Hamburger icon toggles between open and closed states
+#### Scenario: Hamburger icon toggles sidenav open and closed
 
-- **WHEN** the drawer is closed
-- **THEN** the hamburger button displays ☰
-- **WHEN** the drawer is open
-- **THEN** the hamburger button displays ✕
+- **WHEN** the sidenav is closed and the user taps the hamburger `mat-icon-button`
+- **THEN** the sidenav opens, the scrim appears over page content, and the toolbar icon changes to `close` (✕)
+- **WHEN** the user taps ✕ or the scrim
+- **THEN** the sidenav closes and the icon returns to `menu` (☰)
 
-#### Scenario: Mobile drawer layout and positioning
+#### Scenario: Sidenav navigation links
 
-- **WHEN** the hamburger is clicked and the drawer opens
-- **THEN** the drawer SHALL use `position: fixed; top: 68px; left: 0; right: 0; z-index: 99` so it appears directly below the fixed navbar and above page content
-- **THEN** the drawer background SHALL be `#0f172a` with `padding: 16px` and a `border-top: 1px solid #1e293b` separator
+- **WHEN** the sidenav is open
+- **THEN** a `mat-nav-list` is rendered with `mat-list-item` entries for: Services, Security, Client Login, Contact, Book Consultation
+- **THEN** "Book Consultation" is a plain `mat-list-item` in sky-blue (`#38bdf8`) — not a full-width button
+- **THEN** the language toggle pills appear at the bottom of the sidenav
 
-#### Scenario: Drawer navigation links
+#### Scenario: Sidenav nav item text is visible on dark background
 
-- **WHEN** the drawer is open
-- **THEN** each navigation link (Services, Security, Contact) SHALL display as `display: block` with `padding: 14px 8px`, `color: #e2e8f0`, `font-size: 15px`, and a `border-bottom: 1px solid #1e293b` separator
-- **THEN** the "Client Login" button SHALL display with the same `padding: 14px 8px`, `font-size: 15px`, `color: #e2e8f0`, left-aligned, matching other drawer links (implemented via `:host(.drawer-item)` on `ClientPortalLoginComponent`)
-- **THEN** the "Book Consultation" link SHALL render as a compact white button (`background: #fff; color: #0f172a; padding: 8px 16px; border-radius: 6px; font-weight: 700`) using `display: inline-block; margin: 14px 8px` — NOT full-width, left-aligned with other items
-- **THEN** the language toggle row SHALL be visible with `display: flex; gap: 8px; padding: 14px 8px` and a `border-top: 1px solid #1e293b` separator above it
+- **WHEN** the sidenav is open
+- **THEN** all `mat-list-item` labels render in light text (`#e2e8f0`) against the dark navy (`#0f172a`) sidenav background
+- **NOTE** Angular Material 21 MDC `mat-list-item` inherits the light-theme text color by default; the `.app-sidenav` host MUST set `--mat-list-list-item-label-text-color: #e2e8f0` and `--mdc-list-list-item-label-text-color: #e2e8f0` to override this
+
+#### Scenario: Client Login inline expansion in sidenav
+
+- **WHEN** the user taps "Client Login" in the sidenav
+- **THEN** a login card expands inline below the Client Login item showing a "Sign in with Google" link and security label
+- **THEN** tapping "Sign in with Google" navigates to `/oauth2/authorization/google`
 
 ### Requirement: /contact route renders ContactComponent
 
