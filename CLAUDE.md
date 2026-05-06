@@ -53,7 +53,7 @@ Write the failing test first. **The RED phase must be verified** — run the tes
 - [ ] N.X+1 GREEN — write minimal impl → run ./mvnw test -Dtest=X → confirm PASS
 ```
 
-**Test code is the permanent record.** Every test written during RED must be committed to its test file (`*Test.java`, `*.spec.ts`, `e2e/*.spec.ts`) alongside the implementation. These committed tests become the regression suite for all future task groups — they are not throw-away scaffolding.
+**Test code is the permanent record.** Every test written during RED must be committed to its test file (`*Test.java`, `*.spec.ts`, `e2e/*.spec.ts`) alongside the implementation. Once a test goes GREEN it must never be deleted — the test file accumulates all RED→GREEN tests over time. The full history of test cases (both what was verified to fail and what was verified to pass) lives in the committed test files, and every future task must keep them passing.
 
 **Before starting each new task group**, run the full test suite to confirm the baseline is green:
 - Backend: `cd backend && ./mvnw test`
