@@ -1,0 +1,29 @@
+@use '@angular/material' as mat;
+
+// Custom Material theme — sky-blue primary, light content, dark toolbar via override
+$theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$azure-palette,
+  ),
+  typography: (
+    brand-family: inherit,
+    plain-family: inherit,
+  ),
+));
+
+html {
+  @include mat.all-component-themes($theme);
+}
+
+// Dark navy toolbar for mat-toolbar[color="primary"]
+.mat-toolbar.mat-primary {
+  background: #0f172a;
+  color: #ffffff;
+}
+
+body {
+  margin: 0;
+  background: #f1f5f9;
+  font-family: inherit;
+}
