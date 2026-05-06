@@ -1,0 +1,81 @@
+## MODIFIED Requirements
+
+### Requirement: NavbarComponent renders full navigation bar
+
+The system SHALL render a `NavbarComponent` (`<app-navbar />`) at the top of every page. The navbar SHALL use `<mat-toolbar color="primary">` with `position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 68px`. The toolbar background SHALL be `#0f172a` (dark navy) via the Material custom theme. Navigation links SHALL be `mat-button` elements with `color` defaulting to white. The "Book Consultation" CTA SHALL be an `<a mat-flat-button>` with `background: #fff; color: #0f172a`.
+
+#### Scenario: Navbar structure on desktop
+
+- **WHEN** the viewport width is ≥ 768px
+- **THEN** the navbar displays inside a `mat-toolbar`: logo section, `mat-button` nav links (Services · Security · Client Login · Contact), Book Consultation `mat-flat-button`, language toggle pills
+- **THEN** the "Client Login" trigger is a `mat-button` with `[matMenuTrigger]` attached
+- **THEN** the "Book Consultation" renders as a white flat button with `color: #0f172a`
+- **THEN** the navbar stays fixed at the top as the user scrolls
+
+#### Scenario: Logo section
+
+- **WHEN** the navbar renders
+- **THEN** the logo section shows a 42×42px dark rounded icon containing "税", company name "GWH Accounting" in white bold, and tagline "Secure Tax & Accounting Portal" in `#38bdf8`
+
+### Requirement: Navigation links scroll or route correctly
+
+#### Scenario: Services link scrolls to services section
+- **WHEN** the user clicks "Services"
+- **THEN** the page smooth-scrolls to the element with `id="services"` on the landing page
+
+#### Scenario: Security link scrolls to security section
+- **WHEN** the user clicks "Security"
+- **THEN** the page smooth-scrolls to the element with `id="security"` on the landing page
+
+#### Scenario: Contact link navigates to /contact
+- **WHEN** the user clicks "Contact"
+- **THEN** the router navigates to `/contact`
+
+#### Scenario: Book Consultation button navigates to /contact
+- **WHEN** the user clicks "Book Consultation"
+- **THEN** the router navigates to `/contact`
+
+### Requirement: Language toggle switches between EN and 中文
+
+#### Scenario: Default language is English
+- **WHEN** the navbar first renders
+- **THEN** the "EN" pill is active (sky-blue background `#38bdf8`) and "中文" is inactive
+
+#### Scenario: Clicking 中文 activates Chinese
+- **WHEN** the user clicks "中文"
+- **THEN** the "中文" pill becomes active and "EN" becomes inactive
+- **THEN** `NavbarComponent.lang()` returns `'zh'`
+
+#### Scenario: Clicking EN restores English
+- **WHEN** `lang()` is `'zh'` and the user clicks "EN"
+- **THEN** `lang()` returns `'en'` and "EN" pill is active
+
+### Requirement: Navbar collapses to hamburger menu on mobile using MatSidenav
+
+The system SHALL collapse the navbar to a hamburger `mat-icon-button` on narrow screens. The mobile drawer SHALL be a `MatSidenav` (mode `over`, position `start`) defined in `app.html`, wrapping `<router-outlet>`. The sidenav SHALL slide in from the left with a dark scrim over the page content. `NavbarComponent` SHALL receive the `MatSidenav` instance as an `@Input()` and call `sidenav.toggle()` from the hamburger button.
+
+#### Scenario: Hamburger icon toggles sidenav open and closed
+
+- **WHEN** the sidenav is closed and the user taps the hamburger `mat-icon-button`
+- **THEN** the sidenav opens, the scrim appears over page content, and the toolbar icon changes to `close` (✕)
+- **WHEN** the user taps ✕ or the scrim
+- **THEN** the sidenav closes and the icon returns to `menu` (☰)
+
+#### Scenario: Sidenav navigation links
+
+- **WHEN** the sidenav is open
+- **THEN** a `mat-nav-list` is rendered with `mat-list-item` entries for: Services, Security, Client Login, Contact, Book Consultation
+- **THEN** "Book Consultation" is a plain `mat-list-item` in sky-blue (`#38bdf8`) — not a full-width button
+- **THEN** the language toggle pills appear at the bottom of the sidenav
+
+#### Scenario: Client Login inline expansion in sidenav
+
+- **WHEN** the user taps "Client Login" in the sidenav
+- **THEN** a login card expands inline below the Client Login item showing a "Sign in with Google" link and security label
+- **THEN** tapping "Sign in with Google" navigates to `/oauth2/authorization/google`
+
+### Requirement: /contact route renders ContactComponent
+
+#### Scenario: Navigating to /contact
+- **WHEN** the user navigates to `/contact`
+- **THEN** `ContactComponent` is rendered with a "Contact Us" heading and placeholder content
