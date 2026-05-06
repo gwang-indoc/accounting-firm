@@ -2,6 +2,7 @@ package com.gwhaitech.accountingfirm.auth.controller;
 
 import com.gwhaitech.accountingfirm.auth.domain.User;
 import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
+import com.gwhaitech.accountingfirm.auth.service.AuthService;
 import com.gwhaitech.accountingfirm.auth.service.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,16 +10,23 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -58,6 +66,9 @@ class AuthControllerTest {
     @MockitoBean
     private UserRepository userRepository;
 
+    @MockitoBean
+    private AuthService authService;
+
     private User testUser() {
         User user = new User();
         user.setId(1L);
@@ -95,5 +106,43 @@ class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.SET_COOKIE, org.hamcrest.Matchers.containsString("jwt=")))
                 .andExpect(header().string(HttpHeaders.SET_COOKIE, org.hamcrest.Matchers.containsString("Max-Age=0")));
+    }
+
+    @Test
+    void registerWithValidData_returns201() throws Exception {
+        doNothing().when(authService).register(any());
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"fullName":"Alice","email":"alice@example.com",
+                         "password":"secret123","confirmPassword":"secret123"}
+                        """))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    void registerWithMismatchedPasswords_returns400() throws Exception {
+        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passwords do not match"))
+                .when(authService).register(any());
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"fullName":"Alice","email":"alice@example.com",
+                         "password":"secret123","confirmPassword":"different"}
+                        """))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void registerWithDuplicateEmail_returns409() throws Exception {
+        doThrow(new DataIntegrityViolationException("duplicate"))
+                .when(authService).register(any());
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"fullName":"Alice","email":"alice@example.com",
+                         "password":"secret123","confirmPassword":"secret123"}
+                        """))
+                .andExpect(status().isConflict());
     }
 }

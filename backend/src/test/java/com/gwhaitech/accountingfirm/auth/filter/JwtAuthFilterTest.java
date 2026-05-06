@@ -2,6 +2,7 @@ package com.gwhaitech.accountingfirm.auth.filter;
 
 import com.gwhaitech.accountingfirm.auth.domain.User;
 import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
+import com.gwhaitech.accountingfirm.auth.service.AuthService;
 import com.gwhaitech.accountingfirm.auth.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.impl.DefaultClaims;
@@ -67,6 +68,9 @@ class JwtAuthFilterTest {
 
     @MockitoBean
     private UserRepository userRepository;
+
+    @MockitoBean
+    private AuthService authService;
 
     @Test
     void validJwtCookie_setsAuthenticatedPrincipal() throws Exception {
