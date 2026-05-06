@@ -49,6 +49,19 @@ class LocalStorageServiceTest {
     }
 
     @Test
+    void store_overwritesExistingFile() throws Exception {
+        long clientId = 42L;
+        int year = 2024;
+        String filename = "invoice.pdf";
+        service.store(clientId, year, filename, new ByteArrayInputStream("original".getBytes()));
+
+        service.store(clientId, year, filename, new ByteArrayInputStream("updated".getBytes()));
+
+        Path expected = tempDir.resolve("clients").resolve("42").resolve("2024").resolve("invoice.pdf");
+        assertEquals("updated", Files.readString(expected));
+    }
+
+    @Test
     void resolve_returnsAbsolutePathForFilePath() {
         String filePath = "clients/42/2024/invoice.pdf";
 

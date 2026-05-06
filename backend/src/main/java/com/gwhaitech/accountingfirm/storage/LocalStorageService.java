@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 
 @Service
 public class LocalStorageService {
@@ -18,6 +20,7 @@ public class LocalStorageService {
     }
 
     public void store(long clientId, int year, String filename, InputStream in) {
+        Objects.requireNonNull(in, "InputStream must not be null");
         Path target = baseDir
                 .resolve("clients")
                 .resolve(String.valueOf(clientId))
@@ -25,7 +28,7 @@ public class LocalStorageService {
                 .resolve(filename);
         try {
             Files.createDirectories(target.getParent());
-            Files.copy(in, target);
+            Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
