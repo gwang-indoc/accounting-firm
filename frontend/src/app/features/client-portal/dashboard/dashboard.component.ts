@@ -2,10 +2,13 @@ import { Component, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatButton } from '@angular/material/button';
+import { MatCard, MatCardHeader, MatCardTitle, MatCardContent } from '@angular/material/card';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [],
+  imports: [MatToolbar, MatButton, MatCard, MatCardHeader, MatCardTitle, MatCardContent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
