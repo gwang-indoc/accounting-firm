@@ -1,5 +1,6 @@
 package com.gwhaitech.accountingfirm.client.controller;
 
+import com.gwhaitech.accountingfirm.auth.domain.User;
 import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
 import com.gwhaitech.accountingfirm.auth.service.JwtService;
 import com.gwhaitech.accountingfirm.client.dto.DocumentDto;
@@ -17,7 +18,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,6 +35,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -75,6 +79,14 @@ class DocumentControllerTest {
                 LocalDateTime.of(2026, 1, 1, 0, 0));
     }
 
+    private Authentication mockAuth() {
+        User user = new User();
+        user.setId(1L);
+        user.setEmail("tester@example.com");
+        user.setRole("USER");
+        return new UsernamePasswordAuthenticationToken(user, null, List.of());
+    }
+
     @Test
     void postDocuments_newFile_returns201() throws Exception {
         when(documentService.upload(eq(1L), eq(2025), eq("tax.pdf"), anyString(), anyLong(), any(), anyLong()))
@@ -85,7 +97,8 @@ class DocumentControllerTest {
 
         mockMvc.perform(multipart("/api/clients/1/documents")
                 .file(file)
-                .param("year", "2025"))
+                .param("year", "2025")
+                .with(authentication(mockAuth())))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.filename").value("tax.pdf"));
@@ -101,7 +114,8 @@ class DocumentControllerTest {
 
         mockMvc.perform(multipart("/api/clients/1/documents")
                 .file(file)
-                .param("year", "2025"))
+                .param("year", "2025")
+                .with(authentication(mockAuth())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.filename").value("tax.pdf"));
     }
@@ -116,7 +130,8 @@ class DocumentControllerTest {
 
         mockMvc.perform(multipart("/api/clients/1/documents")
                 .file(file)
-                .param("year", "2025"))
+                .param("year", "2025")
+                .with(authentication(mockAuth())))
                 .andExpect(status().isBadRequest());
     }
 
@@ -130,7 +145,8 @@ class DocumentControllerTest {
 
         mockMvc.perform(multipart("/api/clients/99/documents")
                 .file(file)
-                .param("year", "2025"))
+                .param("year", "2025")
+                .with(authentication(mockAuth())))
                 .andExpect(status().isNotFound());
     }
 

@@ -13,6 +13,7 @@ import com.gwhaitech.accountingfirm.storage.StorageProperties;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.util.List;
@@ -36,6 +37,7 @@ public class DocumentService {
         this.storageProperties = storageProperties;
     }
 
+    @Transactional
     public DocumentUploadResult upload(long clientId,
                                        int year,
                                        String filename,
@@ -49,8 +51,6 @@ public class DocumentService {
         validateFilename(filename);
         validateExtension(filename);
         validateSize(sizeBytes);
-
-        localStorageService.store(clientId, year, filename, in);
 
         String filePath = "clients/" + clientId + "/" + year + "/" + filename;
         var existingOpt = clientDocumentRepository
@@ -75,10 +75,13 @@ public class DocumentService {
             doc.setUploadedBy(uploadedBy);
             isNew = true;
         }
+        // Save to DB first — if the file write subsequently fails, @Transactional rolls back the DB row
         ClientDocument saved = clientDocumentRepository.save(doc);
+        localStorageService.store(clientId, year, filename, in);
         return new DocumentUploadResult(toDto(saved), isNew);
     }
 
+    @Transactional(readOnly = true)
     public List<DocumentDto> listDocuments(long clientId, int year) {
         if (!clientRepository.existsById(clientId)) {
             throw new ClientNotFoundException(clientId);
@@ -88,19 +91,24 @@ public class DocumentService {
                 .toList();
     }
 
+    @Transactional
     public void deleteDocument(long docId) {
         ClientDocument doc = clientDocumentRepository.findById(docId)
                 .orElseThrow(() -> new DocumentNotFoundException("Document not found: " + docId));
-        localStorageService.delete(doc.getFilePath());
+        String filePath = doc.getFilePath();
+        // Delete DB record first — if file delete fails, @Transactional rolls back the DB delete
         clientDocumentRepository.delete(doc);
+        localStorageService.delete(filePath);
     }
 
+    @Transactional(readOnly = true)
     public DocumentDto getDocument(long docId) {
         ClientDocument doc = clientDocumentRepository.findById(docId)
                 .orElseThrow(() -> new DocumentNotFoundException("Document not found: " + docId));
         return toDto(doc);
     }
 
+    @Transactional(readOnly = true)
     public Resource getDocumentForDownload(long docId) {
         ClientDocument doc = clientDocumentRepository.findById(docId)
                 .orElseThrow(() -> new DocumentNotFoundException("Document not found: " + docId));

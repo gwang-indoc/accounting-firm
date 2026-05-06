@@ -32,11 +32,16 @@ public class ClientDocument {
     @Column(name = "uploaded_by", nullable = false)
     private Long uploadedBy;
 
-    @Column(name = "uploaded_at", nullable = false, updatable = false)
+    @Column(name = "uploaded_at", nullable = false)
     private LocalDateTime uploadedAt;
 
     @PrePersist
     protected void onCreate() {
+        uploadedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
         uploadedAt = LocalDateTime.now();
     }
 

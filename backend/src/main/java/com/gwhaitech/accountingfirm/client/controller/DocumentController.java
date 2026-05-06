@@ -5,6 +5,7 @@ import com.gwhaitech.accountingfirm.client.dto.DocumentDto;
 import com.gwhaitech.accountingfirm.client.dto.DocumentUploadResult;
 import com.gwhaitech.accountingfirm.client.service.DocumentService;
 import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -63,9 +65,12 @@ public class DocumentController {
         String contentType = dto.mimeType() != null
                 ? dto.mimeType()
                 : MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        String disposition = ContentDisposition.attachment()
+                .filename(dto.filename(), StandardCharsets.UTF_8)
+                .build()
+                .toString();
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + dto.filename() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, disposition)
                 .header(HttpHeaders.CONTENT_TYPE, contentType)
                 .body(resource);
     }
@@ -81,6 +86,6 @@ public class DocumentController {
         if (auth != null && auth.getPrincipal() instanceof User user && user.getId() != null) {
             return user.getId();
         }
-        return 0L;
+        throw new IllegalStateException("Authenticated user not resolvable — check security configuration");
     }
 }
