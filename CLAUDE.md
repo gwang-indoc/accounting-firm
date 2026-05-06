@@ -49,11 +49,19 @@ accounting-firm/
 Write the failing test first. **The RED phase must be verified** — run the test, confirm it fails with the expected message, then implement. Do not mark a RED task complete without running the test and seeing it fail.
 
 ```
-- [ ] N.X RED  — write failing test → run ./mvnw test -Dtest=X → confirm FAILURE
-- [ ] N.X+1 GREEN — write minimal impl → run ./mvnw test -Dtest=X → confirm PASS
+- [ ] N.X RED  — write failing test → run test → confirm FAILURE → paste key failure lines into dev log
+- [ ] N.X+1 GREEN — write minimal impl → run test → confirm PASS → commit test + impl together
 ```
 
-**Test code is the permanent record.** Every test written during RED must be committed to its test file (`*Test.java`, `*.spec.ts`, `e2e/*.spec.ts`) alongside the implementation. Once a test goes GREEN it must never be deleted — the test file accumulates all RED→GREEN tests over time. The full history of test cases (both what was verified to fail and what was verified to pass) lives in the committed test files, and every future task must keep them passing.
+**Only GREEN tests are committed to the codebase.** The committed test suite must always be fully passing — no bare failing tests. A RED test is written, verified to fail, and then immediately implemented and made GREEN before committing. The RED failure output is not code; it is captured in the dev log as TDD evidence (proof the test genuinely failed before the implementation existed).
+
+**Tests that represent planned-but-not-yet-implemented behaviour** must be tagged with a skip annotation so they do not pollute the suite or mislead AI agents:
+- JUnit 5: `@Disabled("planned — not yet implemented")`
+- Vitest / Jasmine: `it.todo(...)` or `xit(...)` / `xdescribe(...)`
+
+A tagged test is a clear promise. An untagged failing test is an undiagnosed bug.
+
+**Only GREEN tests stay permanently.** Once a test goes GREEN it must never be deleted — the committed test files accumulate all passing tests over time and serve as the regression suite for every future task group.
 
 **Before starting each new task group**, run the full test suite to confirm the baseline is green:
 - Backend: `cd backend && ./mvnw test`
@@ -124,7 +132,7 @@ All changes, specs, and archives live under `openspec/` at the project root.
 **Important — `tasks.md` required steps per group:** Every `## N` group must end with:
 ```
 - [ ] N.Z   Run superpowers:requesting-code-review on the diff for group N
-- [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — commit hash, feature bullets, review findings, test count, and names of newly added test files/classes
+- [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — commit hash, feature bullets, review findings, test count, and TDD evidence (paste RED failure lines for each new test)
 ```
 For the final group (if UI is touched), include these two tasks immediately before `N.Z`:
 ```
@@ -211,7 +219,7 @@ When working through `tasks.md`:
 Every task group in `tasks.md` MUST include a log update step. When generating `tasks.md` (during `/opsx:propose`), add this task at the end of each `## N` group, after the code-review checkpoint:
 
 ```
-- [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — add entry for group N with commit hash, feature bullet points, code review findings, test count, and names of newly added test files/classes
+- [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — add entry for group N with commit hash, feature bullet points, code review findings, test count, and TDD evidence (paste RED failure lines for each new test)
 ```
 
 Log file path: `docs/log/YYYY-MM-DD.md` — name the file by date. If the file for that day does not exist, create it.
@@ -233,12 +241,13 @@ Log file path: `docs/log/YYYY-MM-DD.md` — name the file by date. If the file f
 
 **Tests:** X total passing (Y newly added in this group)
 
-**New test files/classes (committed as regression guards):**
-- `path/to/NewFeatureTest.java` — tests X, Y, Z behaviours
-- `frontend/src/app/.../component.spec.ts` — tests A, B behaviours
-- `e2e/feature.spec.ts` — E2E flow for …
+**TDD Evidence (for each new test added in this group):**
 
-_List every test file added or significantly extended in this group. These are the permanent regression suite for future tasks. Omit if no new test files were added._
+    AssertionError: expected 'static' to equal 'fixed'
+    Expected: "fixed"
+    Received: "static"
+
+_Paste the key RED failure lines from the terminal that prove each new test failed before the implementation was written. Omit if no new tests were added._
 ```
 
 ### Rules
