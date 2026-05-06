@@ -24,12 +24,12 @@
 
 ## 3. MatSidenav mobile drawer
 
-- [ ] 3.1 RED — update `navbar.component.spec.ts` (and/or add `app.component.spec.ts`): assert `mat-sidenav-container` and `mat-sidenav` are present in `app.html`; assert `NavbarComponent` accepts a `sidenav` `@Input()` → `npx ng test --no-watch` → confirm FAILURE; paste RED output into dev log
-- [ ] 3.2 GREEN — add `MatSidenav`, `MatSidenavContainer`, `MatSidenavContent` to `app.html` wrapping `<router-outlet>`; add `MatNavList`, `MatListItem` for nav links inside sidenav; add `loginOpen = signal(false)` and inline Client Login expansion; pass `#sidenav` reference to `<app-navbar [sidenav]="sidenav" />`; update `NavbarComponent` to accept `sidenav: MatSidenav` as `@Input()` and call `sidenav.toggle()` from hamburger `mat-icon-button` → confirm PASS
-- [ ] 3.3 Update `navbar.component.css`: hamburger `mat-icon-button` visible only at `max-width: 767px`; sidenav link styles (sky-blue Book Consultation, language toggle at bottom)
-- [ ] 3.4 `npx ng test --no-watch` — all tests green
-- [ ] 3.5 Run superpowers:requesting-code-review on the diff for group 3; address CRITICAL/HIGH findings before moving on
-- [ ] 3.6 Update `docs/log/2026-05-06.md` — commit hash, feature bullets, review findings, test count, TDD evidence
+- [x] 3.1 RED — update `navbar.component.spec.ts` (and/or add `app.component.spec.ts`): assert `mat-sidenav-container` and `mat-sidenav` are present in `app.html`; assert `NavbarComponent` accepts a `sidenav` `@Input()` → `npx ng test --no-watch` → confirm FAILURE; paste RED output into dev log
+- [x] 3.2 GREEN — add `MatSidenav`, `MatSidenavContainer`, `MatSidenavContent` to `app.html` wrapping `<router-outlet>`; add `MatNavList`, `MatListItem` for nav links inside sidenav; add `loginOpen = signal(false)` and inline Client Login expansion; pass `#sidenav` reference to `<app-navbar [sidenav]="sidenav" />`; update `NavbarComponent` to accept `sidenav: MatSidenav` as `@Input()` and call `sidenav.toggle()` from hamburger `mat-icon-button` → confirm PASS
+- [x] 3.3 Update `navbar.component.css`: hamburger `mat-icon-button` visible only at `max-width: 767px`; sidenav link styles (sky-blue Book Consultation, language toggle at bottom)
+- [x] 3.4 `npx ng test --no-watch` — all tests green
+- [x] 3.5 Run superpowers:requesting-code-review on the diff for group 3; address CRITICAL/HIGH findings before moving on
+- [x] 3.6 Update `docs/log/2026-05-06.md` — commit hash, feature bullets, review findings, test count, TDD evidence
 
 ## 4. DashboardComponent + HomeComponent + ContactComponent [parallel]
 
