@@ -34,8 +34,8 @@
 
 ## 2. Backend Registration Endpoint
 
-- [ ] 2.1 Run `cd backend && ./mvnw test` — confirm green baseline
-- [ ] 2.2 Create DTO `com.gwhaitech.accountingfirm.auth.dto.RegisterRequest`:
+- [x] 2.1 Run `cd backend && ./mvnw test` — confirm green baseline
+- [x] 2.2 Create DTO `com.gwhaitech.accountingfirm.auth.dto.RegisterRequest`:
          ```java
          package com.gwhaitech.accountingfirm.auth.dto;
          import jakarta.validation.constraints.*;
@@ -46,7 +46,7 @@
              @NotBlank String confirmPassword
          ) {}
          ```
-- [ ] 2.3 Create `com.gwhaitech.accountingfirm.auth.service.AuthService` (stub — just the class with `@Service`):
+- [x] 2.3 Create `com.gwhaitech.accountingfirm.auth.service.AuthService` (stub — just the class with `@Service`):
          ```java
          @Service
          public class AuthService {
@@ -58,29 +58,29 @@
              }
          }
          ```
-- [ ] 2.4 Add `BCryptPasswordEncoder` bean to `SecurityConfig`:
+- [x] 2.4 Add `BCryptPasswordEncoder` bean to `SecurityConfig`:
          ```java
          @Bean
          public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
          ```
-- [ ] 2.5 RED — add test to `AuthControllerTest`: `POST /api/auth/register` with valid JSON body `{"fullName":"Jane","email":"jane@test.com","password":"password123","confirmPassword":"password123"}` → expect 201.
+- [x] 2.5 RED — add test to `AuthControllerTest`: `POST /api/auth/register` with valid JSON body `{"fullName":"Jane","email":"jane@test.com","password":"password123","confirmPassword":"password123"}` → expect 201.
          Run: `./mvnw test -Dtest=AuthControllerTest` → confirm FAILURE ("No mapping for POST").
          Paste key failure lines to dev log.
-- [ ] 2.6 GREEN — add `POST /api/auth/register` to `AuthController`, inject `AuthService`, implement `AuthService.register(RegisterRequest)`: validate passwords match, BCrypt-hash, save user (`googleSub=null, passwordHash=hash, role="USER"`), return 201. Run test → confirm PASS
-- [ ] 2.7 RED — add test to `AuthControllerTest`: passwords don't match → expect 400.
+- [x] 2.6 GREEN — add `POST /api/auth/register` to `AuthController`, inject `AuthService`, implement `AuthService.register(RegisterRequest)`: validate passwords match, BCrypt-hash, save user (`googleSub=null, passwordHash=hash, role="USER"`), return 201. Run test → confirm PASS
+- [x] 2.7 RED — add test to `AuthControllerTest`: passwords don't match → expect 400.
          Run test → confirm FAILURE. Paste failure lines to dev log.
-- [ ] 2.8 GREEN — throw `ResponseStatusException(BAD_REQUEST)` in `AuthService.register()` when passwords differ. Run test → confirm PASS
-- [ ] 2.9 RED — add test to `AuthControllerTest`: duplicate email → expect 409 (mock `UserRepository.save()` to throw `DataIntegrityViolationException`).
+- [x] 2.8 GREEN — throw `ResponseStatusException(BAD_REQUEST)` in `AuthService.register()` when passwords differ. Run test → confirm PASS
+- [x] 2.9 RED — add test to `AuthControllerTest`: duplicate email → expect 409 (mock `UserRepository.save()` to throw `DataIntegrityViolationException`).
          Run test → confirm FAILURE. Paste failure lines to dev log.
-- [ ] 2.10 GREEN — add `@ExceptionHandler(DataIntegrityViolationException.class)` in `AuthController` returning 409. Run test → confirm PASS → commit all (DTOs + AuthService + AuthController additions + tests)
-- [ ] 2.11 Run `cd backend && ./mvnw test` — confirm all tests pass
-- [ ] 2.12 Run superpowers:requesting-code-review on the diff for group 2; address CRITICAL/HIGH findings before moving on
-- [ ] 2.13 Update `docs/log/2026-05-06.md` — add group 2 entry: commit hash, feature bullets, review findings, test count, TDD evidence (paste RED failure lines from 2.5, 2.7, 2.9)
+- [x] 2.10 GREEN — add `@ExceptionHandler(DataIntegrityViolationException.class)` in `AuthController` returning 409. Run test → confirm PASS → commit all (DTOs + AuthService + AuthController additions + tests)
+- [x] 2.11 Run `cd backend && ./mvnw test` — confirm all tests pass
+- [x] 2.12 Run superpowers:requesting-code-review on the diff for group 2; address CRITICAL/HIGH findings before moving on
+- [x] 2.13 Update `docs/log/2026-05-06.md` — add group 2 entry: commit hash, feature bullets, review findings, test count, TDD evidence (paste RED failure lines from 2.5, 2.7, 2.9)
 
 ## 3. Backend Login Endpoint
 
-- [ ] 3.1 Run `cd backend && ./mvnw test` — confirm green baseline
-- [ ] 3.2 Create DTO `com.gwhaitech.accountingfirm.auth.dto.LoginRequest`:
+- [x] 3.1 Run `cd backend && ./mvnw test` — confirm green baseline
+- [x] 3.2 Create DTO `com.gwhaitech.accountingfirm.auth.dto.LoginRequest`:
          ```java
          package com.gwhaitech.accountingfirm.auth.dto;
          import jakarta.validation.constraints.*;
@@ -89,44 +89,44 @@
              @NotBlank String password
          ) {}
          ```
-- [ ] 3.3 RED — add test to `AuthControllerTest`: `POST /api/auth/login` with valid credentials → expect 200 and `Set-Cookie` header containing `jwt=`.
+- [x] 3.3 RED — add test to `AuthControllerTest`: `POST /api/auth/login` with valid credentials → expect 200 and `Set-Cookie` header containing `jwt=`.
          Mock `AuthService.login()` to return a token string; mock `JwtService` as needed.
          Run: `./mvnw test -Dtest=AuthControllerTest` → confirm FAILURE ("No mapping for POST /api/auth/login").
          Paste failure lines to dev log.
-- [ ] 3.4 GREEN — add `POST /api/auth/login` to `AuthController` (inject `JwtService`, `@Value("${app.cookie.secure:true}")`, `@Value("${app.jwt.expiration-ms:86400000}")`).
+- [x] 3.4 GREEN — add `POST /api/auth/login` to `AuthController` (inject `JwtService`, `@Value("${app.cookie.secure:true}")`, `@Value("${app.jwt.expiration-ms:86400000}")`).
          Implement `AuthService.login(LoginRequest)`:
          1. `userRepository.findByEmail(email)` → throw `ResponseStatusException(UNAUTHORIZED)` if empty
          2. `passwordEncoder.matches(password, user.getPasswordHash())` → throw `UNAUTHORIZED` if false
          3. Return the `User`
          In `AuthController.login()`: call `authService.login()`, call `jwtService.issueToken(user)`, build cookie identical to `OAuth2SuccessHandler` pattern, return 200.
          Run test → confirm PASS
-- [ ] 3.5 RED — add test: wrong password → expect 401. Run test → confirm FAILURE. Paste lines to dev log.
-- [ ] 3.6 GREEN — BCrypt mismatch already handled in step 3.4 `AuthService.login()`. Confirm test passes.
-- [ ] 3.7 RED — add test: unknown email → expect 401. Run test → confirm FAILURE. Paste lines to dev log.
-- [ ] 3.8 GREEN — unknown email already handled in step 3.4. Confirm test passes.
-- [ ] 3.9 Add `findByEmail(String email): Optional<User>` to `UserRepository` if not already present.
+- [x] 3.5 RED — add test: wrong password → expect 401. Run test → confirm FAILURE. Paste lines to dev log.
+- [x] 3.6 GREEN — BCrypt mismatch already handled in step 3.4 `AuthService.login()`. Confirm test passes.
+- [x] 3.7 RED — add test: unknown email → expect 401. Run test → confirm FAILURE. Paste lines to dev log.
+- [x] 3.8 GREEN — unknown email already handled in step 3.4. Confirm test passes.
+- [x] 3.9 Add `findByEmail(String email): Optional<User>` to `UserRepository` if not already present.
          Run `cd backend && ./mvnw test` → all passing → commit
-- [ ] 3.10 Run superpowers:requesting-code-review on the diff for group 3; address CRITICAL/HIGH findings before moving on
-- [ ] 3.11 Update `docs/log/2026-05-06.md` — add group 3 entry: commit hash, feature bullets, review findings, test count, TDD evidence (paste RED failure lines from 3.3, 3.5, 3.7)
+- [x] 3.10 Run superpowers:requesting-code-review on the diff for group 3; address CRITICAL/HIGH findings before moving on
+- [x] 3.11 Update `docs/log/2026-05-06.md` — add group 3 entry: commit hash, feature bullets, review findings, test count, TDD evidence (paste RED failure lines from 3.3, 3.5, 3.7)
 
 ## 4. Frontend Services & Routes
 
-- [ ] 4.0 Invoke superpowers:subagent-driven-development to dispatch the [parallel] units in this group; one subagent owns one RED+GREEN pair end-to-end including self-review.
-- [ ] 4.1 [parallel] Run `cd frontend && npx ng test --no-watch` — confirm green baseline
-- [ ] 4.2 [parallel] RED — add test to `navbar.component.spec.ts`: "Client Login" button has `routerLink="/login"` and no `[matMenuTriggerFor]` attribute.
+- [x] 4.0 Invoke superpowers:subagent-driven-development to dispatch the [parallel] units in this group; one subagent owns one RED+GREEN pair end-to-end including self-review.
+- [x] 4.1 [parallel] Run `cd frontend && npx ng test --no-watch` — confirm green baseline
+- [x] 4.2 [parallel] RED — add test to `navbar.component.spec.ts`: "Client Login" button has `routerLink="/login"` and no `[matMenuTriggerFor]` attribute.
          Run: `npx ng test --include='**/navbar.component.spec.ts' --no-watch` → confirm FAILURE.
          Paste failure lines to dev log.
-- [ ] 4.3 [parallel] GREEN — in `navbar.component.html`:
+- [x] 4.3 [parallel] GREEN — in `navbar.component.html`:
          Replace line 13 (`<button mat-button [matMenuTriggerFor]="loginMenu" data-testid="client-login-btn">Client Login</button>`) with:
          `<a mat-button routerLink="/login" data-testid="client-login-btn">Client Login</a>`
          Remove lines 14–24 (the entire `<mat-menu #loginMenu>` block).
          Update mobile sidenav "Client Login" `mat-list-item` to add `routerLink="/login" (click)="sidenav.close()"`.
          Remove any unused `MatMenuModule` import from `navbar.component.ts`.
          Run test → confirm PASS → commit
-- [ ] 4.4 [parallel] RED — add test to `auth.service.spec.ts`: `authService.register({...})` POSTs to `/api/auth/register` and returns `Observable<void>`.
+- [x] 4.4 [parallel] RED — add test to `auth.service.spec.ts`: `authService.register({...})` POSTs to `/api/auth/register` and returns `Observable<void>`.
          Run: `npx ng test --include='**/auth.service.spec.ts' --no-watch` → confirm FAILURE.
          Paste failure lines to dev log.
-- [ ] 4.5 [parallel] GREEN — add to `AuthService` (`src/app/core/services/auth.service.ts`):
+- [x] 4.5 [parallel] GREEN — add to `AuthService` (`src/app/core/services/auth.service.ts`):
          ```typescript
          register(dto: { fullName: string; email: string; password: string; confirmPassword: string }): Observable<void> {
            return this.http.post<void>('/api/auth/register', dto);
@@ -136,7 +136,7 @@
          }
          ```
          Run test → confirm PASS → commit
-- [ ] 4.6 Add routes to `app.routes.ts` — create stub component files first so routes compile:
+- [x] 4.6 Add routes to `app.routes.ts` — create stub component files first so routes compile:
          - Create `src/app/features/auth/login/login.component.ts` (stub — `@Component({ template: '<p>login</p>', standalone: true }) export class LoginComponent {}`)
          - Create `src/app/features/auth/register/register.component.ts` (stub)
          - Create `src/app/features/auth/login-email/login-email.component.ts` (stub)
@@ -146,9 +146,9 @@
          { path: 'register', loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent) },
          { path: 'login/email', loadComponent: () => import('./features/auth/login-email/login-email.component').then(m => m.LoginEmailComponent) },
          ```
-- [ ] 4.7 Run `cd frontend && npx ng test --no-watch` → all passing → commit
-- [ ] 4.8 Run superpowers:requesting-code-review on the diff for group 4; address CRITICAL/HIGH findings before moving on
-- [ ] 4.9 Update `docs/log/2026-05-06.md` — add group 4 entry: commit hash, feature bullets, review findings, test count, TDD evidence (paste RED failure lines from 4.2, 4.4)
+- [x] 4.7 Run `cd frontend && npx ng test --no-watch` → all passing → commit
+- [x] 4.8 Run superpowers:requesting-code-review on the diff for group 4; address CRITICAL/HIGH findings before moving on
+- [x] 4.9 Update `docs/log/2026-05-06.md` — add group 4 entry: commit hash, feature bullets, review findings, test count, TDD evidence (paste RED failure lines from 4.2, 4.4)
 
 ## 5. Frontend Components
 
