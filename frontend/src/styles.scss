@@ -27,3 +27,33 @@ body {
   background: #f1f5f9;
   font-family: inherit;
 }
+
+// Client Login MatMenu panel — must live in global styles (CDK overlay portal is outside component scope)
+.login-menu-panel {
+  padding: 20px;
+  min-width: 280px;
+}
+
+.login-menu-panel h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.login-menu-panel .google-signin-btn {
+  display: block;
+  text-align: center;
+  padding: 10px 16px;
+  background: #4285f4;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  margin: 12px 0;
+  font-weight: 500;
+}
+
+.login-menu-panel .security-label {
+  font-size: 0.75rem;
+  color: #666;
+  text-align: center;
+  margin: 0;
+}
