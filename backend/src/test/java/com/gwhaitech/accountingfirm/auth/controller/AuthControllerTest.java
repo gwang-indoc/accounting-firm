@@ -5,6 +5,7 @@ import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
 import com.gwhaitech.accountingfirm.auth.exception.EmailAlreadyRegisteredException;
 import com.gwhaitech.accountingfirm.auth.service.AuthService;
 import com.gwhaitech.accountingfirm.auth.service.JwtService;
+import com.gwhaitech.accountingfirm.auth.dto.LoginRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -28,6 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -146,5 +148,43 @@ class AuthControllerTest {
                          "password":"secret123","confirmPassword":"secret123"}
                         """))
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    void loginWithValidCredentials_returns200WithJwtCookie() throws Exception {
+        User user = testUser();
+        when(authService.login(any(LoginRequest.class))).thenReturn(user);
+        when(jwtService.issueToken(user)).thenReturn("test-jwt-token");
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"email":"test@example.com","password":"secret123"}
+                        """))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.SET_COOKIE, org.hamcrest.Matchers.containsString("jwt=test-jwt-token")));
+    }
+
+    @Test
+    void loginWithWrongPassword_returns401() throws Exception {
+        doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED))
+                .when(authService).login(any(LoginRequest.class));
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"email":"test@example.com","password":"wrong"}
+                        """))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void loginWithUnknownEmail_returns401() throws Exception {
+        doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED))
+                .when(authService).login(any(LoginRequest.class));
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"email":"nobody@example.com","password":"secret123"}
+                        """))
+                .andExpect(status().isUnauthorized());
     }
 }

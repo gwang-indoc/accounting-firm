@@ -2,6 +2,7 @@ package com.gwhaitech.accountingfirm.auth.service;
 
 import com.gwhaitech.accountingfirm.auth.domain.User;
 import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
+import com.gwhaitech.accountingfirm.auth.dto.LoginRequest;
 import com.gwhaitech.accountingfirm.auth.dto.RegisterRequest;
 import com.gwhaitech.accountingfirm.auth.exception.EmailAlreadyRegisteredException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -37,5 +38,14 @@ public class AuthService {
         } catch (DataIntegrityViolationException e) {
             throw new EmailAlreadyRegisteredException();
         }
+    }
+
+    public User login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+        if (user.getPasswordHash() == null || !passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+        return user;
     }
 }
