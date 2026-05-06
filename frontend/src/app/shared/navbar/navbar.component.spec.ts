@@ -81,14 +81,21 @@ describe('NavbarComponent', () => {
   });
 
   it('"Client Portal" renders <app-client-portal-login> inside navbar', () => {
+    // app-client-portal-login is in the mobile drawer; open it first
+    component.menuOpen.set(true);
+    fixture.detectChanges();
     const nativeEl = fixture.nativeElement as HTMLElement;
     const clientPortalEl = nativeEl.querySelector('app-client-portal-login');
     expect(clientPortalEl).not.toBeNull();
   });
 
   it('clicking "Client Login" button inside <app-client-portal-login> shows the login dropdown', () => {
+    // Open mobile drawer to access app-client-portal-login
+    component.menuOpen.set(true);
+    fixture.detectChanges();
+
     const nativeEl = fixture.nativeElement as HTMLElement;
-    const loginBtn = nativeEl.querySelector('[data-testid="client-login-btn"]') as HTMLElement;
+    const loginBtn = nativeEl.querySelector('.mobile-drawer [data-testid="client-login-btn"]') as HTMLElement;
     expect(loginBtn).not.toBeNull();
     loginBtn.click();
     fixture.detectChanges();
@@ -140,7 +147,14 @@ describe('NavbarComponent', () => {
     expect(nativeEl.querySelector('[mat-flat-button]')).not.toBeNull();
   });
 
-  // Deferred to task 2.3+2.4: Client Login button replaces app-client-portal-login
-  // with mat-button + [matMenuTrigger]
-  it.todo('Client Login uses mat-button with matMenuTrigger (see tasks 2.3+2.4)');
+  it('Client Login button has matMenuTrigger and mat-menu is in template', () => {
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    // matMenuTriggerFor is an Angular property binding and is not preserved as
+    // an HTML attribute in the rendered DOM — query by data-testid instead
+    const trigger = nativeEl.querySelector('button[data-testid="client-login-btn"]');
+    expect(trigger).not.toBeNull();
+    expect(trigger!.textContent?.trim()).toBe('Client Login');
+    // Confirm a mat-menu element exists in the template (rendered as overlay portal)
+    expect(nativeEl.querySelector('mat-menu')).not.toBeNull();
+  });
 });

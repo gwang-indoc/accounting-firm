@@ -10,7 +10,19 @@
   <div class="nav-links">
     <a mat-button href="#services">Services</a>
     <a mat-button href="#security">Security</a>
-    <app-client-portal-login />
+    <button mat-button [matMenuTriggerFor]="loginMenu" data-testid="client-login-btn">Client Login</button>
+    <mat-menu #loginMenu>
+      <div class="login-menu-panel">
+        <h3>Client Portal</h3>
+        <p>Secure access to your accounting documents and reports.</p>
+        <a
+          data-testid="google-signin-link"
+          href="/oauth2/authorization/google"
+          class="google-signin-btn"
+        >Sign in with Google</a>
+        <p class="security-label">🔒 Secured with Google OAuth2</p>
+      </div>
+    </mat-menu>
     <a mat-button routerLink="/contact">Contact</a>
     <a mat-flat-button routerLink="/contact" class="cta-btn">Book Consultation</a>
   </div>
