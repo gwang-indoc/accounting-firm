@@ -6,20 +6,20 @@ Invoke superpowers:subagent-driven-development to dispatch groups 1, 2 in parall
 - [x] 1.2 Create `StorageProperties` `@ConfigurationProperties(prefix = "app.storage")` record (fields: `uploadDir`, `maxFileSizeMb`, `maxFilenameLength`, `blockedExtensions`); register with `@EnableConfigurationProperties` on `AccountingFirmApplication`
 - [x] 1.3 RED — write failing unit test for `LocalStorageService` under `storage/` package: `store()` creates file at `clients/{clientId}/{year}/{filename}` under a `@TempDir` base; `delete()` removes the file; `resolve()` returns correct `Path`; run test, confirm FAILURE; paste key failure lines into dev log entry
 - [x] 1.4 GREEN — implement `LocalStorageService`: `store(long clientId, int year, String filename, InputStream in)`, `delete(String filePath)`, `resolve(String filePath)`; use `Files.createDirectories` for parent dirs; run test, confirm PASS; commit test + impl together
-- [ ] 1.Z Run superpowers:requesting-code-review on the diff for group 1; address CRITICAL/HIGH findings before moving on
-- [ ] 1.Z+1 Update `docs/log/2026-05-06.md` — add entry for group 1 with commit hash, feature bullets, code review findings, test count, and TDD evidence (paste RED failure lines for `LocalStorageService` test)
+- [x] 1.Z Run superpowers:requesting-code-review on the diff for group 1; address CRITICAL/HIGH findings before moving on
+- [x] 1.Z+1 Update `docs/log/2026-05-06.md` — add entry for group 1 with commit hash, feature bullets, code review findings, test count, and TDD evidence (paste RED failure lines for `LocalStorageService` test)
 
 ## 2. Client Management
 
-- [ ] 2.1 Write Flyway migration `V5__create_clients.sql`: `CREATE TABLE clients (id BIGSERIAL PRIMARY KEY, user_id BIGINT REFERENCES users(id), name VARCHAR(255) NOT NULL, email VARCHAR(255), phone VARCHAR(50), created_at TIMESTAMP NOT NULL DEFAULT NOW())`
-- [ ] 2.2 RED — `@DataJpaTest` for `Client` entity: persist a client with name, email, phone; assert all fields round-trip; run test, confirm FAILURE (entity does not exist yet); paste key failure lines into dev log entry
-- [ ] 2.3 GREEN — create `Client @Entity` + `ClientRepository extends JpaRepository<Client, Long>`; run test, confirm PASS; commit entity + repository + test together
-- [ ] 2.4 RED — unit test `ClientService`: `createClient()` returns `ClientDto` with all fields; `findAll()` returns list; `findById()` returns dto for existing id; `findById()` throws `ClientNotFoundException` for unknown id; run test, confirm FAILURE
-- [ ] 2.5 GREEN — implement `ClientService` (inject `ClientRepository`); add `ClientDto` record; add `ClientNotFoundException`; run test, confirm PASS; commit
-- [ ] 2.6 RED — `@WebMvcTest ClientController`: `POST /api/clients` with valid body returns `201` + `ClientDto` JSON; `POST /api/clients` without name returns `400`; `GET /api/clients` returns `200` + array; `GET /api/clients/{id}` for existing id returns `200`; `GET /api/clients/999` returns `404`; run test, confirm FAILURE
-- [ ] 2.7 GREEN — implement `ClientController` + `CreateClientRequest` DTO with `@Valid @NotBlank name`; add `@ExceptionHandler` for `ClientNotFoundException` → `404`; run test, confirm PASS; commit
-- [ ] 2.Z Run superpowers:requesting-code-review on the diff for group 2; address CRITICAL/HIGH findings before moving on
-- [ ] 2.Z+1 Update `docs/log/2026-05-06.md` — add entry for group 2 with commit hash, feature bullets, code review findings, test count, and TDD evidence (paste RED failure lines for each new test)
+- [x] 2.1 Write Flyway migration `V5__create_clients.sql`: `CREATE TABLE clients (id BIGSERIAL PRIMARY KEY, user_id BIGINT REFERENCES users(id), name VARCHAR(255) NOT NULL, email VARCHAR(255), phone VARCHAR(50), created_at TIMESTAMP NOT NULL DEFAULT NOW())`
+- [x] 2.2 RED — `@DataJpaTest` for `Client` entity: persist a client with name, email, phone; assert all fields round-trip; run test, confirm FAILURE (entity does not exist yet); paste key failure lines into dev log entry
+- [x] 2.3 GREEN — create `Client @Entity` + `ClientRepository extends JpaRepository<Client, Long>`; run test, confirm PASS; commit entity + repository + test together
+- [x] 2.4 RED — unit test `ClientService`: `createClient()` returns `ClientDto` with all fields; `findAll()` returns list; `findById()` returns dto for existing id; `findById()` throws `ClientNotFoundException` for unknown id; run test, confirm FAILURE
+- [x] 2.5 GREEN — implement `ClientService` (inject `ClientRepository`); add `ClientDto` record; add `ClientNotFoundException`; run test, confirm PASS; commit
+- [x] 2.6 RED — `@WebMvcTest ClientController`: `POST /api/clients` with valid body returns `201` + `ClientDto` JSON; `POST /api/clients` without name returns `400`; `GET /api/clients` returns `200` + array; `GET /api/clients/{id}` for existing id returns `200`; `GET /api/clients/999` returns `404`; run test, confirm FAILURE
+- [x] 2.7 GREEN — implement `ClientController` + `CreateClientRequest` DTO with `@Valid @NotBlank name`; add `@ExceptionHandler` for `ClientNotFoundException` → `404`; run test, confirm PASS; commit
+- [x] 2.Z Run superpowers:requesting-code-review on the diff for group 2; address CRITICAL/HIGH findings before moving on
+- [x] 2.Z+1 Update `docs/log/2026-05-06.md` — add entry for group 2 with commit hash, feature bullets, code review findings, test count, and TDD evidence (paste RED failure lines for each new test)
 
 ## 3. Document Foundation (Migration, Entity, Repository)
 
