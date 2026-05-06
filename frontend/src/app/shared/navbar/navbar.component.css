@@ -104,50 +104,6 @@
   padding: 4px 8px;
 }
 
-.mobile-drawer {
-  position: fixed;
-  top: 68px;
-  left: 0;
-  right: 0;
-  z-index: 99;
-  background-color: #0f172a;
-  padding: 16px;
-  border-top: 1px solid #1e293b;
-}
-
-.mobile-drawer a {
-  color: #e2e8f0;
-  text-decoration: none;
-  font-size: 15px;
-  padding: 14px 8px;
-  border-bottom: 1px solid #1e293b;
-  display: block;
-}
-
-.mobile-drawer a.cta-btn {
-  background: #ffffff;
-  color: #0f172a;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-weight: 700;
-  font-size: 15px;
-  display: inline-block;
-  margin: 14px 8px;
-  border-bottom: none;
-}
-
-.mobile-drawer app-client-portal-login {
-  display: block;
-  border-bottom: 1px solid #1e293b;
-}
-
-.mobile-drawer .lang-toggle {
-  display: flex;
-  gap: 8px;
-  padding: 14px 8px;
-  border-top: 1px solid #1e293b;
-}
-
 @media (max-width: 767px) {
   .nav-links {
     display: none;
@@ -155,10 +111,6 @@
 
   .lang-toggle {
     display: none;
-  }
-
-  .mobile-drawer .lang-toggle {
-    display: flex;
   }
 
   .hamburger {
