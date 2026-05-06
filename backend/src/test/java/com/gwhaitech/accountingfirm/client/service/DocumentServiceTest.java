@@ -170,6 +170,20 @@ class DocumentServiceTest {
     }
 
     @Test
+    void upload_filenameWithPathTraversal_throwsFileValidationException() {
+        when(clientRepository.existsById(1L)).thenReturn(true);
+        when(storageProperties.maxFilenameLength()).thenReturn(255);
+
+        InputStream in = new ByteArrayInputStream("data".getBytes());
+
+        assertThatThrownBy(() -> documentService.upload(
+                1L, 2025, "../etc/passwd", "text/plain", 100L, in, 7L))
+                .isInstanceOf(FileValidationException.class);
+
+        verify(localStorageService, never()).store(anyLong(), anyInt(), anyString(), any());
+    }
+
+    @Test
     void upload_clientNotFound_throwsClientNotFoundException() {
         when(clientRepository.existsById(99L)).thenReturn(false);
 

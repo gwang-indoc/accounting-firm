@@ -115,6 +115,9 @@ public class DocumentService {
             throw new FileValidationException(
                     "Filename exceeds max length of " + storageProperties.maxFilenameLength());
         }
+        if (filename.contains("/") || filename.contains("\\") || filename.contains("..")) {
+            throw new FileValidationException("Filename contains illegal path characters");
+        }
     }
 
     private void validateExtension(String filename) {
