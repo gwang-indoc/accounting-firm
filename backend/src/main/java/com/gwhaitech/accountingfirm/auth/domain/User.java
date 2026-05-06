@@ -16,8 +16,11 @@ public class User {
 
     private String name;
 
-    @Column(name = "google_sub", nullable = false, unique = true)
+    @Column(name = "google_sub", nullable = true, unique = true)
     private String googleSub;
+
+    @Column(name = "password_hash", nullable = true)
+    private String passwordHash;
 
     @Column(nullable = false, length = 50)
     private String role = "USER";
@@ -41,5 +44,7 @@ public class User {
     public void setGoogleSub(String googleSub) { this.googleSub = googleSub; }
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+    public String getPasswordHash() { return passwordHash; }
+    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 }

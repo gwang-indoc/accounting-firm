@@ -22,6 +22,9 @@ class UserEntityTest {
     @Autowired
     private TestEntityManager em;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Test
     void persistAndRetrieveUser() {
         User user = new User();
@@ -36,5 +39,16 @@ class UserEntityTest {
         assertThat(saved.getEmail()).isEqualTo("test@example.com");
         assertThat(saved.getGoogleSub()).isEqualTo("google-sub-123");
         assertThat(saved.getCreatedAt()).isNotNull();
+    }
+
+    @Test
+    void savesUserWithNullGoogleSub() {
+        User user = new User();
+        user.setEmail("nooauth@test.com");
+        user.setName("No OAuth");
+        user.setGoogleSub(null);
+        // Should persist without error
+        User saved = userRepository.save(user);
+        assertThat(saved.getId()).isNotNull();
     }
 }
