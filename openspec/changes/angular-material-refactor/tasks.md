@@ -33,7 +33,7 @@
 
 ## 4. DashboardComponent + HomeComponent + ContactComponent [parallel]
 
-- [ ] 4.0 Invoke superpowers:subagent-driven-development to dispatch the [parallel] units in this group; one subagent owns one RED+GREEN pair end-to-end including self-review
+- [x] 4.0 Invoke superpowers:subagent-driven-development to dispatch the [parallel] units in this group; one subagent owns one RED+GREEN pair end-to-end including self-review
 - [ ] 4.1 RED — update `dashboard.component.spec.ts`: assert `mat-toolbar` and `mat-card` are present → confirm FAILURE; paste RED output into dev log [parallel]
 - [ ] 4.2 GREEN — replace dashboard header with `<mat-toolbar color="primary">`; replace logout button with `<button mat-stroked-button (click)="logout()">Logout</button>`; wrap welcome block in `<mat-card><mat-card-header>`; import `MatToolbar`, `MatButton`, `MatCard`, `MatCardHeader`, `MatCardContent` → confirm PASS [parallel]
 - [ ] 4.3 RED — update `home.component.spec.ts`: assert `mat-card` is present in the services section → confirm FAILURE; paste RED output into dev log [parallel]

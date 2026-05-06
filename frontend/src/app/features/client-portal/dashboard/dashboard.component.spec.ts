@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
 import { DashboardComponent } from './dashboard.component';
 
 describe('DashboardComponent', () => {
@@ -19,17 +18,19 @@ describe('DashboardComponent', () => {
     fixture.detectChanges();
   });
 
-  it('renders mat-toolbar', () => {
-    expect(fixture.nativeElement.querySelector('mat-toolbar')).not.toBeNull();
+  it('renders mat-toolbar with color="primary"', () => {
+    const toolbar = fixture.nativeElement.querySelector('mat-toolbar');
+    expect(toolbar).not.toBeNull();
+    expect(toolbar.getAttribute('color')).toBe('primary');
   });
 
   it('renders mat-card wrapping welcome content', () => {
     expect(fixture.nativeElement.querySelector('mat-card')).not.toBeNull();
   });
 
-  it('renders a logout button', () => {
-    const logoutBtn = fixture.nativeElement.querySelector('button');
-    expect(logoutBtn).not.toBeNull();
-    expect(logoutBtn.textContent).toContain('Logout');
+  it('logout button uses mat-stroked-button', () => {
+    const btn = fixture.nativeElement.querySelector('[mat-stroked-button]');
+    expect(btn).not.toBeNull();
+    expect(btn.textContent).toContain('Logout');
   });
 });
