@@ -1,0 +1,25 @@
+<div class="login-email-container">
+  <mat-card class="login-email-card">
+    <mat-card-header>
+      <mat-card-title>Sign In</mat-card-title>
+      <mat-card-subtitle>Use your email and password</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <mat-form-field appearance="outline" style="width:100%">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" style="width:100%">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password" />
+        </mat-form-field>
+        @if (loginError()) {
+          <div class="login-error" data-testid="login-error">Invalid email or password</div>
+        }
+        <button mat-flat-button color="primary" type="submit" style="width:100%">Sign In</button>
+        <a mat-button routerLink="/login" style="width:100%">← Back to Login</a>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

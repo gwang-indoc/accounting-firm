@@ -1,0 +1,18 @@
+.login-email-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 16px;
+}
+
+.login-email-card {
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-error {
+  color: var(--mat-sys-error, #b00020);
+  font-size: 14px;
+  margin-bottom: 12px;
+}
