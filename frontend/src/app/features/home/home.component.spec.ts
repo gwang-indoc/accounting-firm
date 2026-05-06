@@ -13,8 +13,10 @@ describe('HomeComponent', () => {
     fixture.detectChanges();
   });
 
-  it('renders <app-navbar />', () => {
-    expect(fixture.nativeElement.querySelector('app-navbar')).not.toBeNull();
+  it.todo('<app-navbar /> moved to app layout — HomeComponent no longer owns navbar');
+
+  it('services section is wrapped in mat-card', () => {
+    expect(fixture.nativeElement.querySelector('#services mat-card')).not.toBeNull();
   });
 
   it('has element with id="services"', () => {

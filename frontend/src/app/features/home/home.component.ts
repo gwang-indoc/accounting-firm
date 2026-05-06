@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { NavbarComponent } from '../../shared/navbar/navbar.component';
+import { MatCard, MatCardHeader, MatCardTitle, MatCardContent } from '@angular/material/card';
 
 @Component({
   selector: 'app-home',
-  imports: [NavbarComponent],
+  standalone: true,
+  imports: [MatCard, MatCardHeader, MatCardTitle, MatCardContent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
