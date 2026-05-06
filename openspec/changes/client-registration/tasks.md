@@ -12,25 +12,25 @@
 
 ## 1. Database & Entity
 
-- [ ] 1.1 Run `cd backend && ./mvnw test` — confirm green baseline before starting; paste test count to dev log
-- [ ] 1.2 Create `backend/src/main/resources/db/migration/V2__make_google_sub_nullable.sql`:
+- [x] 1.1 Run `cd backend && ./mvnw test` — confirm green baseline before starting; paste test count to dev log
+- [x] 1.2 Create `backend/src/main/resources/db/migration/V2__make_google_sub_nullable.sql`:
          ```sql
          ALTER TABLE users ALTER COLUMN google_sub DROP NOT NULL;
          ```
-- [ ] 1.3 Create `backend/src/main/resources/db/migration/V3__add_password_hash.sql`:
+- [x] 1.3 Create `backend/src/main/resources/db/migration/V3__add_password_hash.sql`:
          ```sql
          ALTER TABLE users ADD COLUMN password_hash VARCHAR(60);
          ```
-- [ ] 1.4 RED — add test to `UserEntityTest`: save a `User` with `googleSub = null` and assert it persists without error.
+- [x] 1.4 RED — add test to `UserEntityTest`: save a `User` with `googleSub = null` and assert it persists without error.
          Run: `./mvnw test -Dtest=UserEntityTest` → confirm FAILURE (NOT NULL constraint violation).
          Paste key failure lines to dev log.
-- [ ] 1.5 GREEN — update `User` entity (`com.gwhaitech.accountingfirm.auth.domain.User`):
+- [x] 1.5 GREEN — update `User` entity (`com.gwhaitech.accountingfirm.auth.domain.User`):
          - Change `@Column(name = "google_sub", nullable = false, unique = true)` → `nullable = true`
          - Add field: `@Column(name = "password_hash", nullable = true) private String passwordHash;` with getter/setter
          Run: `./mvnw test -Dtest=UserEntityTest` → confirm PASS → commit migrations + entity + test together
-- [ ] 1.6 Run `cd backend && ./mvnw test` — confirm all tests pass after entity change
-- [ ] 1.7 Run superpowers:requesting-code-review on the diff for group 1; address CRITICAL/HIGH findings before moving on
-- [ ] 1.8 Update `docs/log/2026-05-06.md` — add group 1 entry: commit hash, feature bullets, review findings, test count, TDD evidence (paste RED failure lines from 1.4)
+- [x] 1.6 Run `cd backend && ./mvnw test` — confirm all tests pass after entity change
+- [x] 1.7 Run superpowers:requesting-code-review on the diff for group 1; address CRITICAL/HIGH findings before moving on
+- [x] 1.8 Update `docs/log/2026-05-06.md` — add group 1 entry: commit hash, feature bullets, review findings, test count, TDD evidence (paste RED failure lines from 1.4)
 
 ## 2. Backend Registration Endpoint
 
