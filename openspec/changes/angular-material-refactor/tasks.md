@@ -19,8 +19,8 @@
 - [x] 2.4 GREEN — replace `<app-client-portal-login />` (desktop) with `<button mat-button [matMenuTrigger]="loginMenu">Client Login</button>` + `<mat-menu #loginMenu>`; update `ClientPortalLoginComponent` to use `MatMenu` + `mat-menu-item`; import `MatMenu`, `MatMenuItem` → confirm PASS [parallel]
 - [x] 2.5 Trim `navbar.component.css` and `client-portal-login.component.css` — remove all rules now handled by Material; retain: logo icon styles, brand text colours, tagline colour, language pill styles, `position: fixed` on `mat-toolbar` host, `@media (max-width: 767px)` breakpoint
 - [x] 2.6 `npx ng test --no-watch` — all tests green
-- [ ] 2.7 Run superpowers:requesting-code-review on the diff for group 2; address CRITICAL/HIGH findings before moving on
-- [ ] 2.8 Update `docs/log/2026-05-06.md` — commit hash, feature bullets, review findings, test count, TDD evidence
+- [x] 2.7 Run superpowers:requesting-code-review on the diff for group 2; address CRITICAL/HIGH findings before moving on
+- [x] 2.8 Update `docs/log/2026-05-06.md` — commit hash, feature bullets, review findings, test count, TDD evidence
 
 ## 3. MatSidenav mobile drawer
 
