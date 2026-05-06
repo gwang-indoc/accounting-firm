@@ -45,8 +45,8 @@
 
 ## 5. E2E Tests, Verification & Cleanup
 
-- [ ] 5.1 Update `e2e/navbar.spec.ts`: replace `@if` drawer assertions with MatSidenav open/close assertions; replace Client Login custom dropdown assertions with MatMenu open/close; confirm CTA and contact navigation assertions still pass
-- [ ] 5.2 Write/update Playwright E2E tests covering the full Material refactor flow:
+- [x] 5.1 Update `e2e/navbar.spec.ts`: replace `@if` drawer assertions with MatSidenav open/close assertions; replace Client Login custom dropdown assertions with MatMenu open/close; confirm CTA and contact navigation assertions still pass
+- [x] 5.2 Write/update Playwright E2E tests covering the full Material refactor flow:
        - Desktop: toolbar renders, Client Login MatMenu opens/closes, Book Consultation navigates to /contact
        - Mobile (375px): hamburger opens sidenav with scrim, nav links visible, Client Login inline expansion, Book Consultation as list item, sidenav closes on scrim tap
        Run:
@@ -55,6 +55,6 @@
        3. `cd e2e && npx playwright test`
        4. `kill $(lsof -ti :4200)`
        5. `kill $(lsof -ti :8080)`
-- [ ] 5.3 Run superpowers:verification-before-completion (`cd backend && ./mvnw test`; `cd frontend && npx ng test --no-watch`; grep for `System.out.println` + `console.log`; diff review)
-- [ ] 5.4 Run superpowers:requesting-code-review on the diff for group 5; address CRITICAL/HIGH findings before moving on
-- [ ] 5.5 Update `docs/log/2026-05-06.md` — final entry: commit hash, feature bullets, review findings, full test count, TDD evidence
+- [x] 5.3 Run superpowers:verification-before-completion (`cd backend && ./mvnw test`; `cd frontend && npx ng test --no-watch`; grep for `System.out.println` + `console.log`; diff review)
+- [x] 5.4 Run superpowers:requesting-code-review on the diff for group 5; address CRITICAL/HIGH findings before moving on
+- [x] 5.5 Update `docs/log/2026-05-06.md` — final entry: commit hash, feature bullets, review findings, full test count, TDD evidence
