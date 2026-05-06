@@ -219,7 +219,7 @@
 
 ## 6. E2E & Final Verification
 
-- [ ] 6.1 Write Playwright E2E test `e2e/client-registration.spec.ts` covering:
+- [x] 6.1 Write Playwright E2E test `e2e/client-registration.spec.ts` covering:
          - Desktop: navbar "Client Login" (`[data-testid="client-login-btn"]`) click → URL is `/login`
          - Mobile (375px): hamburger → sidenav "Client Login" → URL is `/login`
          - `/login` page: three elements visible (Google button, Register button, Email link)
@@ -233,11 +233,11 @@
          3. `cd e2e && npx playwright test client-registration`         # run E2E suite
          4. `kill $(lsof -ti :4200)`                                    # stop frontend
          5. `kill $(lsof -ti :8080)`                                    # stop backend
-- [ ] 6.2 Run superpowers:verification-before-completion:
+- [x] 6.2 Run superpowers:verification-before-completion:
          - `cd backend && ./mvnw test` — all passing
          - `cd frontend && npx ng test --no-watch` — all passing
          - `grep -r "System.out.println" backend/src/main/` — must find nothing
          - `grep -r "console.log" frontend/src/app/` — must find nothing
          - Review full diff: confirm no unintended changes
-- [ ] 6.3 Run superpowers:requesting-code-review on the diff for group 6; address CRITICAL/HIGH findings before moving on
-- [ ] 6.4 Update `docs/log/2026-05-06.md` — add group 6 entry: commit hash, feature bullets, review findings, E2E test count, any TDD evidence
+- [x] 6.3 Run superpowers:requesting-code-review on the diff for group 6; address CRITICAL/HIGH findings before moving on
+- [x] 6.4 Update `docs/log/2026-05-06.md` — add group 6 entry: commit hash, feature bullets, review findings, E2E test count, any TDD evidence

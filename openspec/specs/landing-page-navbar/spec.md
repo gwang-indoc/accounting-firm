@@ -1,14 +1,14 @@
-## ADDED Requirements
+## Requirements
 
 ### Requirement: NavbarComponent renders full navigation bar
 
-The system SHALL render a `NavbarComponent` (`<app-navbar />`) at the top of every page. The navbar SHALL use `<mat-toolbar color="primary">` with `position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 68px`. The toolbar background SHALL be `#0f172a` (dark navy) via the Material custom theme. Navigation links SHALL be `mat-button` elements with `color` defaulting to white. The "Book Consultation" CTA SHALL be an `<a mat-flat-button>` with `background: #fff; color: #0f172a`.
+The system SHALL render a `NavbarComponent` (`<app-navbar />`) at the top of every page. The navbar SHALL use `<mat-toolbar color="primary">` with `position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 68px`. The toolbar background SHALL be `#0f172a` (dark navy) via the Material custom theme. Navigation links SHALL be `mat-button` elements with `color` defaulting to white. The "Book Consultation" CTA SHALL be an `<a mat-flat-button>` with `background: #fff; color: #0f172a`. The "Client Login" button SHALL be an `<a mat-button routerLink="/login">` — there is NO MatMenu popover.
 
 #### Scenario: Navbar structure on desktop
 
 - **WHEN** the viewport width is ≥ 768px
 - **THEN** the navbar displays inside a `mat-toolbar`: logo section, `mat-button` nav links (Services · Security · Client Login · Contact), Book Consultation `mat-flat-button`, language toggle pills
-- **THEN** the "Client Login" trigger is a `mat-button` with `[matMenuTrigger]` attached
+- **THEN** the "Client Login" element is `<a mat-button routerLink="/login">` with NO `[matMenuTrigger]`
 - **THEN** the "Book Consultation" renders as a white flat button with `color: #0f172a`
 - **THEN** the navbar stays fixed at the top as the user scrolls
 
@@ -67,18 +67,13 @@ The system SHALL collapse the navbar to a hamburger `mat-icon-button` on narrow 
 - **THEN** a `mat-nav-list` is rendered with `mat-list-item` entries for: Services, Security, Client Login, Contact, Book Consultation
 - **THEN** "Book Consultation" is a plain `mat-list-item` in sky-blue (`#38bdf8`) — not a full-width button
 - **THEN** the language toggle pills appear at the bottom of the sidenav
+- **THEN** the "Client Login" sidenav item is a plain `mat-list-item` with `routerLink="/login"` that closes the sidenav on click
 
 #### Scenario: Sidenav nav item text is visible on dark background
 
 - **WHEN** the sidenav is open
 - **THEN** all `mat-list-item` labels render in light text (`#e2e8f0`) against the dark navy (`#0f172a`) sidenav background
 - **NOTE** Angular Material 21 MDC `mat-list-item` inherits the light-theme text color by default; the `.app-sidenav` host MUST set `--mat-list-list-item-label-text-color: #e2e8f0` and `--mdc-list-list-item-label-text-color: #e2e8f0` to override this
-
-#### Scenario: Client Login inline expansion in sidenav
-
-- **WHEN** the user taps "Client Login" in the sidenav
-- **THEN** a login card expands inline below the Client Login item showing a "Sign in with Google" link and security label
-- **THEN** tapping "Sign in with Google" navigates to `/oauth2/authorization/google`
 
 ### Requirement: /contact route renders ContactComponent
 
