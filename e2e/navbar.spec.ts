@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test('navbar is fixed to the top', async ({ page }) => {
   await page.goto('/');
-  const position = await page.locator('.navbar').evaluate(el =>
+  const position = await page.locator('.navbar-toolbar').evaluate(el =>
     getComputedStyle(el).position
   );
   expect(position).toBe('fixed');
@@ -28,14 +28,13 @@ test('Book Consultation renders as white button', async ({ page }) => {
 
 test('navbar is visible with logo and nav links', async ({ page }) => {
   await page.goto('/');
-  // Use .navbar (the fixed inner element) not app-navbar (host has 0 height when fixed)
-  await expect(page.locator('.navbar')).toBeVisible();
+  await expect(page.locator('mat-toolbar')).toBeVisible();
   await expect(page.locator('.logo-icon')).toContainText('税');
-  await expect(page.locator('.navbar')).toContainText('GWH Accounting');
-  await expect(page.locator('.navbar')).toContainText('Services');
-  await expect(page.locator('.navbar')).toContainText('Security');
-  await expect(page.locator('.navbar')).toContainText('Contact');
-  await expect(page.locator('.navbar')).toContainText('Book Consultation');
+  await expect(page.locator('mat-toolbar')).toContainText('GWH Accounting');
+  await expect(page.locator('mat-toolbar')).toContainText('Services');
+  await expect(page.locator('mat-toolbar')).toContainText('Security');
+  await expect(page.locator('mat-toolbar')).toContainText('Contact');
+  await expect(page.locator('mat-toolbar')).toContainText('Book Consultation');
 });
 
 test('language toggle switches active pill', async ({ page }) => {
@@ -46,18 +45,18 @@ test('language toggle switches active pill', async ({ page }) => {
   await expect(page.locator('[data-testid="lang-en"]')).toHaveClass(/active/);
 });
 
-test('Client Portal shows dropdown on click', async ({ page }) => {
+test('Client Login opens MatMenu on click', async ({ page }) => {
   await page.goto('/');
   await page.click('[data-testid="client-login-btn"]');
-  await expect(page.locator('.login-dropdown')).toBeVisible();
+  await expect(page.locator('[data-testid="google-signin-link"]')).toBeVisible();
 });
 
-test('clicking outside closes Client Portal dropdown', async ({ page }) => {
+test('pressing Escape closes Client Login MatMenu', async ({ page }) => {
   await page.goto('/');
   await page.click('[data-testid="client-login-btn"]');
-  await expect(page.locator('.login-dropdown')).toBeVisible();
-  await page.click('body', { position: { x: 10, y: 10 } });
-  await expect(page.locator('.login-dropdown')).not.toBeVisible();
+  await expect(page.locator('[data-testid="google-signin-link"]')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('[data-testid="google-signin-link"]')).not.toBeVisible();
 });
 
 test('Book Consultation navigates to /contact', async ({ page }) => {
@@ -78,11 +77,19 @@ test('hamburger shows on mobile viewport', async ({ page }) => {
   await expect(page.locator('[data-testid="hamburger"]')).toBeVisible();
 });
 
-test('hamburger toggles mobile drawer', async ({ page }) => {
+test('hamburger opens MatSidenav on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto('/');
   await page.click('[data-testid="hamburger"]');
-  await expect(page.locator('.mobile-drawer')).toBeVisible();
+  await expect(page.locator('.mat-drawer-backdrop')).toHaveClass(/mat-drawer-shown/);
+});
+
+test('tapping scrim closes MatSidenav on mobile', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto('/');
   await page.click('[data-testid="hamburger"]');
-  await expect(page.locator('.mobile-drawer')).not.toBeVisible();
+  await expect(page.locator('.mat-drawer-backdrop')).toHaveClass(/mat-drawer-shown/);
+  // Click at x=330 to land in the backdrop area right of the 280px-wide sidenav
+  await page.locator('.mat-drawer-backdrop').click({ position: { x: 330, y: 200 } });
+  await expect(page.locator('.mat-drawer-backdrop')).not.toHaveClass(/mat-drawer-shown/);
 });

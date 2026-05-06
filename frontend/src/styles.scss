@@ -38,18 +38,19 @@ app-root {
 
 // Client Login MatMenu panel — must live in global styles.
 // CDK overlays render in a portal appended to <body>, outside the component's DOM subtree,
-// so component-scoped CSS cannot reach them. panelClass="login-menu-panel" applied in navbar template.
-.login-menu-panel {
-  padding: 20px;
-  min-width: 280px;
+// so component-scoped CSS cannot reach them. Angular Material 21 applies MDC panel class
+// as mat-mdc-menu-panel; panelClass binding is preserved on mat-menu for future use.
+.mat-mdc-menu-panel {
+  padding: 8px 0;
+  min-width: 280px !important;
 }
 
-.login-menu-panel h3 {
-  margin: 0 0 8px;
+.mat-mdc-menu-panel h3 {
+  margin: 4px 16px 8px;
   font-size: 1rem;
 }
 
-.login-menu-panel .google-signin-btn {
+.mat-mdc-menu-panel .google-signin-btn {
   display: block;
   text-align: center;
   padding: 10px 16px;
@@ -57,13 +58,13 @@ app-root {
   color: white;
   text-decoration: none;
   border-radius: 4px;
-  margin: 12px 0;
+  margin: 4px 16px 8px;
   font-weight: 500;
 }
 
-.login-menu-panel .security-label {
+.mat-mdc-menu-panel .security-label {
   font-size: 0.75rem;
   color: #666;
   text-align: center;
-  margin: 0;
+  margin: 0 16px 8px;
 }
