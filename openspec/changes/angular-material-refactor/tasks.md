@@ -12,7 +12,7 @@
 
 ## 2. NavbarComponent → MatToolbar + MatMenu (desktop) [parallel]
 
-- [ ] 2.0 Invoke superpowers:subagent-driven-development to dispatch the [parallel] units in this group; one subagent owns one RED+GREEN pair end-to-end including self-review
+- [x] 2.0 Invoke superpowers:subagent-driven-development to dispatch the [parallel] units in this group; one subagent owns one RED+GREEN pair end-to-end including self-review
 - [ ] 2.1 RED — update `navbar.component.spec.ts`: assert `mat-toolbar` is present and `mat-button` elements exist for nav links → `npx ng test --include='**/navbar.component.spec.ts'` → confirm FAILURE; paste RED output into dev log [parallel]
 - [ ] 2.2 GREEN — replace `<nav class="navbar">` with `<mat-toolbar color="primary">`; replace anchor/button nav links with `mat-button`; replace CTA `<a>` with `<a mat-flat-button>`; import `MatToolbar`, `MatButton` in `navbar.component.ts` → confirm PASS [parallel]
 - [ ] 2.3 RED — update `navbar.component.spec.ts`: assert `[matMenuTrigger]` attribute exists on Client Login button and `mat-menu` is in the template → confirm FAILURE; paste RED output into dev log [parallel]

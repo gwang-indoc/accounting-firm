@@ -134,4 +134,13 @@ describe('NavbarComponent', () => {
     const matButtons = nativeEl.querySelectorAll('[mat-button]');
     expect(matButtons.length).toBeGreaterThan(0);
   });
+
+  it('"Book Consultation" uses mat-flat-button', () => {
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    expect(nativeEl.querySelector('[mat-flat-button]')).not.toBeNull();
+  });
+
+  // Deferred to task 2.3+2.4: Client Login button replaces app-client-portal-login
+  // with mat-button + [matMenuTrigger]
+  it.todo('Client Login uses mat-button with matMenuTrigger (see tasks 2.3+2.4)');
 });
