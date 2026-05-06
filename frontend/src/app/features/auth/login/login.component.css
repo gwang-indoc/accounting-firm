@@ -1,0 +1,10 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+}
