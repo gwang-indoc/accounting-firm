@@ -5,6 +5,11 @@
 .app-sidenav {
   width: 280px;
   background: #0f172a;
+  /* MDC list item text colour on dark background */
+  --mat-list-list-item-label-text-color: #e2e8f0;
+  --mat-list-list-item-hover-label-text-color: #ffffff;
+  --mdc-list-list-item-label-text-color: #e2e8f0;
+  color: #e2e8f0;
 }
 
 .sidenav-cta {

@@ -68,6 +68,12 @@ The system SHALL collapse the navbar to a hamburger `mat-icon-button` on narrow 
 - **THEN** "Book Consultation" is a plain `mat-list-item` in sky-blue (`#38bdf8`) — not a full-width button
 - **THEN** the language toggle pills appear at the bottom of the sidenav
 
+#### Scenario: Sidenav nav item text is visible on dark background
+
+- **WHEN** the sidenav is open
+- **THEN** all `mat-list-item` labels render in light text (`#e2e8f0`) against the dark navy (`#0f172a`) sidenav background
+- **NOTE** Angular Material 21 MDC `mat-list-item` inherits the light-theme text color by default; the `.app-sidenav` host MUST set `--mat-list-list-item-label-text-color: #e2e8f0` and `--mdc-list-list-item-label-text-color: #e2e8f0` to override this
+
 #### Scenario: Client Login inline expansion in sidenav
 
 - **WHEN** the user taps "Client Login" in the sidenav

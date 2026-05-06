@@ -21,6 +21,7 @@ html {
 mat-toolbar[color="primary"] {
   background: #0f172a;
   color: #ffffff;
+  --mat-toolbar-container-text-color: #ffffff;
 }
 
 html,

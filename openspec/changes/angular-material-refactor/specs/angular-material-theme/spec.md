@@ -9,7 +9,9 @@ The system SHALL have `@angular/material` 21 and `@angular/cdk` 21 installed as 
 - **WHEN** the Angular app loads
 - **THEN** Material component CSS tokens are available globally
 - **THEN** `mat-toolbar[color="primary"]` has `background-color: #0f172a`
+- **THEN** `mat-toolbar[color="primary"]` text renders in white (`#ffffff`)
 - **THEN** `document.body` computed background is `#f1f5f9`
+- **NOTE** Angular Material 21 MDC toolbar controls child text via `--mat-toolbar-container-text-color`; the global override MUST set this variable alongside `color: #ffffff` to ensure text inside the toolbar (e.g. `<span>` titles) is visible
 
 #### Scenario: Animations provider is registered
 
