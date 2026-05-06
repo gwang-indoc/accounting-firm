@@ -34,14 +34,14 @@
 ## 4. DashboardComponent + HomeComponent + ContactComponent [parallel]
 
 - [x] 4.0 Invoke superpowers:subagent-driven-development to dispatch the [parallel] units in this group; one subagent owns one RED+GREEN pair end-to-end including self-review
-- [ ] 4.1 RED — update `dashboard.component.spec.ts`: assert `mat-toolbar` and `mat-card` are present → confirm FAILURE; paste RED output into dev log [parallel]
-- [ ] 4.2 GREEN — replace dashboard header with `<mat-toolbar color="primary">`; replace logout button with `<button mat-stroked-button (click)="logout()">Logout</button>`; wrap welcome block in `<mat-card><mat-card-header>`; import `MatToolbar`, `MatButton`, `MatCard`, `MatCardHeader`, `MatCardContent` → confirm PASS [parallel]
-- [ ] 4.3 RED — update `home.component.spec.ts`: assert `mat-card` is present in the services section → confirm FAILURE; paste RED output into dev log [parallel]
-- [ ] 4.4 GREEN — wrap services section in `<mat-card>`; apply Material typography classes (`mat-headline-4`, `mat-body-1`) to hero; import `MatCard`, `MatCardTitle`, `MatCardContent` → confirm PASS [parallel]
-- [ ] 4.5 GREEN — update `contact.component.html`: apply `class="mat-headline-4"` to `<h1>` and `class="mat-body-1"` to `<p>`; remove `h1 { margin-bottom: 1rem }` from `contact.component.css` [parallel]
-- [ ] 4.6 `npx ng test --no-watch` — all 30+ tests green
-- [ ] 4.7 Run superpowers:requesting-code-review on the diff for group 4; address CRITICAL/HIGH findings before moving on
-- [ ] 4.8 Update `docs/log/2026-05-06.md` — commit hash, feature bullets, review findings, test count, TDD evidence
+- [x] 4.1 RED — update `dashboard.component.spec.ts`: assert `mat-toolbar` and `mat-card` are present → confirm FAILURE; paste RED output into dev log [parallel]
+- [x] 4.2 GREEN — replace dashboard header with `<mat-toolbar color="primary">`; replace logout button with `<button mat-stroked-button (click)="logout()">Logout</button>`; wrap welcome block in `<mat-card><mat-card-header>`; import `MatToolbar`, `MatButton`, `MatCard`, `MatCardHeader`, `MatCardContent` → confirm PASS [parallel]
+- [x] 4.3 RED — update `home.component.spec.ts`: assert `mat-card` is present in the services section → confirm FAILURE; paste RED output into dev log [parallel]
+- [x] 4.4 GREEN — wrap services section in `<mat-card>`; apply Material typography classes (`mat-headline-4`, `mat-body-1`) to hero; import `MatCard`, `MatCardTitle`, `MatCardContent` → confirm PASS [parallel]
+- [x] 4.5 GREEN — update `contact.component.html`: apply `class="mat-headline-4"` to `<h1>` and `class="mat-body-1"` to `<p>`; remove `h1 { margin-bottom: 1rem }` from `contact.component.css` [parallel]
+- [x] 4.6 `npx ng test --no-watch` — all 30+ tests green
+- [x] 4.7 Run superpowers:requesting-code-review on the diff for group 4; address CRITICAL/HIGH findings before moving on
+- [x] 4.8 Update `docs/log/2026-05-06.md` — commit hash, feature bullets, review findings, test count, TDD evidence
 
 ## 5. E2E Tests, Verification & Cleanup
 
