@@ -115,7 +115,7 @@ All changes, specs, and archives live under `openspec/` at the project root.
 **Important — `tasks.md` required steps per group:** Every `## N` group must end with:
 ```
 - [ ] N.Z   Run superpowers:requesting-code-review on the diff for group N
-- [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — commit hash, feature bullets, review findings, test count
+- [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — commit hash, feature bullets, review findings, test count, TDD evidence (RED failure lines for new tests)
 ```
 For the final group (if UI is touched), include these two tasks immediately before `N.Z`:
 ```
@@ -202,7 +202,7 @@ When working through `tasks.md`:
 Every task group in `tasks.md` MUST include a log update step. When generating `tasks.md` (during `/opsx:propose`), add this task at the end of each `## N` group, after the code-review checkpoint:
 
 ```
-- [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — add entry for group N with commit hash, feature bullet points, code review findings, and test count
+- [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — add entry for group N with commit hash, feature bullet points, code review findings, test count, and TDD evidence (paste RED failure lines for any newly added tests)
 ```
 
 Log file path: `docs/log/YYYY-MM-DD.md` — name the file by date. If the file for that day does not exist, create it.
@@ -223,6 +223,14 @@ Log file path: `docs/log/YYYY-MM-DD.md` — name the file by date. If the file f
 |---|---|---|
 
 **Tests:** X tests all passed, including Y newly added tests
+
+**TDD Evidence (for any tests added in this group):**
+
+    AssertionError: expected 'static' to equal 'fixed'
+    Expected: "fixed"
+    Received: "static"
+
+_Paste key RED failure lines that prove each new test failed before the fix. Omit if no new tests were added._
 ```
 
 ### Rules
