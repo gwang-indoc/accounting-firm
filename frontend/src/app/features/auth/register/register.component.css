@@ -1,0 +1,10 @@
+.register-container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.register-card {
+  width: 100%;
+  max-width: 400px;
+}

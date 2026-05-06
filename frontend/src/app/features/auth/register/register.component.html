@@ -1,0 +1,51 @@
+<div class="register-container">
+  <mat-card class="register-card">
+    <mat-card-header>
+      <mat-card-title>Create Account</mat-card-title>
+      <mat-card-subtitle>Fill in your details below</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <mat-form-field appearance="outline" style="width:100%">
+          <mat-label>Full Name</mat-label>
+          <input matInput formControlName="fullName" />
+          @if (form.get('fullName')?.hasError('required')) {
+            <mat-error>Full name is required</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline" style="width:100%">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" />
+          @if (form.get('email')?.hasError('required')) {
+            <mat-error>Email is required</mat-error>
+          }
+          @if (form.get('email')?.hasError('email')) {
+            <mat-error>Invalid email format</mat-error>
+          }
+          @if (form.get('email')?.hasError('emailTaken')) {
+            <mat-error>Email already registered</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline" style="width:100%">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password" />
+          @if (form.get('password')?.hasError('required')) {
+            <mat-error>Password is required</mat-error>
+          }
+          @if (form.get('password')?.hasError('minlength')) {
+            <mat-error>Minimum 8 characters</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline" style="width:100%">
+          <mat-label>Confirm Password</mat-label>
+          <input matInput type="password" formControlName="confirmPassword" />
+          @if (form.hasError('passwordMismatch') && form.get('confirmPassword')?.touched) {
+            <mat-error>Passwords do not match</mat-error>
+          }
+        </mat-form-field>
+        <button mat-flat-button color="primary" type="submit" style="width:100%">Create Account</button>
+        <a mat-button routerLink="/login" style="width:100%">← Back to Login</a>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
