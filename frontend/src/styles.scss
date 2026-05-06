@@ -17,7 +17,7 @@ html {
 }
 
 // Dark navy toolbar for mat-toolbar[color="primary"]
-.mat-toolbar.mat-primary {
+mat-toolbar[color="primary"] {
   background: #0f172a;
   color: #ffffff;
 }
