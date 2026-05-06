@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
+import { vi } from 'vitest';
 import { NavbarComponent } from './navbar.component';
 
 describe('NavbarComponent', () => {
@@ -80,21 +81,9 @@ describe('NavbarComponent', () => {
     expect(ctaLink).not.toBeUndefined();
   });
 
-  it('"Client Portal" renders <app-client-portal-login> inside navbar', () => {
-    // app-client-portal-login is in the mobile drawer; open it first
-    component.menuOpen.set(true);
-    fixture.detectChanges();
-    const nativeEl = fixture.nativeElement as HTMLElement;
-    const clientPortalEl = nativeEl.querySelector('app-client-portal-login');
-    expect(clientPortalEl).not.toBeNull();
-  });
+  it.todo('"Client Portal" renders <app-client-portal-login> inside navbar — mobile drawer replaced by MatSidenav in Group 3');
 
-  it('mobile drawer contains <app-client-portal-login>', () => {
-    component.menuOpen.set(true);
-    fixture.detectChanges();
-    const nativeEl = fixture.nativeElement as HTMLElement;
-    expect(nativeEl.querySelector('.mobile-drawer app-client-portal-login')).not.toBeNull();
-  });
+  it.todo('mobile drawer replaced by MatSidenav in Group 3 — sidenav content tested in app.spec.ts');
 
   it('hamburger button exists in the DOM', () => {
     const nativeEl = fixture.nativeElement as HTMLElement;
@@ -102,26 +91,37 @@ describe('NavbarComponent', () => {
     expect(hamburger).not.toBeNull();
   });
 
-  it('menuOpen() is false by default', () => {
-    expect(component.menuOpen()).toBe(false);
+  it('sidenavOpen() is false by default', () => {
+    expect(component.sidenavOpen()).toBe(false);
   });
 
-  it('clicking the hamburger button sets menuOpen() to true', () => {
-    const nativeEl = fixture.nativeElement as HTMLElement;
-    const hamburger = nativeEl.querySelector('[data-testid="hamburger"]') as HTMLElement;
+  it('clicking the hamburger button sets sidenavOpen() to true', () => {
+    const mockSidenav = { toggle: vi.fn(), opened: false } as any;
+    component.sidenav = mockSidenav;
+    const hamburger = fixture.nativeElement.querySelector('[data-testid="hamburger"]') as HTMLElement;
     hamburger.click();
     fixture.detectChanges();
-    expect(component.menuOpen()).toBe(true);
+    expect(component.sidenavOpen()).toBe(true);
   });
 
-  it('clicking the hamburger button again sets menuOpen() back to false', () => {
-    const nativeEl = fixture.nativeElement as HTMLElement;
-    const hamburger = nativeEl.querySelector('[data-testid="hamburger"]') as HTMLElement;
+  it('clicking the hamburger button again sets sidenavOpen() back to false', () => {
+    const mockSidenav = { toggle: vi.fn(), opened: false } as any;
+    component.sidenav = mockSidenav;
+    const hamburger = fixture.nativeElement.querySelector('[data-testid="hamburger"]') as HTMLElement;
     hamburger.click();
     fixture.detectChanges();
     hamburger.click();
     fixture.detectChanges();
-    expect(component.menuOpen()).toBe(false);
+    expect(component.sidenavOpen()).toBe(false);
+  });
+
+  it('clicking hamburger calls sidenav.toggle()', () => {
+    const mockSidenav = { toggle: vi.fn(), opened: false } as any;
+    component.sidenav = mockSidenav;
+    const hamburger = fixture.nativeElement.querySelector('[data-testid="hamburger"]') as HTMLElement;
+    hamburger.click();
+    fixture.detectChanges();
+    expect(mockSidenav.toggle).toHaveBeenCalledOnce();
   });
 
   it('renders a mat-toolbar element', () => {

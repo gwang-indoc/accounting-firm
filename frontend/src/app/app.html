@@ -1,1 +1,37 @@
-<router-outlet />
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #sidenav mode="over" position="start" class="app-sidenav">
+    <mat-nav-list>
+      <a mat-list-item href="#services" (click)="sidenav.close()">Services</a>
+      <a mat-list-item href="#security" (click)="sidenav.close()">Security</a>
+      <mat-list-item (click)="loginOpen.update(v => !v)">Client Login</mat-list-item>
+      @if (loginOpen()) {
+        <div class="sidenav-login-panel">
+          <a
+            href="/oauth2/authorization/google"
+            class="sidenav-google-signin-btn"
+            (click)="sidenav.close()"
+          >Sign in with Google</a>
+          <p class="sidenav-security-label">🔒 Secured with Google OAuth2</p>
+        </div>
+      }
+      <a mat-list-item routerLink="/contact" (click)="sidenav.close()">Contact</a>
+      <a mat-list-item routerLink="/contact" class="sidenav-cta" (click)="sidenav.close()">Book Consultation</a>
+    </mat-nav-list>
+    <div class="sidenav-lang-toggle">
+      <button
+        class="lang-pill"
+        [class.active]="lang() === 'en'"
+        (click)="setLang('en')"
+      >EN</button>
+      <button
+        class="lang-pill"
+        [class.active]="lang() === 'zh'"
+        (click)="setLang('zh')"
+      >中文</button>
+    </div>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <app-navbar [sidenav]="sidenav" />
+    <router-outlet />
+  </mat-sidenav-content>
+</mat-sidenav-container>

@@ -1,22 +1,29 @@
-import { Component, signal } from '@angular/core';
+import { Component, Input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ClientPortalLoginComponent } from '../../features/client-portal/client-portal-login/client-portal-login.component';
 import { MatToolbar } from '@angular/material/toolbar';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { MatSidenav } from '@angular/material/sidenav';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, ClientPortalLoginComponent, MatToolbar, MatButton, MatMenu, MatMenuItem, MatMenuTrigger],
+  imports: [RouterLink, MatToolbar, MatButton, MatIconButton, MatMenu, MatMenuItem, MatMenuTrigger],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
 })
 export class NavbarComponent {
+  @Input() sidenav!: MatSidenav;
+
   lang = signal<'en' | 'zh'>('en');
-  menuOpen = signal(false);
+  sidenavOpen = signal(false);
 
   setLang(value: 'en' | 'zh'): void {
     this.lang.set(value);
+  }
+
+  toggleSidenav(): void {
+    this.sidenav.toggle();
+    this.sidenavOpen.update(v => !v);
   }
 }
