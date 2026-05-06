@@ -23,11 +23,11 @@ Invoke superpowers:subagent-driven-development to dispatch groups 1, 2 in parall
 
 ## 3. Document Foundation (Migration, Entity, Repository)
 
-- [ ] 3.1 Write Flyway migration `V6__create_client_documents.sql`: `CREATE TABLE client_documents (id BIGSERIAL PRIMARY KEY, client_id BIGINT NOT NULL REFERENCES clients(id), year SMALLINT NOT NULL, filename VARCHAR(255) NOT NULL, file_path VARCHAR(500) NOT NULL, mime_type VARCHAR(127), size_bytes BIGINT, uploaded_by BIGINT NOT NULL REFERENCES users(id), uploaded_at TIMESTAMP NOT NULL DEFAULT NOW(), UNIQUE (client_id, year, filename))`
-- [ ] 3.2 RED — `@DataJpaTest` for `ClientDocument`: persist a document linked to a saved client; assert all fields persist; attempt a second insert with same `(client_id, year, filename)` and assert constraint violation; run test, confirm FAILURE
-- [ ] 3.3 GREEN — create `ClientDocument @Entity` + `ClientDocumentRepository` with custom finders: `findByClientIdAndYear(Long clientId, int year)`, `findByClientIdAndYearAndFilename(Long clientId, int year, String filename)`; run test, confirm PASS; commit
-- [ ] 3.Z Run superpowers:requesting-code-review on the diff for group 3; address CRITICAL/HIGH findings before moving on
-- [ ] 3.Z+1 Update `docs/log/2026-05-06.md` — add entry for group 3 with commit hash, feature bullets, code review findings, test count, and TDD evidence (paste RED failure lines)
+- [x] 3.1 Write Flyway migration `V6__create_client_documents.sql`: `CREATE TABLE client_documents (id BIGSERIAL PRIMARY KEY, client_id BIGINT NOT NULL REFERENCES clients(id), year SMALLINT NOT NULL, filename VARCHAR(255) NOT NULL, file_path VARCHAR(500) NOT NULL, mime_type VARCHAR(127), size_bytes BIGINT, uploaded_by BIGINT NOT NULL REFERENCES users(id), uploaded_at TIMESTAMP NOT NULL DEFAULT NOW(), UNIQUE (client_id, year, filename))`
+- [x] 3.2 RED — `@DataJpaTest` for `ClientDocument`: persist a document linked to a saved client; assert all fields persist; attempt a second insert with same `(client_id, year, filename)` and assert constraint violation; run test, confirm FAILURE
+- [x] 3.3 GREEN — create `ClientDocument @Entity` + `ClientDocumentRepository` with custom finders: `findByClientIdAndYear(Long clientId, int year)`, `findByClientIdAndYearAndFilename(Long clientId, int year, String filename)`; run test, confirm PASS; commit
+- [x] 3.Z Run superpowers:requesting-code-review on the diff for group 3; address CRITICAL/HIGH findings before moving on
+- [x] 3.Z+1 Update `docs/log/2026-05-06.md` — add entry for group 3 with commit hash, feature bullets, code review findings, test count, and TDD evidence (paste RED failure lines)
 
 ## 4. Document Service & Controller
 
