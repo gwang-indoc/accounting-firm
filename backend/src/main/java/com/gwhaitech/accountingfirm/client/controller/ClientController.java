@@ -2,7 +2,6 @@ package com.gwhaitech.accountingfirm.client.controller;
 
 import com.gwhaitech.accountingfirm.client.dto.ClientDto;
 import com.gwhaitech.accountingfirm.client.dto.CreateClientRequest;
-import com.gwhaitech.accountingfirm.client.exception.ClientNotFoundException;
 import com.gwhaitech.accountingfirm.client.service.ClientService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -33,10 +32,5 @@ public class ClientController {
     @GetMapping("/{id}")
     public ResponseEntity<ClientDto> getById(@PathVariable Long id) {
         return ResponseEntity.ok(clientService.findById(id));
-    }
-
-    @ExceptionHandler(ClientNotFoundException.class)
-    public ResponseEntity<Void> handleNotFound() {
-        return ResponseEntity.notFound().build();
     }
 }
