@@ -4,6 +4,7 @@ import com.gwhaitech.accountingfirm.auth.domain.User;
 import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
 import com.gwhaitech.accountingfirm.auth.service.AuthService;
 import com.gwhaitech.accountingfirm.auth.service.JwtService;
+import com.gwhaitech.accountingfirm.client.service.ClientService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.impl.DefaultClaims;
 import jakarta.servlet.http.Cookie;
@@ -72,6 +73,10 @@ class JwtAuthFilterTest {
     // satisfies AuthController constructor wiring in the WebMvcTest context
     @MockitoBean
     private AuthService authService;
+
+    // satisfies ClientController constructor wiring in the WebMvcTest context
+    @MockitoBean
+    private ClientService clientService;
 
     @Test
     void validJwtCookie_setsAuthenticatedPrincipal() throws Exception {
