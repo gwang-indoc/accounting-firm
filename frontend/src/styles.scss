@@ -28,7 +28,9 @@ body {
   font-family: inherit;
 }
 
-// Client Login MatMenu panel — must live in global styles (CDK overlay portal is outside component scope)
+// Client Login MatMenu panel — must live in global styles.
+// CDK overlays render in a portal appended to <body>, outside the component's DOM subtree,
+// so component-scoped CSS cannot reach them. panelClass="login-menu-panel" applied in navbar template.
 .login-menu-panel {
   padding: 20px;
   min-width: 280px;

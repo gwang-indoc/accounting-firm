@@ -20,7 +20,7 @@ describe('ClientPortalLoginComponent', () => {
   });
 
   it('clicking Client Login button shows dropdown', async () => {
-    const button = fixture.nativeElement.querySelector('[data-testid="client-login-btn"]');
+    const button = fixture.nativeElement.querySelector('[data-testid="drawer-client-login-btn"]');
     button.click();
     fixture.detectChanges();
     const dropdown = fixture.nativeElement.querySelector('.login-dropdown');
@@ -29,7 +29,7 @@ describe('ClientPortalLoginComponent', () => {
 
   it('clicking outside hides dropdown', async () => {
     // Open it first
-    const button = fixture.nativeElement.querySelector('[data-testid="client-login-btn"]');
+    const button = fixture.nativeElement.querySelector('[data-testid="drawer-client-login-btn"]');
     button.click();
     fixture.detectChanges();
     // Click outside (on document body)
@@ -40,7 +40,7 @@ describe('ClientPortalLoginComponent', () => {
   });
 
   it('"Sign in with Google" link href is /oauth2/authorization/google', async () => {
-    const button = fixture.nativeElement.querySelector('[data-testid="client-login-btn"]');
+    const button = fixture.nativeElement.querySelector('[data-testid="drawer-client-login-btn"]');
     button.click();
     fixture.detectChanges();
     const link = fixture.nativeElement.querySelector('[data-testid="google-signin-link"]');

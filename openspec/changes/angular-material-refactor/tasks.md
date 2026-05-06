@@ -13,12 +13,12 @@
 ## 2. NavbarComponent → MatToolbar + MatMenu (desktop) [parallel]
 
 - [x] 2.0 Invoke superpowers:subagent-driven-development to dispatch the [parallel] units in this group; one subagent owns one RED+GREEN pair end-to-end including self-review
-- [ ] 2.1 RED — update `navbar.component.spec.ts`: assert `mat-toolbar` is present and `mat-button` elements exist for nav links → `npx ng test --include='**/navbar.component.spec.ts'` → confirm FAILURE; paste RED output into dev log [parallel]
-- [ ] 2.2 GREEN — replace `<nav class="navbar">` with `<mat-toolbar color="primary">`; replace anchor/button nav links with `mat-button`; replace CTA `<a>` with `<a mat-flat-button>`; import `MatToolbar`, `MatButton` in `navbar.component.ts` → confirm PASS [parallel]
-- [ ] 2.3 RED — update `navbar.component.spec.ts`: assert `[matMenuTrigger]` attribute exists on Client Login button and `mat-menu` is in the template → confirm FAILURE; paste RED output into dev log [parallel]
-- [ ] 2.4 GREEN — replace `<app-client-portal-login />` (desktop) with `<button mat-button [matMenuTrigger]="loginMenu">Client Login</button>` + `<mat-menu #loginMenu>`; update `ClientPortalLoginComponent` to use `MatMenu` + `mat-menu-item`; import `MatMenu`, `MatMenuItem` → confirm PASS [parallel]
-- [ ] 2.5 Trim `navbar.component.css` and `client-portal-login.component.css` — remove all rules now handled by Material; retain: logo icon styles, brand text colours, tagline colour, language pill styles, `position: fixed` on `mat-toolbar` host, `@media (max-width: 767px)` breakpoint
-- [ ] 2.6 `npx ng test --no-watch` — all tests green
+- [x] 2.1 RED — update `navbar.component.spec.ts`: assert `mat-toolbar` is present and `mat-button` elements exist for nav links → `npx ng test --include='**/navbar.component.spec.ts'` → confirm FAILURE; paste RED output into dev log [parallel]
+- [x] 2.2 GREEN — replace `<nav class="navbar">` with `<mat-toolbar color="primary">`; replace anchor/button nav links with `mat-button`; replace CTA `<a>` with `<a mat-flat-button>`; import `MatToolbar`, `MatButton` in `navbar.component.ts` → confirm PASS [parallel]
+- [x] 2.3 RED — update `navbar.component.spec.ts`: assert `[matMenuTrigger]` attribute exists on Client Login button and `mat-menu` is in the template → confirm FAILURE; paste RED output into dev log [parallel]
+- [x] 2.4 GREEN — replace `<app-client-portal-login />` (desktop) with `<button mat-button [matMenuTrigger]="loginMenu">Client Login</button>` + `<mat-menu #loginMenu>`; update `ClientPortalLoginComponent` to use `MatMenu` + `mat-menu-item`; import `MatMenu`, `MatMenuItem` → confirm PASS [parallel]
+- [x] 2.5 Trim `navbar.component.css` and `client-portal-login.component.css` — remove all rules now handled by Material; retain: logo icon styles, brand text colours, tagline colour, language pill styles, `position: fixed` on `mat-toolbar` host, `@media (max-width: 767px)` breakpoint
+- [x] 2.6 `npx ng test --no-watch` — all tests green
 - [ ] 2.7 Run superpowers:requesting-code-review on the diff for group 2; address CRITICAL/HIGH findings before moving on
 - [ ] 2.8 Update `docs/log/2026-05-06.md` — commit hash, feature bullets, review findings, test count, TDD evidence
 
