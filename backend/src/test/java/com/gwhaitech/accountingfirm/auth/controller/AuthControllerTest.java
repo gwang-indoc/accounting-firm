@@ -2,6 +2,7 @@ package com.gwhaitech.accountingfirm.auth.controller;
 
 import com.gwhaitech.accountingfirm.auth.domain.User;
 import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
+import com.gwhaitech.accountingfirm.auth.exception.EmailAlreadyRegisteredException;
 import com.gwhaitech.accountingfirm.auth.service.AuthService;
 import com.gwhaitech.accountingfirm.auth.service.JwtService;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,6 +27,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -118,6 +119,7 @@ class AuthControllerTest {
                          "password":"secret123","confirmPassword":"secret123"}
                         """))
                 .andExpect(status().isCreated());
+        verify(authService).register(any());
     }
 
     @Test
@@ -135,7 +137,7 @@ class AuthControllerTest {
 
     @Test
     void registerWithDuplicateEmail_returns409() throws Exception {
-        doThrow(new DataIntegrityViolationException("duplicate"))
+        doThrow(new EmailAlreadyRegisteredException())
                 .when(authService).register(any());
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)

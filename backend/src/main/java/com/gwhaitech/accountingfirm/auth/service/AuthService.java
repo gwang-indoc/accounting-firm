@@ -3,10 +3,14 @@ package com.gwhaitech.accountingfirm.auth.service;
 import com.gwhaitech.accountingfirm.auth.domain.User;
 import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
 import com.gwhaitech.accountingfirm.auth.dto.RegisterRequest;
+import com.gwhaitech.accountingfirm.auth.exception.EmailAlreadyRegisteredException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Objects;
 
 @Service
 public class AuthService {
@@ -19,6 +23,7 @@ public class AuthService {
     }
 
     public void register(RegisterRequest request) {
+        Objects.requireNonNull(request.password(), "password must not be null");
         if (!request.password().equals(request.confirmPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passwords do not match");
         }
@@ -27,6 +32,10 @@ public class AuthService {
         user.setEmail(request.email());
         user.setPasswordHash(passwordEncoder.encode(request.password()));
         user.setRole("USER");
-        userRepository.save(user);
+        try {
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new EmailAlreadyRegisteredException();
+        }
     }
 }

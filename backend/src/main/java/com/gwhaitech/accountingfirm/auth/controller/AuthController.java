@@ -2,13 +2,13 @@ package com.gwhaitech.accountingfirm.auth.controller;
 
 import com.gwhaitech.accountingfirm.auth.domain.User;
 import com.gwhaitech.accountingfirm.auth.dto.RegisterRequest;
+import com.gwhaitech.accountingfirm.auth.exception.EmailAlreadyRegisteredException;
 import com.gwhaitech.accountingfirm.auth.service.AuthService;
 import com.gwhaitech.accountingfirm.common.dto.UserDto;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -51,7 +51,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ExceptionHandler(EmailAlreadyRegisteredException.class)
     public ResponseEntity<Void> handleDuplicate() {
         return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }

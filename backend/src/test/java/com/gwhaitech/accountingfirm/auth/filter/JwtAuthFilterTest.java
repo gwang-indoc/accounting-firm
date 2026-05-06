@@ -69,6 +69,7 @@ class JwtAuthFilterTest {
     @MockitoBean
     private UserRepository userRepository;
 
+    // satisfies AuthController constructor wiring in the WebMvcTest context
     @MockitoBean
     private AuthService authService;
 
