@@ -26,9 +26,6 @@ public class AuthController {
     @Value("${app.cookie.secure:true}")
     private boolean cookieSecure;
 
-    @Value("${app.jwt.expiration-ms:86400000}")
-    private long expirationMs;
-
     public AuthController(AuthService authService, JwtService jwtService) {
         this.authService = authService;
         this.jwtService = jwtService;
@@ -42,13 +39,7 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response) {
-        Cookie cookie = new Cookie("jwt", "");
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setSecure(cookieSecure);
-        cookie.setMaxAge(0);
-        cookie.setAttribute("SameSite", "Strict");
-        response.addCookie(cookie);
+        response.addCookie(buildJwtCookie("", 0));
         return ResponseEntity.ok().build();
     }
 
@@ -61,19 +52,22 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<Void> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
         User user = authService.login(request);
-        String token = jwtService.issueToken(user);
-        Cookie cookie = new Cookie("jwt", token);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setSecure(cookieSecure);
-        cookie.setMaxAge((int) (expirationMs / 1000));
-        cookie.setAttribute("SameSite", "Strict");
-        response.addCookie(cookie);
+        response.addCookie(buildJwtCookie(jwtService.issueToken(user), jwtService.expirationSeconds()));
         return ResponseEntity.ok().build();
     }
 
     @ExceptionHandler(EmailAlreadyRegisteredException.class)
     public ResponseEntity<Void> handleDuplicate() {
         return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    }
+
+    private Cookie buildJwtCookie(String value, int maxAge) {
+        Cookie cookie = new Cookie("jwt", value);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setSecure(cookieSecure);
+        cookie.setMaxAge(maxAge);
+        cookie.setAttribute("SameSite", "Strict");
+        return cookie;
     }
 }

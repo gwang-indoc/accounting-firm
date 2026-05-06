@@ -187,4 +187,14 @@ class AuthControllerTest {
                         """))
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    void loginWithBlankEmail_returns400() throws Exception {
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"email":"","password":"secret123"}
+                        """))
+                .andExpect(status().isBadRequest());
+    }
 }

@@ -38,6 +38,10 @@ public class JwtService {
                 .compact();
     }
 
+    public int expirationSeconds() {
+        return (int) (expirationMs / 1000);
+    }
+
     public Claims validateToken(String token) throws JwtException {
         return Jwts.parser()
                 .verifyWith(key)
