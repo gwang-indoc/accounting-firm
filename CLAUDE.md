@@ -53,6 +53,15 @@ Write the failing test first. **The RED phase must be verified** — run the tes
 - [ ] N.X+1 GREEN — write minimal impl → run ./mvnw test -Dtest=X → confirm PASS
 ```
 
+**Test code is the permanent record.** Every test written during RED must be committed to its test file (`*Test.java`, `*.spec.ts`, `e2e/*.spec.ts`) alongside the implementation. These committed tests become the regression suite for all future task groups — they are not throw-away scaffolding.
+
+**Before starting each new task group**, run the full test suite to confirm the baseline is green:
+- Backend: `cd backend && ./mvnw test`
+- Frontend: `cd frontend && npx ng test --no-watch`
+- E2E (if servers are up): `cd e2e && npx playwright test`
+
+A failing baseline must be fixed before new work begins.
+
 ## Frontend (Angular)
 
 ### Key Architecture
@@ -115,7 +124,7 @@ All changes, specs, and archives live under `openspec/` at the project root.
 **Important — `tasks.md` required steps per group:** Every `## N` group must end with:
 ```
 - [ ] N.Z   Run superpowers:requesting-code-review on the diff for group N
-- [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — commit hash, feature bullets, review findings, test count, TDD evidence (RED failure lines for new tests)
+- [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — commit hash, feature bullets, review findings, test count, and names of newly added test files/classes
 ```
 For the final group (if UI is touched), include these two tasks immediately before `N.Z`:
 ```
@@ -202,7 +211,7 @@ When working through `tasks.md`:
 Every task group in `tasks.md` MUST include a log update step. When generating `tasks.md` (during `/opsx:propose`), add this task at the end of each `## N` group, after the code-review checkpoint:
 
 ```
-- [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — add entry for group N with commit hash, feature bullet points, code review findings, test count, and TDD evidence (paste RED failure lines for any newly added tests)
+- [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — add entry for group N with commit hash, feature bullet points, code review findings, test count, and names of newly added test files/classes
 ```
 
 Log file path: `docs/log/YYYY-MM-DD.md` — name the file by date. If the file for that day does not exist, create it.
@@ -222,15 +231,14 @@ Log file path: `docs/log/YYYY-MM-DD.md` — name the file by date. If the file f
 | Severity | Issue | Fix |
 |---|---|---|
 
-**Tests:** X tests all passed, including Y newly added tests
+**Tests:** X total passing (Y newly added in this group)
 
-**TDD Evidence (for any tests added in this group):**
+**New test files/classes (committed as regression guards):**
+- `path/to/NewFeatureTest.java` — tests X, Y, Z behaviours
+- `frontend/src/app/.../component.spec.ts` — tests A, B behaviours
+- `e2e/feature.spec.ts` — E2E flow for …
 
-    AssertionError: expected 'static' to equal 'fixed'
-    Expected: "fixed"
-    Received: "static"
-
-_Paste key RED failure lines that prove each new test failed before the fix. Omit if no new tests were added._
+_List every test file added or significantly extended in this group. These are the permanent regression suite for future tasks. Omit if no new test files were added._
 ```
 
 ### Rules
