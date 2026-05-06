@@ -120,23 +120,33 @@ npx playwright test --grep "login"     # single test
 ## OpenSpec Workflow
 
 Change proposals and tasks live in `openspec/`. Use `/opsx:propose` to create a new change, `/opsx:apply` to implement it, and `/opsx:archive` when done.
-All changes, specs, and archives live under `openspec/` at the project root.
 
-**Important — `/opsx:propose` + brainstorming:** `/opsx:propose` triggers `superpowers:brainstorming` first. When brainstorming finishes, it will try to invoke `superpowers:writing-plans` as its terminal state — **ignore that**. Return to the `/opsx:propose` flow and generate the OpenSpec artifacts (`proposal.md`, `design.md`, `tasks.md`). The `writing-plans` terminal state only applies when brainstorming is run standalone.
+### `/opsx:propose` — required sequence
 
-**Important — confirmation before artifacts:** After brainstorming finishes and the design spec is written and committed, **stop and ask the user to confirm** before generating any OpenSpec artifacts. Do not auto-proceed. Wait for an explicit "yes" / "go ahead" before calling `openspec new change` or writing `proposal.md`, `design.md`, specs, or `tasks.md`.
+1. `superpowers:brainstorming` runs first (auto-triggered)
+2. After brainstorming: write the design spec and commit it
+3. **STOP** — ask the user to confirm before generating any artifacts
+4. On confirmation: run `openspec new change`, then generate `proposal.md`, `design.md`, `tasks.md`
 
-**Important — `/opsx:apply` required skills:** Before implementing any task, ALWAYS invoke these skills in order:
+> **Brainstorming terminal state:** After brainstorming completes it will suggest invoking `superpowers:writing-plans` — **ignore that**. That applies to standalone brainstorming only. Continue with step 3 above.
+
+### `/opsx:apply` — required skills (in order)
+
+Before implementing any task, invoke:
 1. `superpowers:test-driven-development` — at session start, before writing any code
-2. `superpowers:subagent-driven-development` — to dispatch a fresh subagent per `[parallel]` task with two-stage review (spec compliance, then code quality)
-3. `superpowers:requesting-code-review` — at each task-group checkpoint (`N.Z` tasks)
+2. `superpowers:subagent-driven-development` — dispatch a fresh subagent per `[parallel]` task with two-stage review (spec compliance, then code quality)
+3. `superpowers:requesting-code-review` — at each task-group checkpoint (`N.Z`)
 
-**Important — `tasks.md` required steps per group:** Every `## N` group must end with:
+### `tasks.md` — required structure per group
+
+**Before dispatching any subagents:** audit every `## N` group — confirm each has an N.Z (code review) and N.Z+1 (log update) task. Add them if missing.
+
+Every `## N` group must end with:
 ```
 - [ ] N.Z   Run superpowers:requesting-code-review on the diff for group N
 - [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — commit hash, feature bullets, review findings, test count, and TDD evidence (paste RED failure lines for each new test)
 ```
-For the final group (if UI is touched), include these two tasks immediately before `N.Z`:
+For the final group (if UI is touched), add these two tasks immediately before `N.Z`:
 ```
 - [ ] M.J Write/update Playwright E2E test under `e2e/` for the affected user flow; commit the file. Run:
          1. ./start.sh                          # start backend
