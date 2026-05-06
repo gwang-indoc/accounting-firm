@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 import { UserDto } from '../models/user.model';
 
 @Injectable({ providedIn: 'root' })
@@ -17,5 +17,13 @@ export class AuthService {
     } catch {
       this.currentUser.set(null);
     }
+  }
+
+  register(dto: { fullName: string; email: string; password: string; confirmPassword: string }): Observable<void> {
+    return this.http.post<void>('/api/auth/register', dto);
+  }
+
+  loginWithEmail(dto: { email: string; password: string }): Observable<void> {
+    return this.http.post<void>('/api/auth/login', dto);
   }
 }

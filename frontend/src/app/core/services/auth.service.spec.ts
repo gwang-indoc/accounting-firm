@@ -40,4 +40,26 @@ describe('AuthService', () => {
     expect(service.currentUser()).toBeNull();
     expect(service.isAuthenticated()).toBe(false);
   });
+
+  it('register POSTs to /api/auth/register and returns Observable<void>', () => {
+    const dto = { fullName: 'Alice', email: 'alice@test.com', password: 'pass1234', confirmPassword: 'pass1234' };
+    let completed = false;
+    service.register(dto).subscribe({ complete: () => { completed = true; } });
+    const req = httpMock.expectOne('/api/auth/register');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(dto);
+    req.flush(null);
+    expect(completed).toBe(true);
+  });
+
+  it('loginWithEmail POSTs to /api/auth/login and returns Observable<void>', () => {
+    const dto = { email: 'alice@test.com', password: 'pass1234' };
+    let completed = false;
+    service.loginWithEmail(dto).subscribe({ complete: () => { completed = true; } });
+    const req = httpMock.expectOne('/api/auth/login');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(dto);
+    req.flush(null);
+    expect(completed).toBe(true);
+  });
 });
