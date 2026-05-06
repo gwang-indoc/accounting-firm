@@ -1,7 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
+import { EventEmitter } from '@angular/core';
 import { vi } from 'vitest';
 import { NavbarComponent } from './navbar.component';
+
+function mockSidenav() {
+  return { toggle: vi.fn(), opened: false, openedChange: new EventEmitter<boolean>() } as any;
+}
 
 describe('NavbarComponent', () => {
   let component: NavbarComponent;
@@ -96,8 +101,8 @@ describe('NavbarComponent', () => {
   });
 
   it('clicking the hamburger button sets sidenavOpen() to true', () => {
-    const mockSidenav = { toggle: vi.fn(), opened: false } as any;
-    component.sidenav = mockSidenav;
+    const mock = mockSidenav();
+    component.sidenav = mock;
     const hamburger = fixture.nativeElement.querySelector('[data-testid="hamburger"]') as HTMLElement;
     hamburger.click();
     fixture.detectChanges();
@@ -105,8 +110,8 @@ describe('NavbarComponent', () => {
   });
 
   it('clicking the hamburger button again sets sidenavOpen() back to false', () => {
-    const mockSidenav = { toggle: vi.fn(), opened: false } as any;
-    component.sidenav = mockSidenav;
+    const mock = mockSidenav();
+    component.sidenav = mock;
     const hamburger = fixture.nativeElement.querySelector('[data-testid="hamburger"]') as HTMLElement;
     hamburger.click();
     fixture.detectChanges();
@@ -116,12 +121,12 @@ describe('NavbarComponent', () => {
   });
 
   it('clicking hamburger calls sidenav.toggle()', () => {
-    const mockSidenav = { toggle: vi.fn(), opened: false } as any;
-    component.sidenav = mockSidenav;
+    const mock = mockSidenav();
+    component.sidenav = mock;
     const hamburger = fixture.nativeElement.querySelector('[data-testid="hamburger"]') as HTMLElement;
     hamburger.click();
     fixture.detectChanges();
-    expect(mockSidenav.toggle).toHaveBeenCalledOnce();
+    expect(mock.toggle).toHaveBeenCalledOnce();
   });
 
   it('renders a mat-toolbar element', () => {

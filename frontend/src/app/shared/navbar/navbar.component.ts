@@ -1,4 +1,4 @@
-import { Component, Input, signal } from '@angular/core';
+import { Component, Input, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -12,11 +12,18 @@ import { MatSidenav } from '@angular/material/sidenav';
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   @Input() sidenav!: MatSidenav;
 
   lang = signal<'en' | 'zh'>('en');
   sidenavOpen = signal(false);
+
+  ngOnInit(): void {
+    if (this.sidenav) {
+      // Sync icon when sidenav closes via scrim or external call
+      this.sidenav.openedChange.subscribe(opened => this.sidenavOpen.set(opened));
+    }
+  }
 
   setLang(value: 'en' | 'zh'): void {
     this.lang.set(value);
