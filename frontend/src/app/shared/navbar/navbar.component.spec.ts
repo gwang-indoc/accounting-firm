@@ -145,10 +145,6 @@ describe('NavbarComponent', () => {
     expect(nativeEl.querySelector('[mat-flat-button]')).not.toBeNull();
   });
 
-  it.skip('Client Login button had matMenuTrigger — replaced by routerLink in Group 4', () => {
-    // Superseded by "Client Login button has routerLink /login and no matMenuTriggerFor"
-  });
-
   it('Client Login button has routerLink /login and no matMenuTriggerFor', () => {
     const nativeEl = fixture.nativeElement as HTMLElement;
     const btn = nativeEl.querySelector('[data-testid="client-login-btn"]');
