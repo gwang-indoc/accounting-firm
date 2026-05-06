@@ -63,5 +63,5 @@ Invoke superpowers:subagent-driven-development to dispatch groups 1, 2 in parall
 ## 5. Final Verification
 
 - [x] 5.1 Run superpowers:verification-before-completion: `cd backend && ./mvnw test`; grep codebase for `System.out.println` and `console.log`; review full diff for stray debug code or missed requirements from specs
-- [ ] 5.Z Run superpowers:requesting-code-review on the full change diff
-- [ ] 5.Z+1 Update `docs/log/2026-05-06.md` — final entry with all commit hashes, complete feature summary, and any outstanding items
+- [x] 5.Z Run superpowers:requesting-code-review on the full change diff
+- [x] 5.Z+1 Update `docs/log/2026-05-06.md` — final entry with all commit hashes, complete feature summary, and any outstanding items
