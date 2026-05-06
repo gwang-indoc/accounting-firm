@@ -123,4 +123,15 @@ describe('NavbarComponent', () => {
     fixture.detectChanges();
     expect(component.menuOpen()).toBe(false);
   });
+
+  it('renders a mat-toolbar element', () => {
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    expect(nativeEl.querySelector('mat-toolbar')).not.toBeNull();
+  });
+
+  it('nav links are rendered as mat-button elements', () => {
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    const matButtons = nativeEl.querySelectorAll('[mat-button]');
+    expect(matButtons.length).toBeGreaterThan(0);
+  });
 });

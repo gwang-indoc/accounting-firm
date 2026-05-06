@@ -1,11 +1,13 @@
 import { Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ClientPortalLoginComponent } from '../../features/client-portal/client-portal-login/client-portal-login.component';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, ClientPortalLoginComponent],
+  imports: [RouterLink, ClientPortalLoginComponent, MatToolbar, MatButton],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
 })

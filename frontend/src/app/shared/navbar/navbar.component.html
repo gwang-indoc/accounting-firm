@@ -1,4 +1,4 @@
-<nav class="navbar">
+<mat-toolbar color="primary" class="navbar-toolbar">
   <div class="brand">
     <div class="logo-icon">税</div>
     <div class="brand-text">
@@ -8,11 +8,11 @@
   </div>
 
   <div class="nav-links">
-    <a href="#services">Services</a>
-    <a href="#security">Security</a>
+    <a mat-button href="#services">Services</a>
+    <a mat-button href="#security">Security</a>
     <app-client-portal-login />
-    <a routerLink="/contact">Contact</a>
-    <a routerLink="/contact" class="cta-btn">Book Consultation</a>
+    <a mat-button routerLink="/contact">Contact</a>
+    <a mat-flat-button routerLink="/contact" class="cta-btn">Book Consultation</a>
   </div>
 
   <div class="lang-toggle">
@@ -31,7 +31,7 @@
   </div>
 
   <button class="hamburger" data-testid="hamburger" (click)="menuOpen.update(v => !v)">{{ menuOpen() ? '✕' : '☰' }}</button>
-</nav>
+</mat-toolbar>
 
 @if (menuOpen()) {
   <div class="mobile-drawer">
