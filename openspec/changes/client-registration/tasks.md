@@ -152,11 +152,11 @@
 
 ## 5. Frontend Components
 
-- [ ] 5.0 Invoke superpowers:subagent-driven-development to dispatch the [parallel] units in this group; one subagent owns one component (stub → full impl → tests) end-to-end including self-review. Units: LoginComponent (5.1–5.4), RegisterComponent (5.5–5.8), LoginEmailComponent (5.9–5.12).
+- [x] 5.0 Invoke superpowers:subagent-driven-development to dispatch the [parallel] units in this group; one subagent owns one component (stub → full impl → tests) end-to-end including self-review. Units: LoginComponent (5.1–5.4), RegisterComponent (5.5–5.8), LoginEmailComponent (5.9–5.12).
 
 **LoginComponent** (`src/app/features/auth/login/`)
 
-- [ ] 5.1 [parallel] Replace stub `login.component.ts` + create `login.component.html` and `login.component.css`:
+- [x] 5.1 [parallel] Replace stub `login.component.ts` + create `login.component.html` and `login.component.css`:
          **HTML** — single centered `mat-card` with `mat-card-header` title "Client Portal", subtitle "Sign in to access your account":
          - `<a mat-flat-button style="background:#4285f4;color:white" href="/oauth2/authorization/google">` with Google "G" icon span + "Sign in with Google"
          - `<mat-divider>` with "or" label
@@ -164,17 +164,17 @@
          - `<mat-divider>` with "or" label
          - `<a mat-button routerLink="/login/email">Sign in with Email →</a>`
          **TS** — standalone, imports: `MatCardModule`, `MatButtonModule`, `MatDividerModule`, `MatSnackBarModule`, `RouterModule`. Inject `ActivatedRoute` and `MatSnackBar`. In `ngOnInit()`: if `route.snapshot.queryParamMap.get('registered') === 'true'`, call `snackBar.open('Account created! Please sign in.', 'OK', { duration: 4000 })`.
-- [ ] 5.2 [parallel] RED — write `login.component.spec.ts`:
+- [x] 5.2 [parallel] RED — write `login.component.spec.ts`:
          (a) renders heading "Client Portal"
          (b) Google button has `href="/oauth2/authorization/google"`
          (c) Register button has `routerLink="/register"`
          (d) With `queryParams: { registered: 'true' }`, `MatSnackBar.open` is called with 'Account created! Please sign in.'
          Run: `npx ng test --include='**/login.component.spec.ts' --no-watch` → confirm FAILURE. Paste lines to dev log.
-- [ ] 5.3 [parallel] GREEN — implement `LoginComponent.ngOnInit()` snackbar logic. Run test → confirm PASS → commit
+- [x] 5.3 [parallel] GREEN — implement `LoginComponent.ngOnInit()` snackbar logic. Run test → confirm PASS → commit
 
 **RegisterComponent** (`src/app/features/auth/register/`)
 
-- [ ] 5.4 [parallel] Replace stub `register.component.ts` + create `register.component.html` and `register.component.css`:
+- [x] 5.4 [parallel] Replace stub `register.component.ts` + create `register.component.html` and `register.component.css`:
          **HTML** — `mat-card` with title "Create Account", subtitle "Fill in your details below":
          - `mat-form-field` × 4: Full Name (`formControlName="fullName"`), Email (`formControlName="email"`), Password (`type="password"`, `formControlName="password"`), Confirm Password (`type="password"`, `formControlName="confirmPassword"`)
          - Each field has `<mat-error>` for required + format + custom errors
@@ -190,16 +190,16 @@
          }
          ```
          On `submit()`: if form invalid return. Call `authService.register(form.value)`. On success: `router.navigate(['/login'], { queryParams: { registered: 'true' } })`. On 409 error: `form.get('email')?.setErrors({ emailTaken: true })`. Imports: `MatCardModule`, `MatFormFieldModule`, `MatInputModule`, `MatButtonModule`, `ReactiveFormsModule`, `RouterModule`.
-- [ ] 5.5 [parallel] RED — write `register.component.spec.ts`:
+- [x] 5.5 [parallel] RED — write `register.component.spec.ts`:
          (a) `passwordMatch` validator returns `{ passwordMismatch: true }` when fields differ
          (b) `authService.register()` mock returning error 409 → email control has error `emailTaken`
          (c) `authService.register()` mock returning success → `router.navigate` called with `['/login', { queryParams: { registered: 'true' } }]`
          Run: `npx ng test --include='**/register.component.spec.ts' --no-watch` → confirm FAILURE. Paste lines to dev log.
-- [ ] 5.6 [parallel] GREEN — implement full `RegisterComponent` submit logic. Run test → confirm PASS → commit
+- [x] 5.6 [parallel] GREEN — implement full `RegisterComponent` submit logic. Run test → confirm PASS → commit
 
 **LoginEmailComponent** (`src/app/features/auth/login-email/`)
 
-- [ ] 5.7 [parallel] Replace stub `login-email.component.ts` + create `login-email.component.html` and `login-email.component.css`:
+- [x] 5.7 [parallel] Replace stub `login-email.component.ts` + create `login-email.component.html` and `login-email.component.css`:
          **HTML** — `mat-card` with title "Sign In", subtitle "Use your email and password":
          - `mat-form-field` for Email (`formControlName="email"`, type="email")
          - `mat-form-field` for Password (`formControlName="password"`, type="password")
@@ -207,15 +207,15 @@
          - `<button mat-flat-button type="submit">Sign In</button>`
          - `<a mat-button routerLink="/login">← Back to Login</a>`
          **TS** — standalone, reactive `FormGroup` with `email` (required, email) and `password` (required). Signal `loginError = signal(false)`. On `submit()`: reset `loginError`. Call `authService.loginWithEmail(form.value)`. On success: `router.navigate(['/portal'])`. On 401 error: `loginError.set(true)`. Imports: `MatCardModule`, `MatFormFieldModule`, `MatInputModule`, `MatButtonModule`, `ReactiveFormsModule`, `RouterModule`.
-- [ ] 5.8 [parallel] RED — write `login-email.component.spec.ts`:
+- [x] 5.8 [parallel] RED — write `login-email.component.spec.ts`:
          (a) `authService.loginWithEmail()` mock returning 401 error → `loginError` signal is `true`, error div visible
          (b) `authService.loginWithEmail()` mock returning success → `router.navigate` called with `['/portal']`
          Run: `npx ng test --include='**/login-email.component.spec.ts' --no-watch` → confirm FAILURE. Paste lines to dev log.
-- [ ] 5.9 [parallel] GREEN — implement full `LoginEmailComponent` submit logic. Run test → confirm PASS → commit
+- [x] 5.9 [parallel] GREEN — implement full `LoginEmailComponent` submit logic. Run test → confirm PASS → commit
 
-- [ ] 5.10 Run `cd frontend && npx ng test --no-watch` → all tests passing → commit if any uncommitted changes
-- [ ] 5.11 Run superpowers:requesting-code-review on the diff for group 5; address CRITICAL/HIGH findings before moving on
-- [ ] 5.12 Update `docs/log/2026-05-06.md` — add group 5 entry: commit hash, feature bullets, review findings, test count, TDD evidence (paste RED failure lines from 5.2, 5.5, 5.8)
+- [x] 5.10 Run `cd frontend && npx ng test --no-watch` → all tests passing → commit if any uncommitted changes
+- [x] 5.11 Run superpowers:requesting-code-review on the diff for group 5; address CRITICAL/HIGH findings before moving on
+- [x] 5.12 Update `docs/log/2026-05-06.md` — add group 5 entry: commit hash, feature bullets, review findings, test count, TDD evidence (paste RED failure lines from 5.2, 5.5, 5.8)
 
 ## 6. E2E & Final Verification
 
