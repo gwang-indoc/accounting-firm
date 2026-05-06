@@ -34,6 +34,7 @@ public class LocalStorageService {
         }
     }
 
+    // filePath must come from the database (written by store()) — never pass raw user input directly
     public void delete(String filePath) {
         Path target = baseDir.resolve(filePath);
         try {
@@ -43,6 +44,7 @@ public class LocalStorageService {
         }
     }
 
+    // filePath must come from the database (written by store()) — never pass raw user input directly
     public Path resolve(String filePath) {
         return baseDir.resolve(filePath).toAbsolutePath();
     }
