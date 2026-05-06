@@ -17,7 +17,7 @@ Add a dedicated `/login` page reachable from the navbar "Client Login" button. T
 | `/login/email` | `LoginEmailComponent` | Email/password login form |
 
 - `ClientPortalLoginComponent` (the old MatMenu popover) is removed.
-- All three routes are lazy-loaded under `AuthModule` (or standalone routes in `app.routes.ts`).
+- All three routes are standalone components registered in `app.routes.ts`.
 - `AuthGuard` does **not** protect these routes — they must be accessible without a session.
 
 ---
@@ -83,12 +83,12 @@ Single centered `mat-card` (Layout A — stacked):
 
 ### Database migrations
 
-**`V3__make_google_sub_nullable.sql`**
+**`V2__make_google_sub_nullable.sql`**
 ```sql
 ALTER TABLE users ALTER COLUMN google_sub DROP NOT NULL;
 ```
 
-**`V4__add_password_hash.sql`**
+**`V3__add_password_hash.sql`**
 ```sql
 ALTER TABLE users ADD COLUMN password_hash VARCHAR(60);
 ```
@@ -122,9 +122,9 @@ ALTER TABLE users ADD COLUMN password_hash VARCHAR(60);
 - **Response**: `200 OK` (cookie set, empty body)
 - **Spring Security**: `permitAll()` on `POST /api/auth/login`
 
-### `JwtService` (new or extend existing)
+### `JwtService`
 
-Extract JWT generation into a shared `JwtService` used by both `OAuth2SuccessHandler` and the new `AuthController`. If JWT logic is already in `OAuth2SuccessHandler`, refactor it out into `JwtService` as part of this change.
+`JwtService` already exists at `auth/service/JwtService.java`. `AuthController` will inject it directly to generate and set the JWT cookie — no refactoring needed.
 
 ---
 
