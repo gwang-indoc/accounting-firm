@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface ClientDocumentRepository extends JpaRepository<ClientDocument, Long> {
 
-    List<ClientDocument> findByClientIdAndYear(Long clientId, short year);
+    List<ClientDocument> findByClientIdAndYear(Long clientId, int year);
 
-    Optional<ClientDocument> findByClientIdAndYearAndFilename(Long clientId, short year, String filename);
+    Optional<ClientDocument> findByClientIdAndYearAndFilename(Long clientId, int year, String filename);
 }
