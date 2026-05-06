@@ -31,7 +31,7 @@ Invoke superpowers:subagent-driven-development to dispatch groups 1, 2 in parall
 
 ## 4. Document Service & Controller
 
-- [ ] 4.1 RED — unit test `DocumentService` (mock `LocalStorageService`, `ClientDocumentRepository`, `ClientRepository`, `StorageProperties`):
+- [x] 4.1 RED — unit test `DocumentService` (mock `LocalStorageService`, `ClientDocumentRepository`, `ClientRepository`, `StorageProperties`):
   - `upload()` with a new file: calls `store()` and saves a new `ClientDocument` record
   - `upload()` with same filename: calls `store()` again and updates the existing record
   - `upload()` with blocked extension (e.g. `.exe`): throws `FileValidationException` (400), `store()` never called
@@ -42,8 +42,8 @@ Invoke superpowers:subagent-driven-development to dispatch groups 1, 2 in parall
   - `deleteDocument()` calls `delete()` and removes DB record
   - `deleteDocument()` for unknown id: throws `DocumentNotFoundException` (404)
   - Run test, confirm FAILURE; paste key failure lines into dev log
-- [ ] 4.2 GREEN — implement `DocumentService` (inject `LocalStorageService`, `ClientDocumentRepository`, `ClientRepository`, `StorageProperties`); implement upsert using `findByClientIdAndYearAndFilename` + save; add `FileValidationException` and `DocumentNotFoundException`; run test, confirm PASS; commit
-- [ ] 4.3 RED — `@WebMvcTest DocumentController` (mock `DocumentService`):
+- [x] 4.2 GREEN — implement `DocumentService` (inject `LocalStorageService`, `ClientDocumentRepository`, `ClientRepository`, `StorageProperties`); implement upsert using `findByClientIdAndYearAndFilename` + save; add `FileValidationException` and `DocumentNotFoundException`; run test, confirm PASS; commit
+- [x] 4.3 RED — `@WebMvcTest DocumentController` (mock `DocumentService`):
   - `POST /api/clients/{id}/documents?year=2025` with multipart file → new file returns `201` + metadata JSON
   - same upload (overwrite) → returns `200` + updated metadata
   - blocked extension → `400`
@@ -56,9 +56,9 @@ Invoke superpowers:subagent-driven-development to dispatch groups 1, 2 in parall
   - `DELETE /api/clients/{id}/documents/{docId}` → `204`
   - `DELETE /api/clients/{id}/documents/999` → `404`
   - Run test, confirm FAILURE
-- [ ] 4.4 GREEN — implement `DocumentController` + `DocumentDto` (id, filename, mimeType, sizeBytes, uploadedAt) + `DocumentUploadResponse`; add `@ExceptionHandler` for `FileValidationException` → `400`, `DocumentNotFoundException` → `404`; run test, confirm PASS; commit
-- [ ] 4.Z Run superpowers:requesting-code-review on the diff for group 4; address CRITICAL/HIGH findings before moving on
-- [ ] 4.Z+1 Update `docs/log/2026-05-06.md` — add entry for group 4 with commit hash, feature bullets, code review findings, test count, and TDD evidence (paste RED failure lines for each new test)
+- [x] 4.4 GREEN — implement `DocumentController` + `DocumentDto` (id, filename, mimeType, sizeBytes, uploadedAt) + `DocumentUploadResponse`; add `@ExceptionHandler` for `FileValidationException` → `400`, `DocumentNotFoundException` → `404`; run test, confirm PASS; commit
+- [x] 4.Z Run superpowers:requesting-code-review on the diff for group 4; address CRITICAL/HIGH findings before moving on
+- [x] 4.Z+1 Update `docs/log/2026-05-06.md` — add entry for group 4 with commit hash, feature bullets, code review findings, test count, and TDD evidence (paste RED failure lines for each new test)
 
 ## 5. Final Verification
 
