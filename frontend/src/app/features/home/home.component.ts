@@ -3,7 +3,6 @@ import { MatCard, MatCardHeader, MatCardTitle, MatCardContent } from '@angular/m
 
 @Component({
   selector: 'app-home',
-  standalone: true,
   imports: [MatCard, MatCardHeader, MatCardTitle, MatCardContent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
