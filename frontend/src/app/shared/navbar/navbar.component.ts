@@ -3,13 +3,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton, MatIconButton } from '@angular/material/button';
-import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatSidenav } from '@angular/material/sidenav';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, MatToolbar, MatButton, MatIconButton, MatMenu, MatMenuItem, MatMenuTrigger],
+  imports: [RouterLink, MatToolbar, MatButton, MatIconButton],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
 })

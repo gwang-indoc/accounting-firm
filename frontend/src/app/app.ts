@@ -12,7 +12,6 @@ import { NavbarComponent } from './shared/navbar/navbar.component';
   styleUrl: './app.css',
 })
 export class App {
-  loginOpen = signal(false);
   lang = signal<'en' | 'zh'>('en');
 
   setLang(value: 'en' | 'zh'): void {

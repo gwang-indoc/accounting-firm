@@ -145,12 +145,15 @@ describe('NavbarComponent', () => {
     expect(nativeEl.querySelector('[mat-flat-button]')).not.toBeNull();
   });
 
-  it('Client Login button has matMenuTrigger and mat-menu is in template', () => {
+  it.skip('Client Login button had matMenuTrigger — replaced by routerLink in Group 4', () => {
+    // Superseded by "Client Login button has routerLink /login and no matMenuTriggerFor"
+  });
+
+  it('Client Login button has routerLink /login and no matMenuTriggerFor', () => {
     const nativeEl = fixture.nativeElement as HTMLElement;
-    const trigger = nativeEl.querySelector('button[data-testid="client-login-btn"]');
-    expect(trigger).not.toBeNull();
-    expect(trigger!.textContent?.trim()).toBe('Client Login');
-    // Material sets aria-haspopup="menu" on the trigger element declaratively
-    expect(trigger!.getAttribute('aria-haspopup')).toBe('menu');
+    const btn = nativeEl.querySelector('[data-testid="client-login-btn"]');
+    expect(btn).not.toBeNull();
+    expect(btn!.getAttribute('routerLink')).toBe('/login');
+    expect(btn!.hasAttribute('matMenuTriggerFor')).toBe(false);
   });
 });
