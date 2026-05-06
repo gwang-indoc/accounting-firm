@@ -1,4 +1,5 @@
-import { Component, Input, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, Input, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -18,10 +19,14 @@ export class NavbarComponent implements OnInit {
   lang = signal<'en' | 'zh'>('en');
   sidenavOpen = signal(false);
 
+  private readonly destroyRef = inject(DestroyRef);
+
   ngOnInit(): void {
     if (this.sidenav) {
-      // Sync icon when sidenav closes via scrim or external call
-      this.sidenav.openedChange.subscribe(opened => this.sidenavOpen.set(opened));
+      // Correct icon after scrim-close or external close (animation completes async)
+      this.sidenav.openedChange
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(opened => this.sidenavOpen.set(opened));
     }
   }
 

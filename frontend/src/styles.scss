@@ -22,10 +22,17 @@ mat-toolbar[color="primary"] {
   color: #ffffff;
 }
 
+html,
 body {
   margin: 0;
+  height: 100%;
   background: #f1f5f9;
   font-family: inherit;
+}
+
+app-root {
+  display: block;
+  height: 100%;
 }
 
 // Client Login MatMenu panel — must live in global styles.
