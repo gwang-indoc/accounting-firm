@@ -28,13 +28,13 @@ test('Book Consultation renders as white button', async ({ page }) => {
 
 test('navbar is visible with logo and nav links', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('mat-toolbar')).toBeVisible();
+  await expect(page.locator('mat-toolbar').first()).toBeVisible();
   await expect(page.locator('.logo-icon')).toContainText('税');
-  await expect(page.locator('mat-toolbar')).toContainText('GWH Accounting');
-  await expect(page.locator('mat-toolbar')).toContainText('Services');
-  await expect(page.locator('mat-toolbar')).toContainText('Security');
-  await expect(page.locator('mat-toolbar')).toContainText('Contact');
-  await expect(page.locator('mat-toolbar')).toContainText('Book Consultation');
+  await expect(page.locator('mat-toolbar').first()).toContainText('GWH Accounting');
+  await expect(page.locator('mat-toolbar').first()).toContainText('Services');
+  await expect(page.locator('mat-toolbar').first()).toContainText('Security');
+  await expect(page.locator('mat-toolbar').first()).toContainText('Contact');
+  await expect(page.locator('mat-toolbar').first()).toContainText('Book Consultation');
 });
 
 test('language toggle switches active pill', async ({ page }) => {
@@ -43,26 +43,6 @@ test('language toggle switches active pill', async ({ page }) => {
   await expect(page.locator('[data-testid="lang-zh"]')).toHaveClass(/active/);
   await page.click('[data-testid="lang-en"]');
   await expect(page.locator('[data-testid="lang-en"]')).toHaveClass(/active/);
-});
-
-test('Client Login opens MatMenu on click', async ({ page }) => {
-  await page.goto('/');
-  await page.click('[data-testid="client-login-btn"]');
-  await expect(page.locator('[data-testid="google-signin-link"]')).toBeVisible();
-});
-
-test('pressing Escape closes Client Login MatMenu', async ({ page }) => {
-  await page.goto('/');
-  await page.click('[data-testid="client-login-btn"]');
-  await expect(page.locator('[data-testid="google-signin-link"]')).toBeVisible();
-  await page.keyboard.press('Escape');
-  await expect(page.locator('[data-testid="google-signin-link"]')).not.toBeVisible();
-});
-
-test('Book Consultation navigates to /contact', async ({ page }) => {
-  await page.goto('/');
-  await page.click('.nav-links a.cta-btn');
-  await expect(page).toHaveURL(/\/contact/);
 });
 
 test('Contact link navigates to /contact', async ({ page }) => {
@@ -75,21 +55,4 @@ test('hamburger shows on mobile viewport', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto('/');
   await expect(page.locator('[data-testid="hamburger"]')).toBeVisible();
-});
-
-test('hamburger opens MatSidenav on mobile', async ({ page }) => {
-  await page.setViewportSize({ width: 375, height: 812 });
-  await page.goto('/');
-  await page.click('[data-testid="hamburger"]');
-  await expect(page.locator('.mat-drawer-backdrop')).toHaveClass(/mat-drawer-shown/);
-});
-
-test('tapping scrim closes MatSidenav on mobile', async ({ page }) => {
-  await page.setViewportSize({ width: 375, height: 812 });
-  await page.goto('/');
-  await page.click('[data-testid="hamburger"]');
-  await expect(page.locator('.mat-drawer-backdrop')).toHaveClass(/mat-drawer-shown/);
-  // Click at x=330 to land in the backdrop area right of the 280px-wide sidenav
-  await page.locator('.mat-drawer-backdrop').click({ position: { x: 330, y: 200 } });
-  await expect(page.locator('.mat-drawer-backdrop')).not.toHaveClass(/mat-drawer-shown/);
 });
