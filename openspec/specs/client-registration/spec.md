@@ -26,12 +26,16 @@ The system SHALL allow unauthenticated users to create a new account via `POST /
 - **THEN** Spring Security permits the request without requiring a JWT cookie
 
 ### Requirement: RegisterComponent presents a registration form using Angular Material
-The system SHALL render `RegisterComponent` at `/register` as a standalone Angular component. The form SHALL use `mat-card`, `mat-form-field`, `mat-input`, `mat-error`, and `mat-flat-button` from Angular Material. The form SHALL be a reactive `FormGroup`.
+The system SHALL render `RegisterComponent` at `/register` as a standalone Angular component. The form SHALL use Angular Material components (`mat-card`, `mat-form-field`, `matInput`, `mat-error`, `mat-flat-button`). The form SHALL be a reactive `FormGroup`. Uses tree-shakeable individual imports (not barrel modules).
+
+**Page layout:** Centered `mat-card` (max-width 420px) on a dot-grid `#f1f5f9` background, matching the login page design system. The card has a 3px sky-blue gradient top accent stripe, a brand block (navy 税 icon + "GWH Accounting" + tagline), a "NEW ACCOUNT" eyebrow label, "Create Account" `<h1>` heading, and "Fill in your details below" subtitle.
+
+**Form fields** (all `mat-form-field appearance="outline"`, full-width via CSS class — no inline `style` attributes): Full Name, Email, Password, Confirm Password. Submit button is `mat-flat-button color="primary"` (full-width, 46px height, 8px border-radius). "← Back to Login" is a `mat-button` below the submit button.
 
 #### Scenario: Form fields and validation
 - **WHEN** the `/register` route is active
 - **THEN** the page renders a `mat-card` with fields: Full Name, Email, Password, Confirm Password
-- **THEN** each field uses `mat-form-field` with `matInput` and `mat-error` for validation messages
+- **THEN** each field uses `mat-form-field appearance="outline"` with `matInput` and `mat-error` for validation messages
 
 #### Scenario: Client-side password mismatch
 - **WHEN** the user submits the form with non-matching Password and Confirm Password

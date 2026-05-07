@@ -26,19 +26,25 @@ The system SHALL allow registered users to authenticate via `POST /api/auth/logi
 - **THEN** Spring Security permits the request without requiring a JWT cookie
 
 ### Requirement: LoginEmailComponent presents an email/password login form using Angular Material
-The system SHALL render `LoginEmailComponent` at `/login/email` as a standalone Angular component. The form SHALL use `mat-card`, `mat-form-field`, `mat-input`, `mat-error`, and `mat-flat-button`.
+The system SHALL render `LoginEmailComponent` at `/login/email` as a standalone Angular component. The form SHALL use Angular Material components (`mat-card`, `mat-form-field`, `matInput`, `mat-flat-button`). Uses tree-shakeable individual imports (not barrel modules).
+
+**Page layout:** Centered `mat-card` (max-width 400px) on a dot-grid `#f1f5f9` background, matching the login/register design system. The card has a 3px sky-blue gradient top accent stripe, a brand block (navy 税 icon + "GWH Accounting" + tagline), an "EMAIL SIGN IN" eyebrow label, "Welcome back" `<h1>` heading, and "Use your email and password" subtitle.
+
+**Form fields** (both `mat-form-field appearance="outline"`, full-width via CSS class): Email and Password. Submit button is `mat-flat-button color="primary"` (full-width, 46px height). "← Back to Login" `mat-button` sits below the submit button.
+
+**Error state:** When `loginError()` signal is `true`, an inline error banner with a warning SVG icon and red-tinted background (`rgba(239,68,68,0.06)`, red border) appears above the submit button with a brief horizontal shake animation. The element carries `data-testid="login-error"`.
 
 #### Scenario: Form fields
 - **WHEN** the `/login/email` route is active
-- **THEN** the page renders a `mat-card` with Email and Password `mat-form-field` inputs and a "Sign In" `mat-flat-button`
+- **THEN** the page renders a `mat-card` with Email and Password `mat-form-field appearance="outline"` inputs and a "Sign In" `mat-flat-button`
 
 #### Scenario: Invalid credentials error
 - **WHEN** the backend returns HTTP 401
-- **THEN** a `mat-error` or inline error message is shown: "Invalid email or password"
+- **THEN** an inline error banner with `data-testid="login-error"` is shown: "Invalid email or password"
 
 #### Scenario: Successful login navigates to portal
 - **WHEN** the backend returns HTTP 200 (JWT cookie set)
-- **THEN** Angular navigates to `/portal`
+- **THEN** Angular navigates to `/portal/dashboard`
 
 #### Scenario: Back to login link
 - **WHEN** the user clicks "← Back to Login"
