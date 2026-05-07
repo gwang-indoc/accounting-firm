@@ -1,9 +1,10 @@
 import { Component, DestroyRef, inject, Input, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatSidenav } from '@angular/material/sidenav';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -18,6 +19,8 @@ export class NavbarComponent implements OnInit {
   lang = signal<'en' | 'zh'>('en');
   sidenavOpen = signal(false);
 
+  protected readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
@@ -36,5 +39,11 @@ export class NavbarComponent implements OnInit {
   toggleSidenav(): void {
     this.sidenav.toggle();
     this.sidenavOpen.update(v => !v);
+  }
+
+  logout(): void {
+    this.authService.logout().subscribe({
+      next: () => this.router.navigate(['/'])
+    });
   }
 }

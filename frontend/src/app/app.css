@@ -2,6 +2,10 @@
   height: 100%;
 }
 
+mat-sidenav-content {
+  padding-top: 68px;
+}
+
 .app-sidenav {
   width: 280px;
   background: #0f172a;

@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom, Observable } from 'rxjs';
+import { firstValueFrom, Observable, tap } from 'rxjs';
 import { UserDto } from '../models/user.model';
 
 @Injectable({ providedIn: 'root' })
@@ -25,5 +25,11 @@ export class AuthService {
 
   loginWithEmail(dto: { email: string; password: string }): Observable<void> {
     return this.http.post<void>('/api/auth/login', dto);
+  }
+
+  logout(): Observable<void> {
+    return this.http.post<void>('/api/auth/logout', {}).pipe(
+      tap(() => this.currentUser.set(null))
+    );
   }
 }

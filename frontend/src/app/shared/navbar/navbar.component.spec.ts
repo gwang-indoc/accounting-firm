@@ -1,8 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
 import { EventEmitter } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
 import { vi } from 'vitest';
 import { NavbarComponent } from './navbar.component';
+import { AuthService } from '../../core/services/auth.service';
 
 function mockSidenav() {
   return { toggle: vi.fn(), opened: false, openedChange: new EventEmitter<boolean>() } as any;
@@ -15,6 +17,7 @@ describe('NavbarComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [NavbarComponent, RouterModule.forRoot([])],
+      providers: [provideHttpClient()],
     }).compileComponents();
     fixture = TestBed.createComponent(NavbarComponent);
     component = fixture.componentInstance;
@@ -151,5 +154,20 @@ describe('NavbarComponent', () => {
     expect(btn).not.toBeNull();
     expect(btn!.getAttribute('routerLink')).toBe('/login');
     expect(btn!.hasAttribute('matMenuTriggerFor')).toBe(false);
+  });
+
+  it('shows Client Login when not authenticated', () => {
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    expect(nativeEl.querySelector('[data-testid="client-login-btn"]')).not.toBeNull();
+    expect(nativeEl.querySelector('[data-testid="logout-btn"]')).toBeNull();
+  });
+
+  it('shows Logout button when authenticated', () => {
+    const authService = TestBed.inject(AuthService);
+    authService.currentUser.set({ id: 1, email: 'a@b.com', name: 'Alice', role: 'USER' });
+    fixture.detectChanges();
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    expect(nativeEl.querySelector('[data-testid="logout-btn"]')).not.toBeNull();
+    expect(nativeEl.querySelector('[data-testid="client-login-btn"]')).toBeNull();
   });
 });
