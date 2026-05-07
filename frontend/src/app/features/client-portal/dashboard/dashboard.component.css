@@ -1,7 +1,373 @@
-.toolbar-spacer {
-  flex: 1;
+/* ── Root ── */
+.portal-root {
+  min-height: 100%;
+  background: #f1f5f9;
 }
 
-.dashboard-content {
-  padding: 24px;
+/* ── Hero Greeting Band ── */
+.portal-hero {
+  background: #0f172a;
+  background-image:
+    radial-gradient(circle at 30% 60%, rgba(56, 189, 248, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(56, 189, 248, 0.04) 0%, transparent 40%);
+  border-bottom: 1px solid #1e293b;
+  padding: 36px 32px 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Dot-grid texture */
+.portal-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, #1e3a5f 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* Sky-blue accent stripe along bottom edge */
+.portal-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 32px;
+  right: 32px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, #38bdf8 30%, #7dd3fc 60%, transparent 100%);
+  opacity: 0.6;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.hero-eyebrow {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #38bdf8;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.hero-name {
+  font-size: 30px;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0 0 6px;
+  letter-spacing: -0.02em;
+}
+
+.hero-date {
+  font-size: 13px;
+  color: #475569;
+  margin: 0;
+}
+
+
+/* ── Content Grid ── */
+.portal-grid {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 28px 32px 48px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* ── Card Base ── */
+.card {
+  border-radius: 10px !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.06) !important;
+  border: 1px solid #e2e8f0 !important;
+  overflow: hidden;
+}
+
+/* Left-accent stripe on all cards */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(180deg, #38bdf8 0%, #0ea5e9 100%);
+  border-radius: 10px 0 0 10px;
+}
+
+/* ── Overview Card ── */
+.card-overview {
+  grid-column: 1 / -1;
+  position: relative;
+}
+
+.card-icon-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  margin-right: 4px;
+}
+
+.overview-icon {
+  background: rgba(56, 189, 248, 0.1);
+  color: #0ea5e9;
+}
+
+.overview-icon mat-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+}
+
+.overview-stats {
+  display: flex;
+  align-items: stretch;
+  margin-top: 4px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.stat-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 18px 16px;
+}
+
+.stat-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: #0ea5e9;
+  line-height: 1;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.stat-divider {
+  margin: 12px 0;
+}
+
+/* ── Actions Card ── */
+.card-actions {
+  position: relative;
+}
+
+.action-single {
+  padding-top: 4px;
+}
+
+.action-tile {
+  width: 100% !important;
+  height: 44px !important;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  color: #475569 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.03em !important;
+  text-transform: none !important;
+  transition: border-color 0.15s, color 0.15s, background 0.15s !important;
+}
+
+.action-tile:hover {
+  border-color: #38bdf8 !important;
+  color: #0ea5e9 !important;
+  background: rgba(56, 189, 248, 0.04) !important;
+}
+
+/* ── Messages Card Header ── */
+.messages-heading {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.unread-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: #38bdf8;
+  color: #0f172a;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 9999px;
+  line-height: 1;
+}
+
+/* ── Messages Card ── */
+.card-messages {
+  position: relative;
+}
+
+.messages-content {
+  padding: 0 !important;
+}
+
+.msg-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 16px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.msg-row:hover {
+  background: #f0f9ff;
+}
+
+.msg-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: transparent;
+  transition: background 0.15s;
+}
+
+.msg-row.unread .msg-dot {
+  background: #38bdf8;
+}
+
+.msg-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.msg-title {
+  font-size: 13px;
+  font-weight: 400;
+  color: #475569;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.msg-row.unread .msg-title {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.msg-sender {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.msg-meta {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.msg-date {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.msg-chevron {
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  color: #cbd5e1;
+}
+
+/* ── Empty State (shared) ── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 16px 20px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 36px !important;
+  width: 36px !important;
+  height: 36px !important;
+  color: #cbd5e1;
+  margin-bottom: 10px;
+}
+
+.empty-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  margin: 0 0 4px;
+}
+
+.empty-hint {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+
+/* ── Responsive ── */
+@media (max-width: 767px) {
+  .portal-hero {
+    padding: 28px 20px 24px;
+  }
+
+  .hero-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .hero-name {
+    font-size: 22px;
+  }
+
+  .portal-grid {
+    grid-template-columns: 1fr;
+    padding: 20px 16px 40px;
+    gap: 16px;
+  }
+
+  .card-overview {
+    grid-column: 1;
+  }
+
+  .overview-stats {
+    flex-direction: column;
+  }
+
+  .stat-divider {
+    display: none;
+  }
 }

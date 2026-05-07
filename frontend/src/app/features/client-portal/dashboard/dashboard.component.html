@@ -1,10 +1,91 @@
-<div class="dashboard-content">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Welcome, {{ authService.currentUser()?.name }}</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <p>You are logged in as {{ authService.currentUser()?.email }}</p>
-    </mat-card-content>
-  </mat-card>
+<div class="portal-root">
+
+  <!-- ── Hero Greeting Band ── -->
+  <header class="portal-hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <span class="hero-eyebrow">{{ greeting }}</span>
+        <h1 class="hero-name">{{ authService.currentUser()?.name }}</h1>
+        <p class="hero-date">{{ today }}</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Dashboard Content Grid ── -->
+  <div class="portal-grid">
+
+    <!-- Account Overview (spec: mat-card showing name + email) -->
+    <mat-card class="card card-overview">
+      <mat-card-header>
+        <div class="card-icon-slot overview-icon">
+          <mat-icon>account_circle</mat-icon>
+        </div>
+        <mat-card-title>{{ authService.currentUser()?.name }}</mat-card-title>
+        <mat-card-subtitle>{{ authService.currentUser()?.email }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="overview-stats">
+          <div class="stat-cell">
+            <span class="stat-value">—</span>
+            <span class="stat-label">Documents</span>
+          </div>
+          <mat-divider [vertical]="true" class="stat-divider"></mat-divider>
+          <div class="stat-cell">
+            <span class="stat-value">2025</span>
+            <span class="stat-label">Tax Year</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Quick Actions -->
+    <mat-card class="card card-actions">
+      <mat-card-header>
+        <mat-card-title>Quick Actions</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="action-single">
+          <button mat-button class="action-tile">Upload Document</button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Messages -->
+    <mat-card class="card card-messages">
+      <mat-card-header>
+        <mat-card-title class="messages-heading">
+          Messages
+          @if (unreadCount > 0) {
+            <span class="unread-badge">{{ unreadCount }}</span>
+          }
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="messages-content">
+        @for (msg of messages; track msg.id) {
+          <button class="msg-row" [class.unread]="!msg.read">
+            <span class="msg-dot"></span>
+            <span class="msg-body">
+              <span class="msg-title">{{ msg.title }}</span>
+              <span class="msg-sender">{{ msg.sender }}</span>
+            </span>
+            <span class="msg-meta">
+              <span class="msg-date">{{ msg.date }}</span>
+              <mat-icon class="msg-chevron">chevron_right</mat-icon>
+            </span>
+          </button>
+          @if (!$last) {
+            <mat-divider></mat-divider>
+          }
+        } @empty {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">inbox</mat-icon>
+            <p class="empty-title">No messages</p>
+            <p class="empty-hint">Messages from your advisor will appear here</p>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+
+  </div>
 </div>

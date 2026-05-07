@@ -45,14 +45,37 @@ The system SHALL redirect unauthenticated users away from `/portal/**` routes to
 - **WHEN** an authenticated user navigates to `/portal/dashboard`
 - **THEN** the dashboard component is rendered with a `mat-card` welcome block showing the user's name
 
-### Requirement: DashboardComponent uses Material components
+### Requirement: DashboardComponent layout
 
-The system SHALL render `DashboardComponent` with a `mat-card` welcome section. There is NO secondary `mat-toolbar` inside the dashboard — the main navbar handles the "Logout" button when authenticated.
+The system SHALL render `DashboardComponent` with the following sections. There is NO secondary `mat-toolbar` inside the dashboard — the main navbar handles the "Logout" button when authenticated.
+
+**Hero greeting band** — full-width dark navy header (`#0f172a`) with a time-of-day greeting label ("Good morning / Good afternoon / Good evening"), the authenticated user's name as a large heading, and the current date. No "Secure Session" badge.
+
+**Account Overview card** (`mat-card`, full-width) — shows the user's name as `mat-card-title`, email as `mat-card-subtitle`, and a two-stat row:
+- Documents (value populated by future API)
+- Tax Year (hardcoded `2025` until API provides it)
+No "Pending Review" stat.
+
+**Quick Actions card** (`mat-card`) — contains a single full-width "Upload Document" button (`mat-button`). Text label only, no icon.
+
+**Messages card** (`mat-card`) — displays a list of clickable message rows. Each row shows an unread indicator dot (sky-blue `#38bdf8`, visible only for unread messages), the message title (bold when unread), sender name, and date. A sky-blue pill badge showing the unread count appears in the card title when `unreadCount > 0`. When no messages exist, an empty state is shown instead. Clicking a row is wired for future navigation to a message detail view.
 
 #### Scenario: Welcome block renders as MatCard
 
 - **WHEN** an authenticated user views the dashboard
 - **THEN** a `mat-card` displays the user's name and email
+
+#### Scenario: Dashboard hero shows time-of-day greeting
+
+- **WHEN** an authenticated user views the dashboard
+- **THEN** the hero band displays "Good morning", "Good afternoon", or "Good evening" based on the current hour
+
+#### Scenario: Messages unread badge
+
+- **WHEN** the Messages card renders and there are unread messages
+- **THEN** a pill badge showing the unread count appears to the right of the "Messages" title
+- **WHEN** all messages are read
+- **THEN** no badge is rendered
 
 ### Requirement: Angular dev proxy forwards OAuth2 and API paths to the backend
 
