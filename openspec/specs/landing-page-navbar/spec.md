@@ -2,15 +2,21 @@
 
 ### Requirement: NavbarComponent renders full navigation bar
 
-The system SHALL render a `NavbarComponent` (`<app-navbar />`) at the top of every page. The navbar SHALL use `<mat-toolbar color="primary">` with `position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 68px`. The toolbar background SHALL be `#0f172a` (dark navy) via the Material custom theme. Navigation links SHALL be `mat-button` elements with `color` defaulting to white. The "Book Consultation" CTA SHALL be an `<a mat-flat-button>` with `background: #fff; color: #0f172a`. The "Client Login" button SHALL be an `<a mat-button routerLink="/login">` — there is NO MatMenu popover.
+The system SHALL render a `NavbarComponent` (`<app-navbar />`) at the top of every page. The navbar SHALL use `<mat-toolbar color="primary">` with `position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 68px`. The toolbar background SHALL be `#0f172a` (dark navy) via the Material custom theme. Navigation links SHALL be `mat-button` elements with `color` defaulting to white. The "Book Consultation" CTA SHALL be an `<a mat-flat-button>` with `background: #fff; color: #0f172a`. The page content area (`mat-sidenav-content`) SHALL have `padding-top: 68px` so content is not obscured by the fixed navbar.
 
-#### Scenario: Navbar structure on desktop
+#### Scenario: Navbar structure on desktop (unauthenticated)
 
-- **WHEN** the viewport width is ≥ 768px
-- **THEN** the navbar displays inside a `mat-toolbar`: logo section, `mat-button` nav links (Services · Security · Client Login · Contact), Book Consultation `mat-flat-button`, language toggle pills
-- **THEN** the "Client Login" element is `<a mat-button routerLink="/login">` with NO `[matMenuTrigger]`
+- **WHEN** the viewport width is ≥ 768px and the user is NOT authenticated
+- **THEN** the navbar displays: logo section, `mat-button` nav links (Services · Security · Client Login · Contact), Book Consultation `mat-flat-button`, language toggle pills
+- **THEN** the "Client Login" element is `<a mat-button routerLink="/login" data-testid="client-login-btn">` with NO `[matMenuTrigger]`
 - **THEN** the "Book Consultation" renders as a white flat button with `color: #0f172a`
 - **THEN** the navbar stays fixed at the top as the user scrolls
+
+#### Scenario: Navbar structure on desktop (authenticated)
+
+- **WHEN** the viewport width is ≥ 768px and the user IS authenticated
+- **THEN** the "Client Login" link is replaced by the authenticated user's display name and a `Logout` `mat-button`
+- **THEN** the Logout button has `data-testid="logout-btn"`
 
 #### Scenario: Logo section
 
@@ -68,6 +74,18 @@ The system SHALL collapse the navbar to a hamburger `mat-icon-button` on narrow 
 - **THEN** "Book Consultation" is a plain `mat-list-item` in sky-blue (`#38bdf8`) — not a full-width button
 - **THEN** the language toggle pills appear at the bottom of the sidenav
 - **THEN** the "Client Login" sidenav item is a plain `mat-list-item` with `routerLink="/login"` that closes the sidenav on click
+
+### Requirement: Navbar logout button is visible when authenticated
+
+The system SHALL replace the "Client Login" link with a user name label and a "Logout" `mat-button` whenever `AuthService.isAuthenticated()` is `true`. The change is reactive — clicking Logout immediately updates the navbar back to the unauthenticated state.
+
+#### Scenario: Logout clears session and redirects to home
+
+- **WHEN** an authenticated user clicks "Logout" in the navbar
+- **THEN** the app calls `POST /api/auth/logout`
+- **THEN** `AuthService.currentUser` is set to `null`
+- **THEN** the router navigates to `/`
+- **THEN** the navbar reverts to showing "Client Login"
 
 #### Scenario: Sidenav nav item text is visible on dark background
 

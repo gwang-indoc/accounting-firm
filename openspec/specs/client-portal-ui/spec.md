@@ -2,42 +2,16 @@
 
 ### Requirement: Client Portal login entry point is a navbar nav link
 
-The `ClientPortalLoginComponent` is rendered as the "Client Login" desktop nav link inside `NavbarComponent` using `MatMenu`. On mobile, the sidenav renders the Google sign-in card inline — `ClientPortalLoginComponent` is NOT used in the mobile drawer.
+The "Client Login" desktop nav link inside `NavbarComponent` is a plain `<a mat-button routerLink="/login">` — there is NO MatMenu. Clicking it navigates to the `/login` page. On mobile, the sidenav renders the same `routerLink="/login"` item.
 
-#### Scenario: Client Portal nav link opens MatMenu on desktop
+#### Scenario: Client Login link navigates to /login
 
-- **WHEN** the user clicks "Client Login" in the desktop navbar
-- **THEN** a `MatMenu` panel opens below the trigger showing "Sign in with Google"
-- **THEN** clicking "Sign in with Google" navigates to `GET /oauth2/authorization/google`
-
-#### Scenario: Click outside closes MatMenu
-
-- **WHEN** the MatMenu is open and the user clicks outside it
-- **THEN** the MatMenu closes
-
-### Requirement: Client Portal dropdown popover
-
-The system SHALL display a `MatMenu` panel directly below the "Client Login" `mat-button` trigger when it is clicked. The panel SHALL contain a portal title, brief description, "Sign in with Google" `mat-menu-item` link, and a security label.
-
-#### Scenario: Click opens the MatMenu
-
-- **WHEN** the user clicks the "Client Login" `mat-button`
-- **THEN** a `MatMenu` panel appears below the trigger
-- **THEN** the panel contains a "Sign in with Google" item
-
-#### Scenario: Click outside dismisses the MatMenu
-
-- **WHEN** the MatMenu is open and the user clicks outside of it
-- **THEN** the MatMenu closes
-
-#### Scenario: Sign in with Google triggers OAuth2 redirect
-
-- **WHEN** the user clicks "Sign in with Google" inside the MatMenu
-- **THEN** the browser navigates to `GET /oauth2/authorization/google`
+- **WHEN** an unauthenticated user clicks "Client Login" in the desktop navbar
+- **THEN** the router navigates to `/login`
 
 ### Requirement: AuthService manages authentication state with signals
 
-The system SHALL maintain authentication state using Angular signals. The `AuthService` SHALL expose `currentUser` (signal) and `isAuthenticated` (computed) and load the current user via `GET /api/auth/me` on app initialisation.
+The system SHALL maintain authentication state using Angular signals. The `AuthService` SHALL expose `currentUser` (signal) and `isAuthenticated` (computed) and load the current user via `GET /api/auth/me` on app initialisation. `AuthService` SHALL also expose a `logout()` method that calls `POST /api/auth/logout` and sets `currentUser` to `null`.
 
 #### Scenario: Authenticated user state is available after app init
 
@@ -48,6 +22,12 @@ The system SHALL maintain authentication state using Angular signals. The `AuthS
 #### Scenario: Unauthenticated state after failed /api/auth/me
 
 - **WHEN** the app initialises and `/api/auth/me` returns 401
+- **THEN** `AuthService.currentUser()` returns `null`
+- **THEN** `AuthService.isAuthenticated()` returns `false`
+
+#### Scenario: Logout clears auth state
+
+- **WHEN** `AuthService.logout()` is called and `POST /api/auth/logout` succeeds
 - **THEN** `AuthService.currentUser()` returns `null`
 - **THEN** `AuthService.isAuthenticated()` returns `false`
 
@@ -63,16 +43,11 @@ The system SHALL redirect unauthenticated users away from `/portal/**` routes to
 #### Scenario: Authenticated user can access dashboard
 
 - **WHEN** an authenticated user navigates to `/portal/dashboard`
-- **THEN** the dashboard component is rendered with a `mat-toolbar` header and `mat-card` welcome block showing the user's name
+- **THEN** the dashboard component is rendered with a `mat-card` welcome block showing the user's name
 
 ### Requirement: DashboardComponent uses Material components
 
-The system SHALL render `DashboardComponent` with a `mat-toolbar color="primary"` header and a `mat-card` for the welcome section.
-
-#### Scenario: Dashboard header renders as MatToolbar
-
-- **WHEN** an authenticated user views the dashboard
-- **THEN** a `mat-toolbar` with `color="primary"` displays "Client Portal" and a `mat-stroked-button` logout button
+The system SHALL render `DashboardComponent` with a `mat-card` welcome section. There is NO secondary `mat-toolbar` inside the dashboard — the main navbar handles the "Logout" button when authenticated.
 
 #### Scenario: Welcome block renders as MatCard
 
