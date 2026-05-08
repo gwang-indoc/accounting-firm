@@ -107,13 +107,13 @@ npx playwright install        # downloads browser binaries
 
    | Section | What to update |
    |---|---|
-   | **Project Overview** | Your project's purpose and tech stack |
-   | **Repository Structure** | Your top-level directories |
-   | **Backend (Spring Boot)** → Key Architecture | Package root, layer names, auth strategy, JWT/cookie scheme, env vars, Flyway path |
-   | **Backend Tests** | Test framework, slice annotations, run commands |
-   | **Frontend (Angular)** → Key Architecture | Framework version, change detection mode, auth signal pattern, HTTP interceptor, route guards |
-   | **Frontend Tests** | Test runner (Vitest / Jasmine / Karma), commands |
-   | **E2E Tests** | Path to `e2e/` and run commands |
+   | **Project Overview** | Project purpose and a one-line tech-stack summary |
+   | **Repository Structure** | Top-level directories and a brief note on what lives in each |
+   | **Backend → Key Architecture** | Package/module root, layered architecture, authentication strategy, session/token scheme, required environment variables, database-migration path |
+   | **Backend Tests** | Test framework, slice/integration test conventions, and the commands to run all tests vs. a single class |
+   | **Frontend → Key Architecture** | Framework + version, change-detection or rendering mode, auth-state pattern, HTTP interceptor or middleware, route guards, and any dev-server proxy paths |
+   | **Frontend Tests** | Test runner, assertion conventions, and the commands to run all tests vs. a single file |
+   | **E2E Tests** | Location of the E2E suite, run commands, and the prerequisite servers needed before tests run |
    | **OpenSpec Workflow** | Keep the skill ordering — `brainstorming` → `test-driven-development` → `subagent-driven-development` → `requesting-code-review` |
    | **Coding Guidelines** | Tweak only if your team has different conventions |
    | **Dev Log Practice** | Adjust path if your log location differs from `docs/log/YYYY-MM-DD.md` |
@@ -146,17 +146,17 @@ npx playwright install        # downloads browser binaries
 
    | Section | What to update |
    |---|---|
-   | **`context:` → Tech stack** | Your backend framework, language, frontend framework, database, auth |
-   | **`context:` → Backend structure** | Package root, layer naming, ORM, migration tool, config files, env-var names |
-   | **`context:` → Backend tests** | Test framework + commands |
-   | **`context:` → Frontend structure** | Routing, HTTP services, auth state, dev-server proxy paths |
-   | **`context:` → Frontend tests** | Test runner + commands |
-   | **`context:` → E2E tests** | Path, commands, server-startup commands |
-   | **`context:` → Conventions** | Migration policy, validation rules, lint command |
+   | **`context:` → Tech stack** | Backend framework + language, frontend framework, database, and authentication mechanism |
+   | **`context:` → Backend structure** | Package/module root, layered architecture, data layer, migration tool + path, configuration files, and required environment variables |
+   | **`context:` → Backend tests** | Test framework, slice/integration conventions, and run commands (full suite + single class) |
+   | **`context:` → Frontend structure** | Routing model, HTTP-service location, auth-state pattern, and dev-server proxy paths |
+   | **`context:` → Frontend tests** | Test runner, assertion conventions, and run commands (full suite + single file) |
+   | **`context:` → E2E tests** | Suite path, run commands, and the prerequisite servers required before tests run |
+   | **`context:` → Conventions** | Migration policy, input-validation rules, and lint command |
    | **`context:` → Superpowers integration** | Keep this block as-is — it encodes the brainstorming → confirmation gate → artifact generation flow |
    | **`rules:` → proposal** | Adjust only if your project has different proposal requirements |
    | **`rules:` → design** | Adjust only if your project has different design requirements |
-   | **`rules:` → tasks** | Adjust framework names (e.g., JUnit/Spring Boot Test → Jest/Mocha; Jasmine → Vitest); keep RED/GREEN, parallel, code-review, E2E, and verification rules |
+   | **`rules:` → tasks** | Update the test-framework names in the RED/GREEN rule and the verification commands; keep the parallel, code-review, E2E, and verification rules |
 
    > **Tip:** You don't have to edit `config.yaml` by hand either. Open it in Claude Code and describe your project — for example:
    > > "Please update `openspec/config.yaml` for my project. Tech stack is `<your stack>`, backend package root is `<...>`, backend tests use `<...>`, frontend uses `<...>` with `<test runner>`, E2E lives at `<path>` and runs with `<command>`. Keep the Superpowers integration block under `context:` and all `rules:` entries as-is."
