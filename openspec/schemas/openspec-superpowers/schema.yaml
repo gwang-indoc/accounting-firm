@@ -1,0 +1,212 @@
+name: openspec-superpowers
+version: 1
+description: |
+  OpenSpec + Superpowers workflow.
+  design (from /opsx:explore) → proposal → specs → tasks → apply
+artifacts:
+  - id: design
+    generates: design.md
+    description: Technical design document, produced during exploration
+    template: design.md
+    instruction: |
+      Create the design document that explains HOW to implement the change.
+
+      Provenance:
+      - This artifact is produced by /opsx:explore in
+        openspec/changes/_draft/<topic>/design.md (uncommitted; _draft/ is
+        gitignored).
+      - /opsx:propose moves it to openspec/changes/<name>/design.md and
+        deletes the _draft/<topic>/ directory.
+      - superpowers:brainstorming is invoked as a REVIEWER (not creator)
+        during /opsx:explore — its findings are folded back into design.md
+        before propose runs.
+      - If the change has UI surface, Visual Companion is offered during
+        /opsx:explore and the selected mockup/wireframe is recorded in the
+        UI section.
+
+      Sections:
+      - **Context**: Background, current state, constraints, stakeholders.
+      - **Goals / Non-Goals**: What this design achieves and explicitly
+        excludes.
+      - **Approach**: High-level architecture and component breakdown.
+      - **Decisions**: Key technical choices with rationale (why X over Y?).
+        MUST include alternatives considered for each decision.
+      - **Risks / Trade-offs**: Known limitations. Format: [Risk] → Mitigation.
+      - **Migration Plan**: Steps to deploy, rollback strategy (if applicable).
+      - **UI** (only if the change touches UI): selected mockup/wireframe
+        with rationale; reference any Visual Companion artifacts.
+      - **Open Questions**: Outstanding decisions or unknowns to resolve.
+
+      Focus on architecture and approach, not line-by-line implementation.
+      Good design docs explain the "why" behind technical decisions.
+    requires: []
+
+  - id: proposal
+    generates: proposal.md
+    description: Proposal explaining WHY this change exists and its scope
+    template: proposal.md
+    instruction: |
+      Create the proposal document that establishes WHY this change is needed,
+      reading design.md as the primary input.
+
+      Sections:
+      - **Why**: 1-2 sentences on the problem or opportunity. What does this
+        solve? Why now? Anchor this in the Context/Goals from design.md.
+      - **What Changes**: Bullet list of changes. Be specific about new
+        capabilities, modifications, or removals. Mark breaking changes with
+        **BREAKING**. Derive from the Approach + Decisions sections of
+        design.md.
+      - **Capabilities**: Identify which specs will be created or modified:
+        - **New Capabilities**: List capabilities being introduced. Each
+          becomes a new specs/<name>/spec.md. Use kebab-case names.
+        - **Modified Capabilities**: List existing capabilities whose
+          REQUIREMENTS are changing. Check openspec/specs/ for existing
+          names. Leave empty if no requirement changes.
+      - **Non-Goals (Out of Scope)**: REQUIRED. What this change explicitly
+        will not do. Mirror or refine design.md's Non-Goals.
+      - **Impact**: Affected code, APIs, dependencies, or systems.
+
+      IMPORTANT: The Capabilities section creates the contract between
+      proposal and specs. Research existing specs before filling it in.
+      Each capability listed will need a corresponding spec file.
+
+      Keep it concise (1-2 pages). Focus on the WHY, not the HOW — HOW lives
+      in design.md.
+    requires:
+      - design
+
+  - id: specs
+    generates: "specs/**/*.md"
+    description: Detailed capability specifications
+    template: spec.md
+    instruction: |
+      Create specification files that define WHAT the system should do.
+
+      Create one spec file per capability listed in the proposal's
+      Capabilities section.
+      - New capabilities: use the exact kebab-case name from the proposal
+        (specs/<capability>/spec.md).
+      - Modified capabilities: use the existing spec folder name from
+        openspec/specs/<capability>/ when creating the delta spec at
+        specs/<capability>/spec.md.
+
+      Delta operations (use ## headers):
+      - **ADDED Requirements**: New capabilities
+      - **MODIFIED Requirements**: Changed behavior — MUST include full
+        updated content (not just the diff)
+      - **REMOVED Requirements**: Deprecated features — MUST include
+        **Reason** and **Migration**
+      - **RENAMED Requirements**: Name changes only — use FROM:/TO: format
+
+      Format:
+      - Each requirement: `### Requirement: <name>` followed by description
+      - Use SHALL/MUST for normative requirements
+      - Each scenario: `#### Scenario: <name>` with WHEN/THEN format
+      - **CRITICAL**: Scenarios MUST use exactly 4 hashtags (`####`). Using
+        3 or bullets will fail silently.
+      - Every requirement MUST have at least one scenario.
+
+      Specs should be testable — each scenario is a potential test case.
+    requires:
+      - proposal
+
+  - id: tasks
+    generates: tasks.md
+    description: Implementation checklist with trackable tasks
+    template: tasks.md
+    instruction: |
+      Create the task list that breaks down the implementation work, reading
+      design.md (HOW) and specs/ (WHAT) as primary inputs. proposal.md is NOT
+      a direct input — it is for human readers.
+
+      **IMPORTANT: Follow the template exactly.** The apply phase parses
+      checkbox format to track progress. Tasks not using `- [ ]` won't be
+      tracked.
+
+      Structural rules:
+      - Group tasks under `## N` numbered headings.
+      - Each task: `- [ ] N.Y Task description`.
+      - For NEW behavior: precede every implementation task with a RED test
+        task. Pattern:
+          - [ ] N.X RED   — write failing test for <behavior>
+          - [ ] N.X+1 GREEN — minimal impl to pass the test
+      - For bug fixes: precede the fix with a regression test (RED) then the
+        fix (GREEN).
+      - Within a `## N` group, when 2+ task units touch disjoint files with
+        no read/write dependency, append ` [parallel]` to each independent
+        unit's first task AND insert as N.0:
+          - [ ] N.0 Invoke superpowers:subagent-driven-development to
+                    dispatch the [parallel] units in this group; one
+                    subagent owns one RED+GREEN pair (or one standalone
+                    task) end-to-end.
+      - Across groups, when 2+ groups are file-disjoint, prepend tasks.md
+        (above `## 1`) with:
+          Invoke superpowers:subagent-driven-development to dispatch groups
+          <list> in parallel; one subagent per group.
+      - Every `## N` group MUST end with:
+          - [ ] N.Z   Run superpowers:requesting-code-review on the diff for
+                       group N; address CRITICAL/HIGH findings before moving
+                       on.
+          - [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — commit hash, feature
+                       bullets, review findings, test count, and TDD
+                       evidence (paste RED failure lines for each new test).
+      - The FINAL group, when UI is touched, MUST include immediately before
+        N.Z:
+          - [ ] M.J Write/update Playwright E2E test under e2e/ for the
+                     affected flow; commit the file. Run:
+                       1. ./start.sh
+                       2. cd frontend && npm start
+                       3. cd e2e && npx playwright test
+                       4. kill $(lsof -ti :4200)
+                       5. kill $(lsof -ti :8080)
+      - The FINAL group MUST include:
+          - [ ] M.K Run superpowers:verification-before-completion
+                     (cd backend && ./mvnw test; cd frontend && npx ng test
+                     --no-watch; grep for System.out.println + console.log;
+                     diff review).
+      - Tasks SHOULD explicitly name the superpowers skill to invoke when
+        relevant.
+
+      Reference specs for WHAT and design for HOW. Each task should be
+      verifiable — you know when it's done.
+    requires:
+      - design
+      - specs
+
+apply:
+  requires: [tasks]
+  tracks: tasks.md
+  instruction: |
+    Read context files (design.md, specs/, tasks.md). Work through pending
+    tasks in order. After each task, IMMEDIATELY update its checkbox from
+    `- [ ]` to `- [x]` before moving on — never batch checkbox updates.
+
+    TDD discipline:
+    - RED: write the failing test → run it → confirm FAILURE → paste the
+      key failure lines to the dev log as TDD evidence → THEN implement.
+    - GREEN: write the minimal implementation to pass → run the test →
+      confirm PASS → commit test + impl together.
+    - Only GREEN tests stay in the committed suite. Tests representing
+      planned-but-not-yet-implemented behavior MUST be tagged
+      (@Disabled / it.todo / xit) — never leave an untagged failing test.
+    - Before starting each new task group, run the full test suite to
+      confirm a green baseline.
+
+    Pause if:
+    - A task is unclear → ask for clarification before guessing.
+    - Implementation reveals a design issue → suggest updating design.md /
+      specs / tasks.md rather than working around it.
+    - A blocker is encountered → report and wait.
+
+    [parallel] tasks: when a group has N.0 referencing
+    superpowers:subagent-driven-development, dispatch one subagent per
+    [parallel] unit. The coordinator updates every checkbox the subagent
+    finished BEFORE dispatching the next subagent.
+
+    Code-review checkpoint (N.Z): at the end of every group, invoke
+    superpowers:requesting-code-review on the diff. Address CRITICAL/HIGH
+    findings before moving to the next group.
+
+    Dev log update (N.Z+1): after the code-review checkpoint, update
+    docs/log/YYYY-MM-DD.md with commit hash, feature bullets, review
+    findings, test count, and TDD evidence.
