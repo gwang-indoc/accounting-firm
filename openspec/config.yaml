@@ -1,4 +1,4 @@
-schema: spec-driven
+schema: openspec-superpowers
 
 # Project context — injected into every artifact's instruction prompt.
 context: |
@@ -51,49 +51,21 @@ context: |
       where Angular 21 supports it.
     - Lint frontend with `cd frontend && npm run lint`.
 
-  Superpowers integration:
-    - This project pairs OpenSpec with Anthropic superpowers skills.
-    - /opsx:propose triggers superpowers:brainstorming BEFORE artifact
-      generation (see .claude/commands/opsx/propose.md).
-    - IMPORTANT: After brainstorming completes inside /opsx:propose, ALWAYS
-      return to the opsx:propose flow to generate OpenSpec artifacts
-      (proposal.md, design.md, tasks.md). Do NOT follow brainstorming's
-      default terminal state of invoking superpowers:writing-plans — that
-      applies only when brainstorming is run standalone.
-    - CONFIRMATION GATE: After brainstorming finishes (design spec written and
-      committed), STOP and ask the user for explicit confirmation before
-      generating any OpenSpec artifacts (proposal.md, design.md, specs/,
-      tasks.md). Do NOT auto-proceed. Example prompt: "Design is ready. Shall
-      I go ahead and generate the OpenSpec artifacts (proposal.md, design.md,
-      specs, tasks.md)?" Wait for an explicit "yes" / "go ahead" before
-      calling `openspec new change` and writing any artifacts.
-    - /opsx:apply runs superpowers:test-driven-development at session
-      start, superpowers:subagent-driven-development to dispatch a fresh
-      subagent per [parallel] task with a two-stage review (spec
-      compliance, then code quality), and superpowers:requesting-code-review
-      at task-group checkpoints (see .claude/commands/opsx/apply.md).
-    - tasks.md MUST scaffold TDD discipline + review checkpoints so the
-      apply phase has the hooks it needs.
-
-# Per-artifact rules — appended to artifact-specific instructions.
-# Each rule must be a quoted scalar to avoid YAML multi-line ambiguity.
-rules:
-  proposal:
-    - 'Always include a Non-Goals (or Out-of-Scope) section.'
-    - 'Capabilities section MUST list which existing capability is modified. Look in openspec/specs/ first; do not invent capability names.'
-    - 'Every proposal must reference the brainstorming spec produced under docs/superpowers/specs/. /opsx:propose ALWAYS runs superpowers:brainstorming first regardless of whether the change has UI surface, so the spec exists for every change.'
-
-  design:
-    - 'Reference the brainstorming spec doc under docs/superpowers/specs/ as a primary input when one exists for this change.'
-    - 'Decisions section MUST cover alternatives considered, not just the choice made.'
-
-  tasks:
-    - "Each implementation task that introduces NEW behavior MUST be preceded by a RED-failing-test task. Pattern: '- [ ] N.X RED — write failing test for <behavior>' followed by '- [ ] N.X+1 GREEN — minimal impl to pass the test'. Use JUnit 5 + Spring Boot Test for backend (controller/service/repository slices) and Jasmine + Angular TestBed for frontend components."
-    - 'Bug fixes MUST be preceded by a regression test that reproduces the bug (RED), then the fix (GREEN).'
-    - "Within a '## N' group, when 2+ task units (a unit = one RED+GREEN pair, or one standalone non-test task) touch disjoint files with no read/write dependency on one another, append ' [parallel]' to each independent unit's first task AND insert as task N.0: '- [ ] N.0 Invoke superpowers:subagent-driven-development to dispatch the [parallel] units in this group; one subagent owns one RED+GREEN pair (or one standalone task) end-to-end including self-review.' If no units within the group are independent, omit N.0 — sequential execution is the default."
-    - "Across groups, when 2+ '## N' groups touch disjoint files with no cross-group read/write dependency, prepend tasks.md (above '## 1') with a top-level line: 'Invoke superpowers:subagent-driven-development to dispatch groups <comma-separated list> in parallel; one subagent per group.' Only add this when group independence is genuinely true; default is sequential. The per-group review checkpoint (N.Z) still applies inside each parallel group."
-    - "Each '## N' task group MUST end with a checkpoint task: '- [ ] N.Z Run superpowers:requesting-code-review on the diff for group N; address CRITICAL/HIGH findings before moving on'."
-    - "The final task group MUST include a verification task: '- [ ] M.K Run superpowers:verification-before-completion (cd backend && ./mvnw test; cd frontend && npx ng test --no-watch; grep for System.out.println + console.log; diff review)'."
-    - "If the change touches the UI surface (any route or component under src/app/, or any client-rendered behavior), the final task group MUST include an E2E test task placed IMMEDIATELY BEFORE the verification-before-completion task. Add or update a Playwright test file under `e2e/` covering the affected user flow (explicit URL + user actions + expected outcomes). The E2E task MUST include these exact run commands in the task description: (1) start the backend: `./start.sh`, (2) start the frontend: `cd frontend && npm start`, (3) run Playwright: `cd e2e && npx playwright test`, (4) stop the frontend: `kill $(lsof -ti :4200)`, (5) stop the backend: `kill $(lsof -ti :8080)`. All five commands must appear in the task so the implementer starts and stops servers cleanly without leaving orphan processes."
-    - "Tasks SHOULD explicitly name the superpowers skill to invoke when relevant (e.g., 'Invoke superpowers:test-driven-development to scaffold tests for the new service method')."
-    - "CHECKBOX DISCIPLINE: After completing each task, immediately update its checkbox from '- [ ]' to '- [x]' in tasks.md before moving on to the next task. Never batch checkbox updates. If a subagent completes the work, the coordinator MUST update the checkboxes for every task that subagent finished before dispatching the next subagent."
+  OpenSpec + Superpowers workflow:
+    - design.md is produced by /opsx:explore in
+      openspec/changes/_draft/<topic>/ (uncommitted; _draft/ is gitignored).
+    - superpowers:brainstorming is invoked during /opsx:explore as a
+      REVIEWER of the design.md, not its creator.
+    - If the change has UI surface, Visual Companion is offered during
+      /opsx:explore and the selected design is recorded in design.md's
+      UI section.
+    - /opsx:propose promotes the draft to openspec/changes/<name>/design.md,
+      then generates proposal.md, specs/, tasks.md. proposal.md is for
+      human readers (Why / Scope); tasks generation reads design + specs
+      only.
+    - /opsx:apply enforces TDD discipline and review checkpoints per the
+      schema's apply.instruction (returned by `openspec instructions apply`).
+    - /opsx:archive moves the change to archive/, syncs delta specs, drafts
+      a per-archive lessons file at docs/lessons/YYYY-MM-DD-<name>.md
+      (user-reviewed before write), and optionally updates README.md on
+      explicit user opt-in.
