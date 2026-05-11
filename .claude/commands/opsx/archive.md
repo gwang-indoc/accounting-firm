@@ -87,6 +87,63 @@ Archive a completed change in the experimental workflow.
    - Spec sync status (synced / sync skipped / no delta specs)
    - Note about any warnings (incomplete artifacts/tasks)
 
+7. **Generate lessons-learned file**
+
+   a. **Read source material**:
+      - Read `openspec/changes/archive/YYYY-MM-DD-<name>/` artifacts (proposal, design, tasks, specs).
+      - Read the most recent `docs/log/*.md` entries that mention `<name>` or whose date overlaps the change's active window.
+
+   b. **Draft a bulleted lessons list** focused on:
+      - **Scope drift**: differences between proposal/design and what shipped.
+      - **Recurring review findings**: themes that came up across multiple group N.Z checkpoints.
+      - **TDD gaps**: untagged failing tests, missing RED evidence, baseline failures encountered.
+      - **Surprises**: anything future similar work should anticipate (perf, integration friction, library quirks, schema edge cases).
+
+   c. **Show the draft to the user** and accept edits. Use the AskUserQuestion tool with options "Looks good, write it" / "Let me edit" / "Skip lessons for this change". Do NOT auto-write.
+
+   d. **If approved**, write to `docs/lessons/YYYY-MM-DD-<name>.md` (create `docs/lessons/` if missing). Use this template:
+
+      ```markdown
+      # Lessons: <Change Name>
+
+      **Archived:** YYYY-MM-DD
+      **Change directory:** `openspec/changes/archive/YYYY-MM-DD-<name>/`
+
+      ## Scope vs. reality
+
+      - <bullet>
+
+      ## Recurring review findings
+
+      - <bullet>
+
+      ## TDD observations
+
+      - <bullet>
+
+      ## Surprises / things to anticipate next time
+
+      - <bullet>
+      ```
+
+   e. **If `CLAUDE.md` does not already have a `## Lessons Learned` section**, add this one-line section (one-time):
+
+      ```markdown
+      ## Lessons Learned
+
+      Lessons from archived changes live in `docs/lessons/` — one file per archive, named `YYYY-MM-DD-<change-name>.md`.
+      ```
+
+      Check first with `grep -c '^## Lessons Learned' CLAUDE.md`. Only add if zero.
+
+8. **Prompt for README update**
+
+   Use the AskUserQuestion tool:
+   > "Update README.md based on what shipped in this change? (y/n)"
+
+   - If "n": skip and proceed to Output.
+   - If "y": read README.md, identify candidate edits that reflect the change (new feature, new env var, new run instruction, etc.), propose them to the user, accept edits, write only after explicit approval.
+
 **Output On Success**
 
 ```
@@ -155,3 +212,5 @@ Target archive directory already exists.
 - Show clear summary of what happened
 - If sync is requested, use the Skill tool to invoke `openspec-sync-specs` (agent-driven)
 - If delta specs exist, always run the sync assessment and show the combined summary before prompting
+- **Lessons-learned is user-reviewed, never auto-written.** Always show the draft and get approval before writing `docs/lessons/YYYY-MM-DD-<name>.md`.
+- **README updates require explicit "y".** Default to "n" (no update). Even on "y", propose specific edits and get approval before writing.
