@@ -48,10 +48,7 @@ accounting-firm/
 
 Write the failing test first. **The RED phase must be verified** — run the test, confirm it fails with the expected message, then implement. Do not mark a RED task complete without running the test and seeing it fail.
 
-```
-- [ ] N.X RED  — write failing test → run test → confirm FAILURE → paste key failure lines into dev log
-- [ ] N.X+1 GREEN — write minimal impl → run test → confirm PASS → commit test + impl together
-```
+The exact RED/GREEN task pattern, parallel dispatch, code-review checkpoint, dev log update, and checkbox discipline rules live in the openspec-superpowers schema's `tasks.instruction` (for authoring tasks.md) and `apply.instruction` (for executing it). The schema is the source of truth — see `openspec/schemas/openspec-superpowers/schema.yaml`.
 
 **Only GREEN tests are committed to the codebase.** The committed test suite must always be fully passing — no bare failing tests. A RED test is written, verified to fail, and then immediately implemented and made GREEN before committing. The RED failure output is not code; it is captured in the dev log as TDD evidence (proof the test genuinely failed before the implementation existed).
 
@@ -119,43 +116,18 @@ npx playwright test --grep "login"     # single test
 
 ## OpenSpec Workflow
 
-Change proposals and tasks live in `openspec/`. Use `/opsx:propose` to create a new change, `/opsx:apply` to implement it, and `/opsx:archive` when done.
+Four stages: **Explore → Propose → Apply → Archive**. Each is a slash command in `.claude/commands/opsx/`.
 
-### `/opsx:propose` — required sequence
+| Command | Purpose | Key artifacts |
+|---|---|---|
+| `/opsx:explore` | Think through ideas; produce draft `design.md` in `openspec/changes/_draft/<topic>/` (gitignored). Invokes `superpowers:brainstorming` as REVIEWER. Offers Visual Companion for UI. | Draft `design.md` |
+| `/opsx:propose` | Promote the draft into `openspec/changes/<name>/`, STOP and confirm, then generate `proposal.md`, `specs/`, `tasks.md`. | All change artifacts |
+| `/opsx:apply` | Implement tasks per `tasks.md`, following TDD/review/checkpoint rules from schema's `apply.instruction`. | Working code + dev log entries |
+| `/opsx:archive` | Move change to `openspec/changes/archive/`, sync delta specs, draft per-change lessons to `docs/lessons/YYYY-MM-DD-<name>.md` (user-reviewed). | Archived change + lessons file |
 
-1. `superpowers:brainstorming` runs first (auto-triggered)
-2. After brainstorming: write the design spec and commit it
-3. **STOP** — ask the user to confirm before generating any artifacts
-4. On confirmation: run `openspec new change`, then generate `proposal.md`, `design.md`, `tasks.md`
+Schema: `openspec/schemas/openspec-superpowers/schema.yaml` is the source of truth for artifact-content rules and apply-time discipline. The slash commands carry orchestration only.
 
-> **Brainstorming terminal state:** After brainstorming completes it will suggest invoking `superpowers:writing-plans` — **ignore that**. That applies to standalone brainstorming only. Continue with step 3 above.
-
-### `/opsx:apply` — required skills (in order)
-
-Before implementing any task, invoke:
-1. `superpowers:test-driven-development` — at session start, before writing any code
-2. `superpowers:subagent-driven-development` — dispatch a fresh subagent per `[parallel]` task with two-stage review (spec compliance, then code quality)
-3. `superpowers:requesting-code-review` — at each task-group checkpoint (`N.Z`)
-
-### `tasks.md` — required structure per group
-
-**Before dispatching any subagents:** audit every `## N` group — confirm each has an N.Z (code review) and N.Z+1 (log update) task. Add them if missing.
-
-Every `## N` group must end with:
-```
-- [ ] N.Z   Run superpowers:requesting-code-review on the diff for group N
-- [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — commit hash, feature bullets, review findings, test count, and TDD evidence (paste RED failure lines for each new test)
-```
-For the final group (if UI is touched), add these two tasks immediately before `N.Z`:
-```
-- [ ] M.J Write/update Playwright E2E test under `e2e/` for the affected user flow; commit the file. Run:
-         1. ./start.sh                          # start backend
-         2. cd frontend && npm start            # start frontend
-         3. cd e2e && npx playwright test       # run E2E suite
-         4. kill $(lsof -ti :4200)              # stop frontend
-         5. kill $(lsof -ti :8080)              # stop backend
-- [ ] M.K Run superpowers:verification-before-completion (cd backend && ./mvnw test; cd frontend && npx ng test --no-watch; grep for System.out.println + console.log; diff review)
-```
+Manual-control commands `/opsx:new`, `/opsx:continue`, `/opsx:ff` remain available for advanced flows; they delegate to the schema via `openspec status` and `openspec instructions`.
 
 ## Coding Guidelines
 
@@ -217,24 +189,9 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
-### 5. Checkbox Discipline
-
-**Mark each task complete immediately after finishing it. Never batch updates.**
-
-When working through `tasks.md`:
-- Update `- [ ]` to `- [x]` as soon as the task is done, before moving to the next one.
-- If a subagent completes work, the coordinator must update every checkbox that subagent finished before dispatching the next subagent.
-- A checkbox marked `[x]` means the work is done AND verified — not just "I think it's done".
-
 ## Dev Log Practice
 
-Every task group in `tasks.md` MUST include a log update step. When generating `tasks.md` (during `/opsx:propose`), add this task at the end of each `## N` group, after the code-review checkpoint:
-
-```
-- [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — add entry for group N with commit hash, feature bullet points, code review findings, test count, and TDD evidence (paste RED failure lines for each new test)
-```
-
-Log file path: `docs/log/YYYY-MM-DD.md` — name the file by date. If the file for that day does not exist, create it.
+Dev log entries live at `docs/log/YYYY-MM-DD.md` — one file per date, created on first use. The schema (`tasks.instruction`) is what requires a log update task in every `## N` group; this section defines what each entry looks like.
 
 ### Each log entry should include
 
@@ -264,6 +221,5 @@ _Paste the key RED failure lines from the terminal that prove each new test fail
 
 ### Rules
 
-- Log update is a required task in every group — not optional, not deferred.
 - Use `- [ ]` for pending items and `- [x]` for completed items.
 - Keep a **To Do** section at the end of the log, listing the next batch of work or known issues.
