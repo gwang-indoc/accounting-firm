@@ -9,6 +9,10 @@ Implement tasks from an OpenSpec change.
 
 **Input**: Optionally specify a change name (e.g., `/opsx:apply add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
+**Authoritative rules**
+
+This command orchestrates how to work through tasks. The actual TDD discipline, code-review checkpoints, checkbox discipline, subagent dispatch, and dev log update rules live in the schema's `apply.instruction` field and are returned automatically by `openspec instructions apply --change "<name>" --json` (see Step 3 below). Read that output before starting — it is the authoritative source for HOW each task is executed.
+
 **Steps**
 
 1. **Select the change**
