@@ -1,15 +1,19 @@
 ---
 name: "OPSX: Explore"
-description: "Enter explore mode - think through ideas, investigate problems, clarify requirements"
+description: "Enter explore mode - think through ideas, investigate problems, clarify requirements, and produce a draft design.md"
 category: Workflow
 tags: [workflow, explore, experimental, thinking]
 ---
 
-Enter explore mode. Think deeply. Visualize freely. Follow the conversation wherever it goes.
+Enter explore mode. Think deeply. Visualize freely. Follow the conversation wherever it goes. When exploration converges, write a draft `design.md` to `openspec/changes/_draft/<topic>/`, then invoke `superpowers:brainstorming` as a REVIEWER to surface gaps before the design crystallizes.
 
-**IMPORTANT: Explore mode is for thinking, not implementing.** You may read files, search code, and investigate the codebase, but you must NEVER write code or implement features. If the user asks you to implement something, remind them to exit explore mode first and create a change proposal. You MAY create OpenSpec artifacts (proposals, designs, specs) if the user asks—that's capturing thinking, not implementing.
+**IMPORTANT: Explore mode is for thinking AND producing the design draft, not for implementing application code.** You MAY:
+- Read files, search code, investigate the codebase.
+- Write `openspec/changes/_draft/<topic>/design.md` and iterate on it.
+- Invoke `superpowers:brainstorming` to review the draft.
+- Offer Visual Companion when the change has UI surface and record the chosen design.
 
-**This is a stance, not a workflow.** There are no fixed steps, no required sequence, no mandatory outputs. You're a thinking partner helping the user explore.
+You may NOT write application code or modify production files. If the user asks to implement, remind them to run `/opsx:propose` first.
 
 **Input**: The argument after `/opsx:explore` is whatever the user wants to think about. Could be:
 - A vague idea: "real-time collaboration"
@@ -22,12 +26,12 @@ Enter explore mode. Think deeply. Visualize freely. Follow the conversation wher
 
 ## The Stance
 
-- **Curious, not prescriptive** - Ask questions that emerge naturally, don't follow a script
-- **Open threads, not interrogations** - Surface multiple interesting directions and let the user follow what resonates. Don't funnel them through a single path of questions.
-- **Visual** - Use ASCII diagrams liberally when they'd help clarify thinking
-- **Adaptive** - Follow interesting threads, pivot when new information emerges
-- **Patient** - Don't rush to conclusions, let the shape of the problem emerge
-- **Grounded** - Explore the actual codebase when relevant, don't just theorize
+- **Curious, not prescriptive** - Ask questions that emerge naturally, don't follow a script.
+- **Open threads, not interrogations** - Surface multiple interesting directions and let the user follow what resonates.
+- **Visual** - Use ASCII diagrams liberally when they'd help clarify thinking.
+- **Adaptive** - Follow interesting threads, pivot when new information emerges.
+- **Patient** - Don't rush to conclusions, let the shape of the problem emerge.
+- **Grounded** - Explore the actual codebase when relevant, don't just theorize.
 
 ---
 
@@ -35,139 +39,112 @@ Enter explore mode. Think deeply. Visualize freely. Follow the conversation wher
 
 Depending on what the user brings, you might:
 
-**Explore the problem space**
-- Ask clarifying questions that emerge from what they said
-- Challenge assumptions
-- Reframe the problem
-- Find analogies
+**Explore the problem space** — ask clarifying questions, challenge assumptions, reframe, find analogies.
 
-**Investigate the codebase**
-- Map existing architecture relevant to the discussion
-- Find integration points
-- Identify patterns already in use
-- Surface hidden complexity
+**Investigate the codebase** — map architecture, find integration points, identify patterns, surface hidden complexity.
 
-**Compare options**
-- Brainstorm multiple approaches
-- Build comparison tables
-- Sketch tradeoffs
-- Recommend a path (if asked)
+**Compare options** — brainstorm approaches, build comparison tables, sketch tradeoffs, recommend a path (if asked).
 
-**Visualize**
-```
-┌─────────────────────────────────────────┐
-│     Use ASCII diagrams liberally        │
-├─────────────────────────────────────────┤
-│                                         │
-│      ┌────────┐         ┌────────┐      │
-│      │ State  │────────▶│ State  │      │
-│      │   A    │         │   B    │      │
-│      └────────┘         └────────┘      │
-│                                         │
-│   System diagrams, state machines,      │
-│   data flows, architecture sketches,    │
-│   dependency graphs, comparison tables  │
-│                                         │
-└─────────────────────────────────────────┘
-```
+**Visualize** — ASCII diagrams for system flows, state machines, data flows, dependency graphs, comparison tables.
 
-**Surface risks and unknowns**
-- Identify what could go wrong
-- Find gaps in understanding
-- Suggest spikes or investigations
+**Surface risks and unknowns** — identify what could go wrong, find gaps, suggest spikes.
+
+---
+
+## Producing the design draft
+
+When exploration converges and the shape of the problem is clear, transition into draft-production mode:
+
+1. **Ask for a topic slug.** Use the AskUserQuestion tool (open-ended):
+   > "What's a short kebab-case slug for this topic? (e.g., `realtime-collab`, `auth-cleanup`) — vague is fine, the final change name is decided at propose time."
+
+2. **Write the draft `design.md`** at `openspec/changes/_draft/<topic>/design.md`. Use this template:
+
+   ```markdown
+   # Design: <Topic Title>
+
+   **Date:** YYYY-MM-DD
+   **Status:** Draft — produced via /opsx:explore
+
+   ## Context
+
+   <Background, current state, constraints, stakeholders.>
+
+   ## Goals / Non-Goals
+
+   **Goals:**
+   - <Bullet>
+
+   **Non-Goals:**
+   - <Bullet>
+
+   ## Approach
+
+   <High-level architecture and component breakdown.>
+
+   ## Decisions
+
+   ### Decision: <name>
+   **Choice:** <chosen approach>
+   **Alternatives considered:** <list>
+   **Rationale:** <why X over Y>
+
+   ## Risks / Trade-offs
+
+   - [Risk] → Mitigation
+
+   ## Migration Plan
+
+   <Steps to deploy, rollback strategy. Omit section if not applicable.>
+
+   ## UI
+
+   <Selected mockup/wireframe with rationale. Omit section if no UI surface.>
+
+   ## Open Questions
+
+   - <Bullet>
+   ```
+
+3. **Invoke `superpowers:brainstorming` as REVIEWER.** Use the Skill tool with this prompt:
+   > "Review the existing design.md at `openspec/changes/_draft/<topic>/design.md`. DO NOT start a new design. Run the spec self-review checklist (placeholder scan, internal consistency, scope, ambiguity check) and return findings as a structured list. The design was produced via /opsx:explore and will be promoted into a real change by /opsx:propose; your role is to surface issues so the user can refine it."
+
+4. **Apply findings** to `design.md`. Iterate until the user is satisfied.
+
+5. **If the change has UI surface**, offer Visual Companion:
+   > "This change has UI. Want me to open Visual Companion to design the screens? Some of what we're working on might be easier to compare visually. (Requires opening a local URL.)"
+
+   If the user accepts, run Visual Companion. Capture the selected mockup/wireframe (as ASCII, description, or reference to a saved image) into the UI section of `design.md`.
+
+6. **Notify the user**:
+   > "Draft ready at `openspec/changes/_draft/<topic>/design.md`. The draft is gitignored — it lives outside source control until /opsx:propose promotes it. When you're ready to formalize this as a change, run `/opsx:propose`."
 
 ---
 
 ## OpenSpec Awareness
 
-You have full context of the OpenSpec system. Use it naturally, don't force it.
+If the user mentions an EXISTING change (already in `openspec/changes/<name>/`, not in `_draft/`), read its artifacts for context (`proposal.md`, `design.md`, `specs/`, `tasks.md`). Reference them naturally in conversation. If insights warrant updates, offer:
 
-### Check for context
+| Insight Type               | Where to Capture               |
+|----------------------------|--------------------------------|
+| New requirement discovered | `specs/<capability>/spec.md`   |
+| Requirement changed        | `specs/<capability>/spec.md`   |
+| Design decision made       | `design.md`                    |
+| Scope changed              | `proposal.md`                  |
+| New work identified        | `tasks.md`                     |
+| Assumption invalidated     | Relevant artifact              |
 
-At the start, quickly check what exists:
-```bash
-openspec list --json
-```
-
-This tells you:
-- If there are active changes
-- Their names, schemas, and status
-- What the user might be working on
-
-If the user mentioned a specific change name, read its artifacts for context.
-
-### When no change exists
-
-Think freely. When insights crystallize, you might offer:
-
-- "This feels solid enough to start a change. Want me to create a proposal?"
-- Or keep exploring - no pressure to formalize
-
-### When a change exists
-
-If the user mentions a change or you detect one is relevant:
-
-1. **Read existing artifacts for context**
-   - `openspec/changes/<name>/proposal.md`
-   - `openspec/changes/<name>/design.md`
-   - `openspec/changes/<name>/tasks.md`
-   - etc.
-
-2. **Reference them naturally in conversation**
-   - "Your design mentions using Redis, but we just realized SQLite fits better..."
-   - "The proposal scopes this to premium users, but we're now thinking everyone..."
-
-3. **Offer to capture when decisions are made**
-
-    | Insight Type               | Where to Capture               |
-    |----------------------------|--------------------------------|
-    | New requirement discovered | `specs/<capability>/spec.md` |
-    | Requirement changed        | `specs/<capability>/spec.md` |
-    | Design decision made       | `design.md`                  |
-    | Scope changed              | `proposal.md`                |
-    | New work identified        | `tasks.md`                   |
-    | Assumption invalidated     | Relevant artifact              |
-
-   Example offers:
-   - "That's a design decision. Capture it in design.md?"
-   - "This is a new requirement. Add it to specs?"
-   - "This changes scope. Update the proposal?"
-
-4. **The user decides** - Offer and move on. Don't pressure. Don't auto-capture.
-
----
-
-## What You Don't Have To Do
-
-- Follow a script
-- Ask the same questions every time
-- Produce a specific artifact
-- Reach a conclusion
-- Stay on topic if a tangent is valuable
-- Be brief (this is thinking time)
-
----
-
-## Ending Discovery
-
-There's no required ending. Discovery might:
-
-- **Flow into a proposal**: "Ready to start? I can create a change proposal."
-- **Result in artifact updates**: "Updated design.md with these decisions"
-- **Just provide clarity**: User has what they need, moves on
-- **Continue later**: "We can pick this up anytime"
-
-When things crystallize, you might offer a summary - but it's optional. Sometimes the thinking IS the value.
+Offer and move on. Don't pressure. Don't auto-capture.
 
 ---
 
 ## Guardrails
 
-- **Don't implement** - Never write code or implement features. Creating OpenSpec artifacts is fine, writing application code is not.
-- **Don't fake understanding** - If something is unclear, dig deeper
-- **Don't rush** - Discovery is thinking time, not task time
-- **Don't force structure** - Let patterns emerge naturally
-- **Don't auto-capture** - Offer to save insights, don't just do it
-- **Do visualize** - A good diagram is worth many paragraphs
-- **Do explore the codebase** - Ground discussions in reality
-- **Do question assumptions** - Including the user's and your own
+- **Don't implement application code** — explore is for thinking and producing the design draft. Application code happens during /opsx:apply.
+- **Don't commit `_draft/`** — it's gitignored.
+- **Don't run `openspec new change`** during explore — that's /opsx:propose's job. Explore keeps the design in `_draft/` so the kebab-case name decision is deferred.
+- **Don't fake understanding** — if something is unclear, dig deeper.
+- **Don't rush** — discovery is thinking time, not task time.
+- **Do visualize** — a good diagram is worth many paragraphs.
+- **Do explore the codebase** — ground discussions in reality.
+- **Do question assumptions** — including the user's and your own.
