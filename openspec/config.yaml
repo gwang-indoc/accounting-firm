@@ -29,9 +29,9 @@ context: |
       /api/** to localhost:8080.
     - Component filenames use kebab-case (e.g., invoice-list.component.ts).
 
-  Frontend tests: Jasmine + Angular TestBed. Run with
-  `cd frontend && npm test` (watch) or
-  `npx ng test --no-watch` (CI). Single file:
+  Frontend tests: Vitest + Angular TestBed (not Karma/Jasmine). Use
+  `vi.fn()` for mocks, `toBe(true)` not `toBeTrue()`. Run with
+  `cd frontend && npx ng test --no-watch` (CI). Single file:
   `npx ng test --include='**/my.component.spec.ts'`.
 
   E2E tests: Playwright test suite under `e2e/` at the project root.
