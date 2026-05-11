@@ -45,3 +45,6 @@ backend/target/
 # Package manager lock files (keep one, remove others as appropriate)
 # yarn.lock
 # package-lock.json
+
+# OpenSpec exploration drafts (produced by /opsx:explore, promoted by /opsx:propose)
+openspec/changes/_draft/
