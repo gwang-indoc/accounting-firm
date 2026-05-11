@@ -99,7 +99,7 @@ Archive a completed change in the experimental workflow.
       - **TDD gaps**: untagged failing tests, missing RED evidence, baseline failures encountered.
       - **Surprises**: anything future similar work should anticipate (perf, integration friction, library quirks, schema edge cases).
 
-   c. **Show the draft to the user** and accept edits. Use the AskUserQuestion tool with options "Looks good, write it" / "Let me edit" / "Skip lessons for this change". Do NOT auto-write.
+   c. **Show the draft to the user** and accept edits. Use the AskUserQuestion tool with options "Looks good, write it" / "Let me edit" / "Skip lessons for this change". Do NOT auto-write. If the user picks "Let me edit", let them revise the draft inline, then re-present the same three options.
 
    d. **If approved**, write to `docs/lessons/YYYY-MM-DD-<name>.md` (create `docs/lessons/` if missing). Use this template:
 
