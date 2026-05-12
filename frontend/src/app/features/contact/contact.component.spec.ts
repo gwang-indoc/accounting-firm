@@ -34,4 +34,26 @@ describe('ContactComponent', () => {
     expect(btn).not.toBeNull();
     expect(btn.textContent.trim()).toBe('Send Message');
   });
+
+  it('form is invalid when name is empty', () => {
+    component.form.patchValue({ name: '', email: 'a@b.com', subject: 'S', message: 'M' });
+    expect(component.form.invalid).toBe(true);
+  });
+
+  it('form is invalid when email is not valid', () => {
+    component.form.patchValue({ name: 'Alice', email: 'not-an-email', subject: 'S', message: 'M' });
+    expect(component.form.invalid).toBe(true);
+  });
+
+  it('form is invalid when message exceeds 5000 chars', () => {
+    component.form.patchValue({ name: 'Alice', email: 'a@b.com', subject: 'S', message: 'x'.repeat(5001) });
+    expect(component.form.invalid).toBe(true);
+  });
+
+  it('Send button is disabled when form is invalid', () => {
+    component.form.patchValue({ name: '', email: 'a@b.com', subject: 'S', message: 'M' });
+    fixture.detectChanges();
+    const btn = fixture.nativeElement.querySelector('button[mat-stroked-button]');
+    expect(btn.disabled).toBe(true);
+  });
 });
