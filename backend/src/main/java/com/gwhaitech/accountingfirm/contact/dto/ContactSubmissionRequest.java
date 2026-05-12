@@ -1,9 +1,13 @@
 package com.gwhaitech.accountingfirm.contact.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public record ContactSubmissionRequest(
-    String name,
-    String email,
-    String subject,
-    String message,
+    @NotBlank String name,
+    @NotBlank @Email String email,
+    @NotBlank @Size(max = 200) String subject,
+    @NotBlank @Size(max = 5000) String message,
     String companyUrl
 ) {}
