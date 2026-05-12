@@ -111,10 +111,17 @@ When exploration converges and the shape of the problem is clear, transition int
 
 4. **Apply findings** to `design.md`. Iterate until the user is satisfied.
 
-5. **If the change has UI surface**, offer Visual Companion:
+5. **UI-surface check — this step is MANDATORY, do not skip.**
+
+   Before sending the "Draft ready" notification (step 6), explicitly decide: does this change touch UI? Signals — new Angular component or page, route addition, layout/styling/component-library choice, anything under `frontend/src/app/features/**`. If the answer is yes, OFFER Visual Companion as **its own message** (no other content in the same message):
+
    > "This change has UI. Want me to open Visual Companion to design the screens? Some of what we're working on might be easier to compare visually. (Requires opening a local URL.)"
 
-   If the user accepts, run Visual Companion. Capture the selected mockup/wireframe (as ASCII, description, or reference to a saved image) into the UI section of `design.md`.
+   Wait for the user's response.
+   - If they accept: run Visual Companion, capture the selected mockup/wireframe (as ASCII, description, or reference to a saved image) into the UI section of `design.md`, then go to step 6.
+   - If they decline: go to step 6.
+
+   **Never** send the "Draft ready" notification on a UI-touching change without first offering Visual Companion. Forcing the user to type "show visual companion" themselves is a process failure.
 
 6. **Notify the user**:
    > "Draft ready at `openspec/changes/_draft/<topic>/design.md`. The draft is gitignored — it lives outside source control until /opsx:propose promotes it. When you're ready to formalize this as a change, run `/opsx:propose`."
