@@ -63,4 +63,16 @@ class ContactServiceTest {
         assertEquals("[Contact] Hello", email.getSubject());
         assertArrayEquals(new String[]{"notify@firm.com"}, email.getTo());
     }
+
+    @Test
+    void smtpFailureDoesNotPropagate() {
+        doThrow(new org.springframework.mail.MailSendException("SMTP down"))
+            .when(mailSender).send(any(SimpleMailMessage.class));
+
+        ContactSubmissionRequest req = new ContactSubmissionRequest(
+            "Bob", "bob@example.com", "SMTP Test", "Message", "");
+
+        assertDoesNotThrow(() -> service.submit(req, "1.2.3.4"));
+        verify(repository).save(any()); // row was still persisted
+    }
 }
