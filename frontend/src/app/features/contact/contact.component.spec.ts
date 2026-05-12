@@ -87,18 +87,19 @@ describe('ContactComponent', () => {
     expect(errors.length).toBe(0);
   });
 
-  it('on success, form is reset and snackbar shows success message', async () => {
+  it('on success, inline confirmation appears and no snackbar is opened', async () => {
     contactServiceMock.send.mockReturnValue(of(undefined));
     component.form.patchValue({ name: 'Alice', email: 'a@b.com', subject: 'S', message: 'M', companyUrl: '' });
     fixture.detectChanges();
 
     component.submit();
     await fixture.whenStable();
+    fixture.detectChanges();
 
-    expect(component.form.value.name).toBeFalsy();
-    expect(snackBarMock.open).toHaveBeenCalledWith(
-      "Thanks — we'll reply soon", undefined, { duration: 3000 }
-    );
+    const confirmation = fixture.nativeElement.querySelector('[role="status"]');
+    expect(confirmation).not.toBeNull();
+    expect(confirmation.textContent).toContain("Thanks — we'll reply soon");
+    expect(snackBarMock.open).not.toHaveBeenCalled();
   });
 
   it('on error, form values are preserved and error snackbar opens', async () => {

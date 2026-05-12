@@ -26,6 +26,7 @@ import { finalize } from 'rxjs';
 export class ContactComponent {
   form: FormGroup;
   submitting = signal(false);
+  showConfirmation = signal(false);
   private formDirective = viewChild.required(FormGroupDirective);
 
   constructor(
@@ -45,12 +46,13 @@ export class ContactComponent {
   submit(): void {
     if (this.form.invalid) return;
     this.submitting.set(true);
+    this.showConfirmation.set(false);
     this.contactService.send(this.form.value).pipe(
       finalize(() => this.submitting.set(false)),
     ).subscribe({
       next: () => {
         this.formDirective().resetForm();
-        this.snackBar.open("Thanks — we'll reply soon", undefined, { duration: 3000 });
+        this.showConfirmation.set(true);
       },
       error: () => {
         this.snackBar.open('Something went wrong. Please try again.', 'OK');

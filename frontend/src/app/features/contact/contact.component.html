@@ -123,6 +123,13 @@
           </span>
         </button>
 
+        @if (showConfirmation()) {
+          <div class="confirmation-block" role="status" aria-live="polite">
+            <mat-icon>check_circle</mat-icon>
+            <span>Thanks — we'll reply soon.</span>
+          </div>
+        }
+
       </form>
     </div>
   </main>

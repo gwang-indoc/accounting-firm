@@ -3,13 +3,13 @@
 - [x] 1.1 RED — In `frontend/src/app/features/contact/contact.component.spec.ts`, add a new test "after a successful submit, no `mat-error` is visible for any field". Stub `ContactService.send` to return `of(undefined)`, fill the form with valid values, call `component.submit()`, await `fixture.whenStable()`, then `fixture.detectChanges()`. Query for `mat-error` elements and assert the NodeList length is `0`. Run `cd frontend && npx ng test --include='**/contact.component.spec.ts' --no-watch` and verify the test FAILS (it should fail because the current `form.reset()` leaves the form-directive `submitted = true`, so the cleared empty required fields render their errors). Paste the RED failure output into the dev log entry for this group.
 - [x] 1.2 GREEN — In `contact.component.ts`, import `FormGroupDirective` and `viewChild` from `@angular/core` / `@angular/forms`. Add `private formDirective = viewChild.required(FormGroupDirective);`. Replace `this.form.reset()` in the success handler with `this.formDirective().resetForm()`. Run the same test command and verify it now PASSES along with all pre-existing tests in the file.
 - [x] 1.Z Run `superpowers:requesting-code-review` on the diff for group 1; address CRITICAL/HIGH findings before moving on.
-- [ ] 1.Z+1 Update `docs/log/YYYY-MM-DD.md` — commit hash, feature bullets, review findings, test count, and TDD evidence (paste the RED failure lines from 1.1).
+- [x] 1.Z+1 Update `docs/log/YYYY-MM-DD.md` — commit hash, feature bullets, review findings, test count, and TDD evidence (paste the RED failure lines from 1.1).
 
 ## 2. Replace success snackbar with inline confirmation block
 
-- [ ] 2.1 RED — In `contact.component.spec.ts`, replace the existing test `'on success, form is reset and snackbar shows success message'` (around lines 76–88) with `'on success, inline confirmation appears and no snackbar is opened'`. New assertions: after `component.submit()` and `fixture.whenStable()` + `detectChanges()`, the DOM contains an element with `[role="status"]` whose text content includes `"Thanks — we'll reply soon"`; AND `snackBarMock.open` was NOT called. Run `cd frontend && npx ng test --include='**/contact.component.spec.ts' --no-watch` and verify the new test FAILS (no inline element exists yet; snackbar still fires). Paste the RED failure lines.
-- [ ] 2.2 GREEN — In `contact.component.ts`, add `showConfirmation = signal(false);`. In the success handler, after `this.formDirective().resetForm()`, call `this.showConfirmation.set(true);` and REMOVE the `this.snackBar.open(...)` line from the success branch. Leave the error-branch snackbar untouched.
-- [ ] 2.3 GREEN — In `contact.component.html`, immediately after the closing `</button>` of the Send Message button (still inside the `<form>` element), add:
+- [x] 2.1 RED — In `contact.component.spec.ts`, replace the existing test `'on success, form is reset and snackbar shows success message'` (around lines 76–88) with `'on success, inline confirmation appears and no snackbar is opened'`. New assertions: after `component.submit()` and `fixture.whenStable()` + `detectChanges()`, the DOM contains an element with `[role="status"]` whose text content includes `"Thanks — we'll reply soon"`; AND `snackBarMock.open` was NOT called. Run `cd frontend && npx ng test --include='**/contact.component.spec.ts' --no-watch` and verify the new test FAILS (no inline element exists yet; snackbar still fires). Paste the RED failure lines.
+- [x] 2.2 GREEN — In `contact.component.ts`, add `showConfirmation = signal(false);`. In the success handler, after `this.formDirective().resetForm()`, call `this.showConfirmation.set(true);` and REMOVE the `this.snackBar.open(...)` line from the success branch. Leave the error-branch snackbar untouched.
+- [x] 2.3 GREEN — In `contact.component.html`, immediately after the closing `</button>` of the Send Message button (still inside the `<form>` element), add:
   ```html
   @if (showConfirmation()) {
     <div class="confirmation-block" role="status" aria-live="polite">
@@ -18,8 +18,8 @@
     </div>
   }
   ```
-- [ ] 2.4 GREEN — In `contact.component.css`, append the `.confirmation-block` styles (per `design.md` "Style sketch"): flex row, 10px gap, 16px top margin, 14px/16px padding, 8px radius, translucent cyan background and border (`rgba(56, 189, 248, 0.08)` / `rgba(56, 189, 248, 0.25)`), `#cbd5e1` text, 14px font, `animation: fadeSlideUp 0.3s ease both;`. Nested rule: `.confirmation-block mat-icon { color: #38bdf8; font-size: 20px; width: 20px; height: 20px; }`. Run the full component spec and verify it now PASSES.
-- [ ] 2.Z Run `superpowers:requesting-code-review` on the diff for group 2; address CRITICAL/HIGH findings before moving on.
+- [x] 2.4 GREEN — In `contact.component.css`, append the `.confirmation-block` styles (per `design.md` "Style sketch"): flex row, 10px gap, 16px top margin, 14px/16px padding, 8px radius, translucent cyan background and border (`rgba(56, 189, 248, 0.08)` / `rgba(56, 189, 248, 0.25)`), `#cbd5e1` text, 14px font, `animation: fadeSlideUp 0.3s ease both;`. Nested rule: `.confirmation-block mat-icon { color: #38bdf8; font-size: 20px; width: 20px; height: 20px; }`. Run the full component spec and verify it now PASSES.
+- [x] 2.Z Run `superpowers:requesting-code-review` on the diff for group 2; address CRITICAL/HIGH findings before moving on.
 - [ ] 2.Z+1 Update `docs/log/YYYY-MM-DD.md` — commit hash, feature bullets, review findings, test count, TDD evidence.
 
 ## 3. Auto-hide confirmation when the visitor types again
