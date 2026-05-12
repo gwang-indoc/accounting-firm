@@ -75,4 +75,35 @@ class ContactServiceTest {
         assertDoesNotThrow(() -> service.submit(req, "1.2.3.4"));
         verify(repository).save(any()); // row was still persisted
     }
+
+    @Test
+    void fromAddressDefaultsToMailUsername() {
+        // service was constructed with props having fromEmail=null
+        // We need access to the internal @Value field via reflection or by injecting it
+        // The cleanest way: add a package-private setter for test use, OR use ReflectionTestUtils
+        org.springframework.test.util.ReflectionTestUtils.setField(service, "mailUsername", "noreply@spring.com");
+
+        ContactSubmissionRequest req = new ContactSubmissionRequest(
+            "Charlie", "charlie@example.com", "From test", "Body", "");
+        service.submit(req, "10.0.0.1");
+
+        ArgumentCaptor<SimpleMailMessage> captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
+        verify(mailSender).send(captor.capture());
+        assertEquals("noreply@spring.com", captor.getValue().getFrom());
+    }
+
+    @Test
+    void fromAddressUsesExplicitOverrideWhenSet() {
+        MailProperties propsWithFrom = new MailProperties("notify@firm.com", "no-reply@firm.com");
+        ContactService svcWithFrom = new ContactService(repository, mailSender, propsWithFrom);
+
+        ContactSubmissionRequest req = new ContactSubmissionRequest(
+            "Dave", "dave@example.com", "From override", "Body", "");
+        svcWithFrom.submit(req, "10.0.0.2");
+
+        ArgumentCaptor<SimpleMailMessage> captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
+        verify(mailSender, atLeastOnce()).send(captor.capture());
+        SimpleMailMessage lastEmail = captor.getAllValues().get(captor.getAllValues().size() - 1);
+        assertEquals("no-reply@firm.com", lastEmail.getFrom());
+    }
 }
