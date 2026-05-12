@@ -6,6 +6,8 @@ import com.gwhaitech.accountingfirm.auth.service.AuthService;
 import com.gwhaitech.accountingfirm.auth.service.JwtService;
 import com.gwhaitech.accountingfirm.client.service.ClientService;
 import com.gwhaitech.accountingfirm.client.service.DocumentService;
+import com.gwhaitech.accountingfirm.contact.service.ContactService;
+import com.gwhaitech.accountingfirm.contact.service.RateLimiter;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.impl.DefaultClaims;
 import jakarta.servlet.http.Cookie;
@@ -82,6 +84,13 @@ class JwtAuthFilterTest {
     // satisfies DocumentController constructor wiring in the WebMvcTest context
     @MockitoBean
     private DocumentService documentService;
+
+    // satisfies ContactController constructor wiring in the WebMvcTest context
+    @MockitoBean
+    private ContactService contactService;
+
+    @MockitoBean
+    private RateLimiter rateLimiter;
 
     @Test
     void validJwtCookie_setsAuthenticatedPrincipal() throws Exception {
