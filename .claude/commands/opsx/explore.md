@@ -11,7 +11,7 @@ Enter explore mode. Think deeply. Visualize freely. Follow the conversation wher
 - Read files, search code, investigate the codebase.
 - Write `openspec/changes/_draft/<topic>/design.md` and iterate on it.
 - Invoke `superpowers:brainstorming` to review the draft.
-- Offer Visual Companion when the change has UI surface and record the chosen design.
+- Optionally offer Visual Companion when the change involves visual decisions that benefit from side-by-side mockups, and record the chosen design.
 
 You may NOT write application code or modify production files. If the user asks to implement, remind them to run `/opsx:propose` first.
 
@@ -111,17 +111,17 @@ When exploration converges and the shape of the problem is clear, transition int
 
 4. **Apply findings** to `design.md`. Iterate until the user is satisfied.
 
-5. **UI-surface check — this step is MANDATORY, do not skip.**
+5. **UI-surface check — optional.**
 
-   Before sending the "Draft ready" notification (step 6), explicitly decide: does this change touch UI? Signals — new Angular component or page, route addition, layout/styling/component-library choice, anything under `frontend/src/app/features/**`. If the answer is yes, OFFER Visual Companion as **its own message** (no other content in the same message):
+   Visual Companion is an optional tool, not a required step. Before sending the "Draft ready" notification (step 6), use judgment: does this change involve visual decisions that would genuinely benefit from side-by-side mockups (e.g., comparing multiple layout options, exploring a brand-new screen, picking between visual treatments)? If yes — and only if yes — you MAY offer Visual Companion as **its own message** (no other content in the same message):
 
-   > "This change has UI. Want me to open Visual Companion to design the screens? Some of what we're working on might be easier to compare visually. (Requires opening a local URL.)"
+   > "This change has visual decisions to make. Want me to open Visual Companion to compare mockups? (Requires opening a local URL.)"
 
    Wait for the user's response.
    - If they accept: run Visual Companion, capture the selected mockup/wireframe (as ASCII, description, or reference to a saved image) into the UI section of `design.md`, then go to step 6.
-   - If they decline: go to step 6.
+   - If they decline or you didn't offer: go to step 6.
 
-   **Never** send the "Draft ready" notification on a UI-touching change without first offering Visual Companion. Forcing the user to type "show visual companion" themselves is a process failure.
+   For small UI tweaks, behavior changes to existing components, or anything where an ASCII mockup in the design.md is sufficient, skip the offer entirely. The user can always invoke Visual Companion explicitly if they want it.
 
 6. **Notify the user**:
    > "Draft ready at `openspec/changes/_draft/<topic>/design.md`. The draft is gitignored — it lives outside source control until /opsx:propose promotes it. When you're ready to formalize this as a change, run `/opsx:propose`."

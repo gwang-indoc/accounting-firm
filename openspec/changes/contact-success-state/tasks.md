@@ -35,11 +35,11 @@
   ```
 - [x] 3.3 GREEN — In `contact.component.html`, add `(input)="onFormInput()"` to the opening `<form ...>` tag, alongside the existing `[formGroup]` and `(ngSubmit)` bindings. Run the full component spec and verify it now PASSES.
 - [x] 3.Z Run `superpowers:requesting-code-review` on the diff for group 3; address CRITICAL/HIGH findings before moving on.
-- [ ] 3.Z+1 Update `docs/log/YYYY-MM-DD.md` — commit hash, feature bullets, review findings, test count, TDD evidence.
+- [x] 3.Z+1 Update `docs/log/YYYY-MM-DD.md` — commit hash, feature bullets, review findings, test count, TDD evidence.
 
 ## 4. End-to-end coverage and final verification
 
-- [ ] 4.1 Add Playwright E2E test under `e2e/` named `contact-success-state.spec.ts` covering the full success flow:
+- [x] 4.1 Add Playwright E2E test under `e2e/` named `contact-success-state.spec.ts` covering the full success flow:
   1. Navigate to `/contact`.
   2. Use `page.route('**/api/contact', ...)` to stub the POST with a 202 response so the test does not depend on backend mail config.
   3. Fill `name`, `email`, `subject`, `message` with valid values.
@@ -49,13 +49,13 @@
   7. Assert each of the four visible inputs has an empty value.
   8. Type a single character into the Name field.
   9. Assert `[role="status"]` is no longer attached to the DOM.
-- [ ] 4.2 Run the E2E test cycle:
+- [x] 4.2 Run the E2E test cycle:
   1. `./start.sh`
   2. `cd frontend && npm start`
   3. `cd e2e && npx playwright test --grep "contact-success-state"`
   4. `kill $(lsof -ti :4200)`
   5. `kill $(lsof -ti :8080)`
-- [ ] 4.3 Run `superpowers:verification-before-completion`:
+- [x] 4.3 Run `superpowers:verification-before-completion`:
   1. `cd backend && ./mvnw test`
   2. `cd frontend && npx ng test --no-watch`
   3. `grep -rn "System.out.println" backend/src/main/` (should be empty for new code)

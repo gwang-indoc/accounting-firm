@@ -24,7 +24,7 @@ test.describe('Contact page', () => {
     const response = await request.response();
     expect(response?.status()).toBe(202);
 
-    await expect(page.locator('mat-snack-bar-container')).toContainText("Thanks");
+    await expect(page.locator('[role="status"]')).toContainText("Thanks");
   });
 
   test('negative path: invalid email shows inline error and fires no POST', async ({ page }) => {
