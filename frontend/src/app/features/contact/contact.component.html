@@ -1,51 +1,104 @@
 <div class="contact-page">
-  <mat-card class="contact-form-card">
-    <mat-card-header>
-      <mat-card-title>Contact Us</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="submit()">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Name</mat-label>
-          <input matInput formControlName="name" />
-          <mat-error>Name is required</mat-error>
-        </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Email</mat-label>
-          <input matInput type="email" formControlName="email" />
-          <mat-error>Enter a valid email address</mat-error>
-        </mat-form-field>
+  <!-- Two-column grid on desktop, single column on mobile -->
+  <div class="contact-grid">
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Subject</mat-label>
-          <input matInput formControlName="subject" />
-        </mat-form-field>
+    <!-- LEFT: Contact form card -->
+    <mat-card class="contact-form-card">
+      <mat-card-header>
+        <mat-card-title>Send Us a Message</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="form" (ngSubmit)="submit()">
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Message</mat-label>
-          <textarea matInput formControlName="message" rows="6"></textarea>
-          <mat-error>Message is too long (5000 character limit)</mat-error>
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name" />
+            <mat-error>Name is required</mat-error>
+          </mat-form-field>
 
-        <!-- Honeypot: off-screen, hidden from keyboard and screen readers -->
-        <input
-          formControlName="companyUrl"
-          name="companyUrl"
-          tabindex="-1"
-          aria-hidden="true"
-          autocomplete="off"
-          style="position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden;"
-        />
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" formControlName="email" />
+            <mat-error>Enter a valid email address</mat-error>
+          </mat-form-field>
 
-        <button
-          mat-stroked-button
-          color="primary"
-          type="submit"
-          [disabled]="form.invalid || submitting()">
-          Send Message
-        </button>
-      </form>
-    </mat-card-content>
-  </mat-card>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Subject</mat-label>
+            <input matInput formControlName="subject" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Message</mat-label>
+            <textarea matInput formControlName="message" rows="6"></textarea>
+            <mat-error>Message is too long (5000 character limit)</mat-error>
+          </mat-form-field>
+
+          <!-- Honeypot: off-screen, invisible to keyboard and screen readers -->
+          <input
+            formControlName="companyUrl"
+            name="companyUrl"
+            tabindex="-1"
+            aria-hidden="true"
+            autocomplete="off"
+            style="position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden;"
+          />
+
+          <div class="form-actions">
+            <button
+              mat-stroked-button
+              color="primary"
+              type="submit"
+              [disabled]="form.invalid || submitting()">
+              Send Message
+            </button>
+          </div>
+
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- RIGHT: Find Us sidebar card (address + map in one card) -->
+    <mat-card class="find-us-card">
+      <mat-card-header>
+        <mat-card-title>Find Us</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+
+        <div class="contact-info">
+          <div class="info-row">
+            <span class="info-label">Address</span>
+            <span class="info-value">123 Main St, Anytown CA 90210</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Phone</span>
+            <span class="info-value">(555) 123-4567</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Email</span>
+            <span class="info-value">info@firm.com</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Hours</span>
+            <span class="info-value">Mon–Fri 9–5</span>
+          </div>
+        </div>
+
+        <div class="map-container">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3305.7152274!2d-118.24368!3d34.052234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c2c75ddc27da13%3A0xe22fef1de0f462ef!2sLos+Angeles%2C+CA!5e0!3m2!1sen!2sus!4v1699999999999!5m2!1sen!2sus"
+            width="100%"
+            height="300"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Office location map">
+          </iframe>
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+
+  </div>
 </div>
