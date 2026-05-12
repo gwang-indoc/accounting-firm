@@ -66,4 +66,69 @@ class ContactControllerTest {
 
         verify(contactService).submit(any(), anyString());
     }
+
+    @Test
+    void missingNameReturns400() throws Exception {
+        mockMvc.perform(post("/api/contact")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"email":"alice@example.com","subject":"Hello","message":"World","companyUrl":""}
+                """))
+            .andExpect(status().isBadRequest());
+        verify(contactService, never()).submit(any(), anyString());
+    }
+
+    @Test
+    void invalidEmailReturns400() throws Exception {
+        mockMvc.perform(post("/api/contact")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"name":"Alice","email":"not-an-email","subject":"Hello","message":"World","companyUrl":""}
+                """))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void subjectTooLongReturns400() throws Exception {
+        mockMvc.perform(post("/api/contact")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"name\":\"Alice\",\"email\":\"alice@example.com\",\"subject\":\""
+                    + "x".repeat(201) + "\",\"message\":\"World\",\"companyUrl\":\"\"}"))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void messageTooLongReturns400() throws Exception {
+        mockMvc.perform(post("/api/contact")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"name\":\"Alice\",\"email\":\"alice@example.com\",\"subject\":\"Hello\",\"message\":\""
+                    + "x".repeat(5001) + "\",\"companyUrl\":\"\"}"))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void honeypotFilledReturns200NotCalling202() throws Exception {
+        when(rateLimiter.tryAcquire(anyString())).thenReturn(true);
+        mockMvc.perform(post("/api/contact")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"name":"Alice","email":"alice@example.com","subject":"Hello","message":"World",
+                     "companyUrl":"http://spam.example"}
+                """))
+            .andExpect(status().isOk());
+        verify(contactService, never()).submit(any(), anyString());
+        verify(rateLimiter, never()).tryAcquire(anyString());
+    }
+
+    @Test
+    void rateLimitExceededReturns429() throws Exception {
+        when(rateLimiter.tryAcquire(anyString())).thenReturn(false);
+        mockMvc.perform(post("/api/contact")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"name":"Alice","email":"alice@example.com","subject":"Hello","message":"World","companyUrl":""}
+                """))
+            .andExpect(status().isTooManyRequests());
+        verify(contactService, never()).submit(any(), anyString());
+    }
 }
