@@ -56,6 +56,15 @@ JWT_SECRET=change-me-to-a-random-32-char-string
 SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/accounting_firm
 SPRING_DATASOURCE_USERNAME=postgres
 SPRING_DATASOURCE_PASSWORD=postgres
+
+# File uploads
+UPLOAD_DIR=./uploads
+UPLOAD_MAX_FILE_SIZE_MB=10
+UPLOAD_MAX_FILENAME_LENGTH=100
+BLOCKED_EXTENSIONS=exe,js
+
+# Contact form — email address where contact submissions are delivered
+CONTACT_NOTIFICATION_EMAIL=you@example.com
 ```
 
 ### 3. Start the backend
@@ -64,7 +73,7 @@ SPRING_DATASOURCE_PASSWORD=postgres
 ./start.sh
 ```
 
-`start.sh` loads `.env` automatically and starts the backend. Make sure the `.env` file exists at the project root before running it.
+`start.sh` loads `.env` automatically, defaults to the `dev` Spring profile, and starts the backend on `localhost:8080`.
 
 ### 4. Start the frontend
 
@@ -72,7 +81,33 @@ SPRING_DATASOURCE_PASSWORD=postgres
 cd frontend && npm start
 ```
 
-The Angular dev server proxies `/api/**` to the Spring Boot server at `localhost:8080`.
+The Angular dev server proxies `/api/**`, `/oauth2/**`, and `/login/oauth2/**` to the Spring Boot server at `localhost:8080`.
+
+## Production Deployment
+
+### 1. Create `.env.prod`
+
+Copy `.env` to `.env.prod` (gitignored) and fill in production values. Add the SMTP block for outbound email:
+
+```bash
+# ... same keys as .env, with production values ...
+
+# SMTP — Gmail example (requires an App Password, not your regular password)
+# Enable 2-Step Verification at myaccount.google.com first, then generate
+# an App Password at myaccount.google.com/apppasswords
+SPRING_MAIL_HOST=smtp.gmail.com
+SPRING_MAIL_PORT=587
+SPRING_MAIL_USERNAME=you@gmail.com
+SPRING_MAIL_PASSWORD=your-app-password
+```
+
+### 2. Start the production backend
+
+```bash
+./start_prod.sh
+```
+
+`start_prod.sh` requires `.env.prod` to exist (exits with an error if missing), sources it, forces `SPRING_PROFILES_ACTIVE=prod`, and starts the backend.
 
 ## Backend Commands
 
@@ -113,4 +148,22 @@ cd frontend && npx ng test --include='**/my.component.spec.ts'
 
 # Lint
 cd frontend && npm run lint
+```
+
+## E2E Tests (Playwright)
+
+E2E tests live under `e2e/`. Both the backend and frontend must be running before executing them.
+
+```bash
+# Install dependencies (first time only)
+cd e2e && npm install
+
+# Run all E2E tests
+cd e2e && npx playwright test
+
+# Run a specific test file
+cd e2e && npx playwright test contact.spec.ts
+
+# Run tests matching a keyword
+cd e2e && npx playwright test --grep "login"
 ```
