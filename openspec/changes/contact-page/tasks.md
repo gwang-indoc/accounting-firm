@@ -103,3 +103,13 @@
        - Review `git diff main...new_approach -- backend/ frontend/ openspec/changes/contact-page/ e2e/` for any unintended changes
 - [x] 6.Z Run `superpowers:requesting-code-review` on the diff for group 6; address CRITICAL/HIGH findings before moving on.
 - [x] 6.Z+1 Update `docs/log/YYYY-MM-DD.md` — commit hash, feature bullets, review findings, test count, TDD evidence (paste RED failure lines from 6.1, 6.3, 6.5, 6.7, 6.9), and a one-line note recording the values used in task 6.0.
+
+---
+
+## Post-completion follow-ups (2026-05-12)
+
+- [x] Fix `./start.sh` — added `SPRING_PROFILES_ACTIVE` default so `LoggingMailSender` loads without needing to set the profile manually. See `docs/log/2026-05-12.md §1`.
+- [x] Add `contact.notification-email` to `application.yml` via `${CONTACT_NOTIFICATION_EMAIL}` env var; simplify `application-dev.yml` to a comment; add SMTP block to `application-prod.yml`. See `docs/log/2026-05-12.md §1`.
+- [x] Add `CONTACT_NOTIFICATION_EMAIL` to `.env`.
+- [x] Create `start_prod.sh` + `.env.prod` for production deployment; add `.env.prod` to `.gitignore`. See `docs/log/2026-05-12.md §2`.
+- [x] Premium contact page UI redesign — split-screen layout, Playfair Display, icon rows, 税 watermark, dark-inverted map, entrance animations, Material Icons font added to `index.html`. See `docs/log/2026-05-12.md §3`.

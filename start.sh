@@ -10,5 +10,8 @@ fi
 
 set -a && source "$SCRIPT_DIR/.env" && set +a
 
+# Default to dev profile for local development if not already set
+export SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE:-dev}"
+
 cd "$SCRIPT_DIR/backend"
 ./mvnw spring-boot:run

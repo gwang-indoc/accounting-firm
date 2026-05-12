@@ -1,20 +1,2 @@
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/accounting_firm
-    username: postgres
-    password: postgres
-  jpa:
-    show-sql: true
-
-app:
-  cookie:
-    secure: false
-  frontend-url: http://localhost:4200
-
-contact:
-  notification-email: dev@example.com
-
-logging:
-  level:
-    com.gwhaitech: DEBUG
-    org.springframework.security: DEBUG
+# No property overrides needed for dev.
+# Dev-specific behaviour (e.g. LoggingMailSender) is handled via @Profile("dev") beans.

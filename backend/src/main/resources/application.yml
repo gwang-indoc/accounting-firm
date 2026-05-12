@@ -22,6 +22,9 @@ spring:
   flyway:
     enabled: true
 
+contact:
+  notification-email: ${CONTACT_NOTIFICATION_EMAIL}
+
 app:
   jwt:
     secret: ${JWT_SECRET}

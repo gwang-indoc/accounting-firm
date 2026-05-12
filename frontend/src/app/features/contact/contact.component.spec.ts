@@ -33,7 +33,7 @@ describe('ContactComponent', () => {
     expect(fields.length).toBe(4);
     const btn = fixture.nativeElement.querySelector('button[mat-stroked-button]');
     expect(btn).not.toBeNull();
-    expect(btn.textContent.trim()).toBe('Send Message');
+    expect(btn.textContent).toContain('Send Message');
   });
 
   it('form is invalid when name is empty', () => {
