@@ -223,3 +223,7 @@ _Paste the key RED failure lines from the terminal that prove each new test fail
 
 - Use `- [ ]` for pending items and `- [x]` for completed items.
 - Keep a **To Do** section at the end of the log, listing the next batch of work or known issues.
+
+## Lessons Learned
+
+Lessons from archived changes live in `docs/lessons/` — one file per archive, named `YYYY-MM-DD-<change-name>.md`.
