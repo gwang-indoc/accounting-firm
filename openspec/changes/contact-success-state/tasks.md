@@ -20,12 +20,12 @@
   ```
 - [x] 2.4 GREEN — In `contact.component.css`, append the `.confirmation-block` styles (per `design.md` "Style sketch"): flex row, 10px gap, 16px top margin, 14px/16px padding, 8px radius, translucent cyan background and border (`rgba(56, 189, 248, 0.08)` / `rgba(56, 189, 248, 0.25)`), `#cbd5e1` text, 14px font, `animation: fadeSlideUp 0.3s ease both;`. Nested rule: `.confirmation-block mat-icon { color: #38bdf8; font-size: 20px; width: 20px; height: 20px; }`. Run the full component spec and verify it now PASSES.
 - [x] 2.Z Run `superpowers:requesting-code-review` on the diff for group 2; address CRITICAL/HIGH findings before moving on.
-- [ ] 2.Z+1 Update `docs/log/YYYY-MM-DD.md` — commit hash, feature bullets, review findings, test count, TDD evidence.
+- [x] 2.Z+1 Update `docs/log/YYYY-MM-DD.md` — commit hash, feature bullets, review findings, test count, TDD evidence.
 
 ## 3. Auto-hide confirmation when the visitor types again
 
-- [ ] 3.1 RED — In `contact.component.spec.ts`, add a test `'inline confirmation hides when user types in any field after success'`. After triggering a successful submit (same setup as test 2.1), assert the inline confirmation IS visible. Then set `showConfirmation` indirectly by dispatching an `input` event from a Name field input element: locate `input[formControlName="name"]`, set its `.value = 'A'`, and `dispatchEvent(new Event('input', { bubbles: true }))`. After `fixture.detectChanges()`, assert the element with `[role="status"]` is no longer in the DOM. Run the test and verify it FAILS (no handler exists yet). Paste the RED failure lines.
-- [ ] 3.2 GREEN — In `contact.component.ts`, add:
+- [x] 3.1 RED — In `contact.component.spec.ts`, add a test `'inline confirmation hides when user types in any field after success'`. After triggering a successful submit (same setup as test 2.1), assert the inline confirmation IS visible. Then set `showConfirmation` indirectly by dispatching an `input` event from a Name field input element: locate `input[formControlName="name"]`, set its `.value = 'A'`, and `dispatchEvent(new Event('input', { bubbles: true }))`. After `fixture.detectChanges()`, assert the element with `[role="status"]` is no longer in the DOM. Run the test and verify it FAILS (no handler exists yet). Paste the RED failure lines.
+- [x] 3.2 GREEN — In `contact.component.ts`, add:
   ```ts
   onFormInput(): void {
     if (this.showConfirmation()) {
@@ -33,8 +33,8 @@
     }
   }
   ```
-- [ ] 3.3 GREEN — In `contact.component.html`, add `(input)="onFormInput()"` to the opening `<form ...>` tag, alongside the existing `[formGroup]` and `(ngSubmit)` bindings. Run the full component spec and verify it now PASSES.
-- [ ] 3.Z Run `superpowers:requesting-code-review` on the diff for group 3; address CRITICAL/HIGH findings before moving on.
+- [x] 3.3 GREEN — In `contact.component.html`, add `(input)="onFormInput()"` to the opening `<form ...>` tag, alongside the existing `[formGroup]` and `(ngSubmit)` bindings. Run the full component spec and verify it now PASSES.
+- [x] 3.Z Run `superpowers:requesting-code-review` on the diff for group 3; address CRITICAL/HIGH findings before moving on.
 - [ ] 3.Z+1 Update `docs/log/YYYY-MM-DD.md` — commit hash, feature bullets, review findings, test count, TDD evidence.
 
 ## 4. End-to-end coverage and final verification

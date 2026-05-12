@@ -102,6 +102,37 @@ describe('ContactComponent', () => {
     expect(snackBarMock.open).not.toHaveBeenCalled();
   });
 
+  it('inline confirmation hides when user types in any field after success', async () => {
+    contactServiceMock.send.mockReturnValue(of(undefined));
+    component.form.patchValue({ name: 'Alice', email: 'a@b.com', subject: 'S', message: 'M', companyUrl: '' });
+    fixture.detectChanges();
+
+    component.submit();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('[role="status"]')).not.toBeNull();
+
+    const nameInput = fixture.nativeElement.querySelector('input[formcontrolname="name"]');
+    nameInput.value = 'A';
+    nameInput.dispatchEvent(new Event('input', { bubbles: true }));
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('[role="status"]')).toBeNull();
+
+    nameInput.value = 'Al';
+    nameInput.dispatchEvent(new Event('input', { bubbles: true }));
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('[role="status"]')).toBeNull();
+  });
+
+  it('onFormInput is a no-op when confirmation is already hidden', () => {
+    component.showConfirmation.set(false);
+    component.onFormInput();
+    expect(component.showConfirmation()).toBe(false);
+  });
+
   it('on error, form values are preserved and error snackbar opens', async () => {
     contactServiceMock.send.mockReturnValue(throwError(() => new Error('server error')));
     component.form.patchValue({ name: 'Alice', email: 'a@b.com', subject: 'S', message: 'M', companyUrl: '' });

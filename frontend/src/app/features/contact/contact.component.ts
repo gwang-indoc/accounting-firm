@@ -43,6 +43,12 @@ export class ContactComponent {
     });
   }
 
+  onFormInput(): void {
+    if (this.showConfirmation()) {
+      this.showConfirmation.set(false);
+    }
+  }
+
   submit(): void {
     if (this.form.invalid) return;
     this.submitting.set(true);

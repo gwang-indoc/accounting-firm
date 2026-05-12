@@ -69,7 +69,7 @@
         <p class="form-sub">All fields are required.</p>
       </div>
 
-      <form [formGroup]="form" (ngSubmit)="submit()" class="contact-form" novalidate>
+      <form [formGroup]="form" (ngSubmit)="submit()" (input)="onFormInput()" class="contact-form" novalidate>
 
         <div class="field-row">
           <mat-form-field appearance="outline" class="full-width">
