@@ -5,6 +5,7 @@ import com.gwhaitech.accountingfirm.auth.handler.OAuth2SuccessHandler;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -41,6 +42,7 @@ public class SecurityConfig {
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/oauth2/**", "/login/oauth2/**", "/api/auth/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().denyAll()
             )
