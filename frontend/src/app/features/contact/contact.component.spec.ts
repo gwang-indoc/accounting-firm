@@ -86,4 +86,18 @@ describe('ContactComponent', () => {
       "Thanks — we'll reply soon", undefined, { duration: 3000 }
     );
   });
+
+  it('on error, form values are preserved and error snackbar opens', async () => {
+    contactServiceMock.send.mockReturnValue(throwError(() => new Error('server error')));
+    component.form.patchValue({ name: 'Alice', email: 'a@b.com', subject: 'S', message: 'M', companyUrl: '' });
+    fixture.detectChanges();
+
+    component.submit();
+    await fixture.whenStable();
+
+    expect(component.form.value.name).toBe('Alice');
+    expect(snackBarMock.open).toHaveBeenCalledWith(
+      expect.stringContaining('wrong'), 'OK'
+    );
+  });
 });
