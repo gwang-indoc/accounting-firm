@@ -73,6 +73,20 @@ describe('ContactComponent', () => {
     );
   });
 
+  it('after a successful submit, no mat-error is visible for any field', async () => {
+    contactServiceMock.send.mockReturnValue(of(undefined));
+    component.form.patchValue({ name: 'Alice', email: 'a@b.com', subject: 'S', message: 'M', companyUrl: '' });
+    fixture.detectChanges();
+
+    const btn = fixture.nativeElement.querySelector('button[mat-stroked-button]');
+    btn.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const errors = fixture.nativeElement.querySelectorAll('mat-error');
+    expect(errors.length).toBe(0);
+  });
+
   it('on success, form is reset and snackbar shows success message', async () => {
     contactServiceMock.send.mockReturnValue(of(undefined));
     component.form.patchValue({ name: 'Alice', email: 'a@b.com', subject: 'S', message: 'M', companyUrl: '' });

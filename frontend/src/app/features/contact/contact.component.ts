@@ -1,5 +1,5 @@
-import { Component, signal } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, signal, viewChild } from '@angular/core';
+import { FormBuilder, FormGroup, FormGroupDirective, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -26,6 +26,7 @@ import { finalize } from 'rxjs';
 export class ContactComponent {
   form: FormGroup;
   submitting = signal(false);
+  private formDirective = viewChild.required(FormGroupDirective);
 
   constructor(
     private fb: FormBuilder,
@@ -48,7 +49,7 @@ export class ContactComponent {
       finalize(() => this.submitting.set(false)),
     ).subscribe({
       next: () => {
-        this.form.reset();
+        this.formDirective().resetForm();
         this.snackBar.open("Thanks — we'll reply soon", undefined, { duration: 3000 });
       },
       error: () => {
