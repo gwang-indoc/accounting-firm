@@ -257,6 +257,12 @@
   --mdc-outlined-text-field-input-text-color: #f1f5f9;
   --mdc-outlined-text-field-caret-color: #38bdf8;
   --mdc-outlined-text-field-container-shape: 8px;
+  --mdc-outlined-text-field-container-color: #1e2d45;
+}
+
+/* Ensure typed text is always visible regardless of Material token resolution */
+.contact-form .mat-mdc-input-element {
+  color: #f1f5f9 !important;
 }
 
 .contact-form textarea.mat-mdc-input-element {

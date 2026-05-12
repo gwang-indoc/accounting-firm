@@ -70,7 +70,7 @@ This command orchestrates how to work through tasks. The actual TDD discipline, 
    - Show which task is being worked on
    - Make the code changes required
    - Keep changes minimal and focused
-   - Mark task complete in the tasks file: `- [ ]` → `- [x]`
+   - Mark task complete in the tasks file: `- [ ]` → `- [x]` using the **Edit tool** (never `sed` — `sed` targets by line number and fails silently when lines shift)
    - Continue to next task
 
    **Pause if:**

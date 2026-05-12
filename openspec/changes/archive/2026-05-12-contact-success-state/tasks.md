@@ -61,5 +61,5 @@
   3. `grep -rn "System.out.println" backend/src/main/` (should be empty for new code)
   4. `grep -rn "console.log" frontend/src/app/features/contact/` (should be empty for new code)
   5. Final `git diff` review for stray changes.
-- [ ] 4.Z Run `superpowers:requesting-code-review` on the cumulative diff for the change; address CRITICAL/HIGH findings before declaring complete.
-- [ ] 4.Z+1 Update `docs/log/YYYY-MM-DD.md` — commit hash, feature bullets, review findings, total test count (including 3 new component tests + 1 new E2E test), and TDD evidence for any RED tests added in this group.
+- [x] 4.Z Run `superpowers:requesting-code-review` on the cumulative diff for the change; address CRITICAL/HIGH findings before declaring complete.
+- [x] 4.Z+1 Update `docs/log/YYYY-MM-DD.md` — commit hash, feature bullets, review findings, total test count (including 3 new component tests + 1 new E2E test), and TDD evidence for any RED tests added in this group.
