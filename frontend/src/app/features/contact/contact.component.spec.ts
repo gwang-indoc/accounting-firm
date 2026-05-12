@@ -100,4 +100,14 @@ describe('ContactComponent', () => {
       expect.stringContaining('wrong'), 'OK'
     );
   });
+
+  it('honeypot input has correct off-screen attributes', () => {
+    const honeypot = fixture.nativeElement.querySelector('input[name="companyUrl"]');
+    expect(honeypot).not.toBeNull();
+    expect(honeypot.getAttribute('tabindex')).toBe('-1');
+    expect(honeypot.getAttribute('aria-hidden')).toBe('true');
+    // Check inline style for off-screen positioning
+    expect(honeypot.style.position).toBe('absolute');
+    expect(honeypot.style.left).toBe('-9999px');
+  });
 });
