@@ -11,6 +11,9 @@ app:
     secure: false
   frontend-url: http://localhost:4200
 
+contact:
+  notification-email: dev@example.com
+
 logging:
   level:
     com.gwhaitech: DEBUG
