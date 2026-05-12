@@ -93,38 +93,29 @@ Archive a completed change in the experimental workflow.
       - Read `openspec/changes/archive/YYYY-MM-DD-<name>/` artifacts (proposal, design, tasks, specs).
       - Read the most recent `docs/log/*.md` entries that mention `<name>` or whose date overlaps the change's active window.
 
-   b. **Draft a bulleted lessons list** focused on:
-      - **Scope drift**: differences between proposal/design and what shipped.
-      - **Recurring review findings**: themes that came up across multiple group N.Z checkpoints.
-      - **TDD gaps**: untagged failing tests, missing RED evidence, baseline failures encountered.
-      - **Surprises**: anything future similar work should anticipate (perf, integration friction, library quirks, schema edge cases).
+   b. **Draft a SHORT bulleted lessons list.** Hard limits:
+      - **Max 5 bullets total.** Fewer is better. Zero is fine — if nothing surprising happened, skip the file.
+      - **One line per bullet (~20 words).** Name the gotcha, don't tell the story.
+      - **Only include lessons that would change future behavior.** Skip generic observations, recaps of what shipped, or anything obvious from reading the code.
+      - Categories to scan (but don't enforce all four): scope drift, recurring review findings, TDD gotchas, library/framework surprises.
+
+      These files are read on-demand by future tasks — keep them lean. A lesson worth keeping is one a future Claude can absorb in a glance.
 
    c. **Show the draft to the user** and accept edits. Use the AskUserQuestion tool with options "Looks good, write it" / "Let me edit" / "Skip lessons for this change". Do NOT auto-write. If the user picks "Let me edit", let them revise the draft inline, then re-present the same three options.
 
-   d. **If approved**, write to `docs/lessons/YYYY-MM-DD-<name>.md` (create `docs/lessons/` if missing). Use this template:
+   d. **If approved**, write to `docs/lessons/YYYY-MM-DD-<name>.md` (create `docs/lessons/` if missing). Use this minimal template:
 
       ```markdown
       # Lessons: <Change Name>
 
       **Archived:** YYYY-MM-DD
-      **Change directory:** `openspec/changes/archive/YYYY-MM-DD-<name>/`
+      **Source:** `openspec/changes/archive/YYYY-MM-DD-<name>/`
 
-      ## Scope vs. reality
-
-      - <bullet>
-
-      ## Recurring review findings
-
-      - <bullet>
-
-      ## TDD observations
-
-      - <bullet>
-
-      ## Surprises / things to anticipate next time
-
-      - <bullet>
+      - <terse one-line lesson>
+      - <terse one-line lesson>
       ```
+
+      No section headers. No padding bullets. If a category has nothing worth saying, omit it entirely.
 
    e. **If `CLAUDE.md` does not already have a `## Lessons Learned` section**, add this one-line section (one-time):
 
