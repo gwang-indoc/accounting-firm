@@ -4,6 +4,7 @@ import { ContactComponent } from './contact.component';
 import { ContactService } from '../../core/services/contact.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { vi } from 'vitest';
+import { of, throwError } from 'rxjs';
 
 describe('ContactComponent', () => {
   let fixture: ComponentFixture<ContactComponent>;
@@ -55,5 +56,34 @@ describe('ContactComponent', () => {
     fixture.detectChanges();
     const btn = fixture.nativeElement.querySelector('button[mat-stroked-button]');
     expect(btn.disabled).toBe(true);
+  });
+
+  it('clicking Send with valid form calls ContactService.send once', async () => {
+    contactServiceMock.send.mockReturnValue(of(undefined));
+    component.form.patchValue({ name: 'Alice', email: 'a@b.com', subject: 'S', message: 'M', companyUrl: '' });
+    fixture.detectChanges();
+
+    const btn = fixture.nativeElement.querySelector('button[mat-stroked-button]');
+    btn.click();
+    await fixture.whenStable();
+
+    expect(contactServiceMock.send).toHaveBeenCalledTimes(1);
+    expect(contactServiceMock.send).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'Alice', email: 'a@b.com', subject: 'S', message: 'M' })
+    );
+  });
+
+  it('on success, form is reset and snackbar shows success message', async () => {
+    contactServiceMock.send.mockReturnValue(of(undefined));
+    component.form.patchValue({ name: 'Alice', email: 'a@b.com', subject: 'S', message: 'M', companyUrl: '' });
+    fixture.detectChanges();
+
+    component.submit();
+    await fixture.whenStable();
+
+    expect(component.form.value.name).toBeFalsy();
+    expect(snackBarMock.open).toHaveBeenCalledWith(
+      "Thanks — we'll reply soon", undefined, { duration: 3000 }
+    );
   });
 });

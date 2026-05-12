@@ -4,7 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ContactService } from '../../core/services/contact.service';
 import { finalize } from 'rxjs';
 
@@ -17,7 +17,6 @@ import { finalize } from 'rxjs';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatSnackBarModule,
   ],
   templateUrl: './contact.component.html',
   styleUrl: './contact.component.css',
