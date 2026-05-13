@@ -2,54 +2,10 @@ schema: openspec-superpowers
 
 # Project context — injected into every artifact's instruction prompt.
 context: |
-  Tech stack: Spring Boot 3.5 (Java 21) backend + Angular 21 frontend,
-  PostgreSQL database, Google OAuth2 authentication via Spring Security.
-
-  Backend structure (package root: com.gwhaitech.accountingfirm):
-    - Layered architecture: Controller → Service → Repository.
-    - Spring Data JPA repositories; schema managed by Flyway migrations
-      under src/main/resources/db/migration/.
-    - Config: application.yml (defaults), application-dev.yml (local),
-      application-prod.yml (prod). Secrets via env vars
-      (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, SPRING_DATASOURCE_*).
-    - REST controllers annotated @RestController under the .web package;
-      DTOs in .dto; domain entities in .domain.
-
-  Backend tests: JUnit 5 + Spring Boot Test. Use @WebMvcTest for
-  controller slices, @DataJpaTest for repository slices, @SpringBootTest
-  for integration tests. Tests mirror src/main/java layout under
-  src/test/java. Run with `cd backend && ./mvnw test` (all) or
-  `./mvnw test -Dtest=ClassName` (single class).
-
-  Frontend structure (Angular 21, standalone components):
-    - Feature-based lazy-loaded routing under src/app/.
-    - HTTP services in src/app/core/services/; auth state via AuthService;
-      HTTP interceptor attaches session credentials to API requests.
-    - Backend base URL configured in environment.ts; dev server proxies
-      /api/** to localhost:8080.
-    - Component filenames use kebab-case (e.g., invoice-list.component.ts).
-
-  Frontend tests: Vitest + Angular TestBed (not Karma/Jasmine). Use
-  `vi.fn()` for mocks, `toBe(true)` not `toBeTrue()`. Run with
-  `cd frontend && npx ng test --no-watch` (CI). Single file:
-  `npx ng test --include='**/my.component.spec.ts'`.
-
-  E2E tests: Playwright test suite under `e2e/` at the project root.
-  Run with `cd e2e && npx playwright test` (all) or
-  `npx playwright test --grep "<test name>"` (single test).
-  Tests require the backend (`./start.sh`) and frontend (`cd frontend && npm start`)
-  to be running before execution. E2E tests cover the full user flow for any
-  UI change introduced — each feature or bug fix that touches the UI surface
-  must have a corresponding Playwright test in `e2e/`.
-
-  Conventions:
-    - Database changes MUST be a new Flyway migration file; never edit
-      existing migrations.
-    - Validate inputs at REST boundaries (Bean Validation / @Valid);
-      never trust client-supplied IDs beyond what Spring Security permits.
-    - Angular components should be standalone; use signals for local state
-      where Angular 21 supports it.
-    - Lint frontend with `cd frontend && npm run lint`.
+  Tech stack, repository layout, test-runner commands, and coding
+  conventions are documented in CLAUDE.md at the project root and are
+  loaded automatically into every Claude Code session — do NOT duplicate
+  them here. Read CLAUDE.md when you need that context.
 
   OpenSpec + Superpowers workflow:
     - design.md is produced by /opsx:explore in
@@ -69,3 +25,21 @@ context: |
       a per-archive lessons file at docs/lessons/YYYY-MM-DD-<name>.md
       (user-reviewed before write), and optionally updates README.md on
       explicit user opt-in.
+
+# Per-artifact rules — additive to the schema's built-in guidance.
+# Keep project-specific shell commands and paths here so the schema stays
+# project-agnostic.
+rules:
+  tasks:
+    - >-
+      M.J Playwright E2E execution (final group when UI is touched): start
+      the backend with `./start.sh`, start the frontend with
+      `cd frontend && npm start`, run the test with
+      `cd e2e && npx playwright test`, then stop both servers with
+      `kill $(lsof -ti :4200)` and `kill $(lsof -ti :8080)`.
+    - >-
+      M.K verification-before-completion commands: run
+      `cd backend && ./mvnw test`, run
+      `cd frontend && npx ng test --no-watch`, grep the diff for stray
+      `System.out.println` and `console.log`, and perform a diff review
+      before claiming the work is done.

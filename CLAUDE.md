@@ -100,21 +100,6 @@ npx playwright test --grep "login"     # single test
 
 - `/git-command-push` - Stage all, commit, and push in one step
 
-## OpenSpec Workflow
-
-Four stages: **Explore → Propose → Apply → Archive**. Each is a slash command in `.claude/commands/opsx/`.
-
-| Command | Purpose | Key artifacts |
-|---|---|---|
-| `/opsx:explore` | Think through ideas; produce draft `design.md` in `openspec/changes/_draft/<topic>/` (gitignored). Invokes `superpowers:brainstorming` as REVIEWER. Offers Visual Companion for UI. | Draft `design.md` |
-| `/opsx:propose` | Promote the draft into `openspec/changes/<name>/`, STOP and confirm, then generate `proposal.md`, `specs/`, `tasks.md`. | All change artifacts |
-| `/opsx:apply` | Implement tasks per `tasks.md`, following TDD/review/checkpoint rules from schema's `apply.instruction`. | Working code + dev log entries |
-| `/opsx:archive` | Move change to `openspec/changes/archive/`, sync delta specs, draft per-change lessons to `docs/lessons/YYYY-MM-DD-<name>.md` (user-reviewed). | Archived change + lessons file |
-
-Schema: `openspec/schemas/openspec-superpowers/schema.yaml` is the source of truth for artifact-content rules and apply-time discipline. The slash commands carry orchestration only.
-
-Manual-control commands `/opsx:new`, `/opsx:continue`, `/opsx:ff` remain available for advanced flows; they delegate to the schema via `openspec status` and `openspec instructions`.
-
 ## Coding Guidelines
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
@@ -174,41 +159,6 @@ For multi-step tasks, state a brief plan:
 ```
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
-
-## Dev Log Practice
-
-Dev log entries live at `docs/log/YYYY-MM-DD.md` — one file per date, created on first use. The schema (`tasks.instruction` / `apply.instruction`) is what requires a log update task and lists what to capture; this section defines only the layout each entry should use.
-
-### Entry template
-
-```md
-### N. Feature Name
-
-**Commit:** `<git hash>`
-
-**Feature:**
-
-- Briefly describe what was done using bullet points
-
-**Code Review Findings, if any:**
-| Severity | Issue | Fix |
-|---|---|---|
-
-**Tests:** X total passing (Y newly added in this group)
-
-**TDD Evidence (for each new test added in this group):**
-
-    AssertionError: expected 'static' to equal 'fixed'
-    Expected: "fixed"
-    Received: "static"
-
-_Paste the key RED failure lines from the terminal that prove each new test failed before the implementation was written. Omit if no new tests were added._
-```
-
-### Rules
-
-- Use `- [ ]` for pending items and `- [x]` for completed items.
-- Keep a **To Do** section at the end of the log, listing the next batch of work or known issues.
 
 ## Lessons Learned
 
