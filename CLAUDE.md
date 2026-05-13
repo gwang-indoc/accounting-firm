@@ -46,26 +46,12 @@ accounting-firm/
 
 ### TDD Discipline
 
-Write the failing test first. **The RED phase must be verified** — run the test, confirm it fails with the expected message, then implement. Do not mark a RED task complete without running the test and seeing it fail.
+Authoritative TDD/checkbox/parallel/review/dev-log rules live in `openspec/schemas/openspec-superpowers/schema.yaml` — `tasks.instruction` (for authoring `tasks.md`) and `apply.instruction` (for executing it). Read those before starting work.
 
-The exact RED/GREEN task pattern, parallel dispatch, code-review checkpoint, dev log update, and checkbox discipline rules live in the openspec-superpowers schema's `tasks.instruction` (for authoring tasks.md) and `apply.instruction` (for executing it). The schema is the source of truth — see `openspec/schemas/openspec-superpowers/schema.yaml`.
-
-**Only GREEN tests are committed to the codebase.** The committed test suite must always be fully passing — no bare failing tests. A RED test is written, verified to fail, and then immediately implemented and made GREEN before committing. The RED failure output is not code; it is captured in the dev log as TDD evidence (proof the test genuinely failed before the implementation existed).
-
-**Tests that represent planned-but-not-yet-implemented behaviour** must be tagged with a skip annotation so they do not pollute the suite or mislead AI agents:
-- JUnit 5: `@Disabled("planned — not yet implemented")`
-- Vitest / Jasmine: `it.todo(...)` or `xit(...)` / `xdescribe(...)`
-
-A tagged test is a clear promise. An untagged failing test is an undiagnosed bug.
-
-**Only GREEN tests stay permanently.** Once a test goes GREEN it must never be deleted — the committed test files accumulate all passing tests over time and serve as the regression suite for every future task group.
-
-**Before starting each new task group**, run the full test suite to confirm the baseline is green:
+Baseline test commands (run before each new task group; a failing baseline must be fixed first):
 - Backend: `cd backend && ./mvnw test`
 - Frontend: `cd frontend && npx ng test --no-watch`
 - E2E (if servers are up): `cd e2e && npx playwright test`
-
-A failing baseline must be fixed before new work begins.
 
 ## Frontend (Angular)
 
@@ -108,7 +94,7 @@ npx playwright test --grep "login"     # single test
 
 **Requirements before running:** backend must be started (`./start.sh`) and frontend must be started (`cd frontend && npm start`).
 
-**When to add E2E tests:** every change that introduces or modifies a UI flow must include a Playwright test in `e2e/` covering that flow. Ad-hoc browser automation that is not saved to disk does not count — the test must be committed.
+**When to add E2E tests:** see schema `tasks.instruction` — the final group of any UI-touching change must include a committed Playwright test in `e2e/` covering the affected flow.
 
 ## Skills Available
 
@@ -191,9 +177,9 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ## Dev Log Practice
 
-Dev log entries live at `docs/log/YYYY-MM-DD.md` — one file per date, created on first use. The schema (`tasks.instruction`) is what requires a log update task in every `## N` group; this section defines what each entry looks like.
+Dev log entries live at `docs/log/YYYY-MM-DD.md` — one file per date, created on first use. The schema (`tasks.instruction` / `apply.instruction`) is what requires a log update task and lists what to capture; this section defines only the layout each entry should use.
 
-### Each log entry should include
+### Entry template
 
 ```md
 ### N. Feature Name
