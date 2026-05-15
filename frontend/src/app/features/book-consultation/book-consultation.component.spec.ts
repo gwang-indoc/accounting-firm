@@ -156,4 +156,14 @@ describe('BookConsultationComponent', () => {
     expect(honeypot.style.position).toBe('absolute');
     expect(honeypot.style.left).toBe('-9999px');
   });
+
+  it('does NOT render the map iframe (moved to /contact)', () => {
+    const iframe = fixture.nativeElement.querySelector('iframe');
+    expect(iframe).toBeNull();
+  });
+
+  it('does NOT render the contact detail items (moved to /contact)', () => {
+    const details = fixture.nativeElement.querySelectorAll('.detail-item');
+    expect(details.length).toBe(0);
+  });
 });
