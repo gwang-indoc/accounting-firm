@@ -25,10 +25,10 @@ test.describe('Material refactor — desktop', () => {
     await expect(page).toHaveURL(/\/login$/);
   });
 
-  test('Book Consultation navigates to /contact', async ({ page }) => {
+  test('Book Consultation navigates to /book-consultation', async ({ page }) => {
     await page.goto('/');
     await page.click('.nav-links a.cta-btn');
-    await expect(page).toHaveURL(/\/contact/);
+    await expect(page).toHaveURL(/\/book-consultation/);
   });
 });
 
@@ -71,11 +71,11 @@ test.describe('Material refactor — mobile (375px)', () => {
     await expect(page.locator('.mat-drawer-backdrop')).not.toHaveClass(/mat-drawer-shown/);
   });
 
-  test('Book Consultation in sidenav navigates to /contact', async ({ page }) => {
+  test('Book Consultation in sidenav navigates to /book-consultation', async ({ page }) => {
     await page.goto('/');
     await page.click('[data-testid="hamburger"]');
     await expect(page.locator('.mat-drawer-backdrop')).toHaveClass(/mat-drawer-shown/);
     await page.locator('mat-sidenav a.sidenav-cta').click();
-    await expect(page).toHaveURL(/\/contact/);
+    await expect(page).toHaveURL(/\/book-consultation/);
   });
 });

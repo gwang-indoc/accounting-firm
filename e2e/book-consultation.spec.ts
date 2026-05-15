@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Book Consultation page', () => {
-  test('happy path: submits form, shows success snackbar, and POST reaches backend', async ({ page }) => {
+  test('happy path: submits form, shows inline confirmation, and POST reaches backend', async ({ page }) => {
     const [request] = await Promise.all([
       page.waitForRequest(req => req.url().includes('/api/contact') && req.method() === 'POST'),
       (async () => {
