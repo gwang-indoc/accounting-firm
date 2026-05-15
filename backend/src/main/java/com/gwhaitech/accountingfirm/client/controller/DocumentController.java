@@ -18,6 +18,9 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+// TODO(auth): restrict to STAFF/ADMIN role or owning user — currently any
+// authenticated user can pass any clientId. Tracked separately from the
+// /api/me/documents client-self surface added in May 2026.
 @RestController
 @RequestMapping("/api/clients/{clientId}/documents")
 public class DocumentController {
