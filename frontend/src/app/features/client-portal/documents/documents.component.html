@@ -20,9 +20,9 @@
     <div class="controls">
       <label class="year-label">
         Tax Year:
-        <select class="year-select" [value]="selectedYear()" (change)="onYearChange($any($event.target).value)">
+        <select class="year-select" (change)="onYearChange($any($event.target).value)">
           @for (y of years(); track y) {
-            <option [value]="y">{{ y }}</option>
+            <option [value]="y" [selected]="y === selectedYear()">{{ y }}</option>
           }
         </select>
       </label>
