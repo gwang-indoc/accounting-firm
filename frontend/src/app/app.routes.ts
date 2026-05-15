@@ -10,7 +10,12 @@ export const routes: Routes = [
   {
     path: 'contact',
     loadComponent: () =>
-      import('./features/contact/contact.component').then(m => m.ContactComponent),
+      import('./features/book-consultation/book-consultation.component').then(m => m.BookConsultationComponent),
+  },
+  {
+    path: 'book-consultation',
+    loadComponent: () =>
+      import('./features/book-consultation/book-consultation.component').then(m => m.BookConsultationComponent),
   },
   {
     path: 'portal/dashboard',

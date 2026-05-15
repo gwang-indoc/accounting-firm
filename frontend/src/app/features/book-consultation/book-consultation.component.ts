@@ -10,7 +10,7 @@ import { ContactService } from '../../core/services/contact.service';
 import { finalize } from 'rxjs';
 
 @Component({
-  selector: 'app-contact',
+  selector: 'app-book-consultation',
   standalone: true,
   imports: [
     ReactiveFormsModule,
@@ -20,10 +20,10 @@ import { finalize } from 'rxjs';
     MatButtonModule,
     MatIconModule,
   ],
-  templateUrl: './contact.component.html',
-  styleUrl: './contact.component.css',
+  templateUrl: './book-consultation.component.html',
+  styleUrl: './book-consultation.component.css',
 })
-export class ContactComponent {
+export class BookConsultationComponent {
   form: FormGroup;
   submitting = signal(false);
   showConfirmation = signal(false);

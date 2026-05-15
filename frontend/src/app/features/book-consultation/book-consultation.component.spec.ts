@@ -1,14 +1,14 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
-import { ContactComponent } from './contact.component';
+import { BookConsultationComponent } from './book-consultation.component';
 import { ContactService } from '../../core/services/contact.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { vi } from 'vitest';
 import { of, throwError } from 'rxjs';
 
-describe('ContactComponent', () => {
-  let fixture: ComponentFixture<ContactComponent>;
-  let component: ContactComponent;
+describe('BookConsultationComponent', () => {
+  let fixture: ComponentFixture<BookConsultationComponent>;
+  let component: BookConsultationComponent;
   const contactServiceMock = { send: vi.fn() };
   const snackBarMock = { open: vi.fn() };
 
@@ -16,14 +16,14 @@ describe('ContactComponent', () => {
     contactServiceMock.send.mockReset();
     snackBarMock.open.mockReset();
     await TestBed.configureTestingModule({
-      imports: [ContactComponent],
+      imports: [BookConsultationComponent],
       providers: [
         provideZonelessChangeDetection(),
         { provide: ContactService, useValue: contactServiceMock },
         { provide: MatSnackBar, useValue: snackBarMock },
       ],
     }).compileComponents();
-    fixture = TestBed.createComponent(ContactComponent);
+    fixture = TestBed.createComponent(BookConsultationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
