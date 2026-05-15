@@ -1,0 +1,177 @@
+package com.gwhaitech.accountingfirm.client.service;
+
+import com.gwhaitech.accountingfirm.auth.domain.User;
+import com.gwhaitech.accountingfirm.client.domain.Client;
+import com.gwhaitech.accountingfirm.client.domain.ClientDocument;
+import com.gwhaitech.accountingfirm.client.domain.ClientDocumentRepository;
+import com.gwhaitech.accountingfirm.client.domain.ClientRepository;
+import com.gwhaitech.accountingfirm.client.dto.MyDocumentsDto;
+import com.gwhaitech.accountingfirm.client.exception.DocumentNotFoundException;
+import com.gwhaitech.accountingfirm.storage.LocalStorageService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import java.io.ByteArrayOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
+
+class MeDocumentServiceTest {
+
+    private ClientRepository clientRepo;
+    private ClientDocumentRepository docRepo;
+    private LocalStorageService storage;
+    private MeDocumentService service;
+
+    @BeforeEach
+    void setUp() {
+        clientRepo = mock(ClientRepository.class);
+        docRepo = mock(ClientDocumentRepository.class);
+        storage = mock(LocalStorageService.class);
+        service = new MeDocumentService(clientRepo, docRepo, storage);
+    }
+
+    private User user(long id) {
+        User u = new User();
+        u.setId(id);
+        return u;
+    }
+
+    private Client client(long id, String name) {
+        Client c = new Client();
+        c.setId(id);
+        c.setName(name);
+        return c;
+    }
+
+    private ClientDocument doc(long id, long clientId, int year, String filename, String filePath) {
+        ClientDocument d = new ClientDocument();
+        d.setId(id);
+        d.setClientId(clientId);
+        d.setYear((short) year);
+        d.setFilename(filename);
+        d.setFilePath(filePath);
+        d.setMimeType("application/pdf");
+        d.setSizeBytes(100L);
+        d.setUploadedBy(1L);
+        return d;
+    }
+
+    @Test
+    void listMyDocuments_returnsLinkedPayloadWhenUserHasClient() {
+        when(clientRepo.findByUserId(7L)).thenReturn(Optional.of(client(99L, "Jane Smith")));
+        ClientDocument d1 = doc(1L, 99L, 2025, "T4-2025.pdf", "clients/99/2025/T4-2025.pdf");
+        ClientDocument d2 = doc(2L, 99L, 2024, "T4-2024.pdf", "clients/99/2024/T4-2024.pdf");
+        when(docRepo.findByClientIdOrderByYearDescUploadedAtDesc(99L)).thenReturn(List.of(d1, d2));
+
+        MyDocumentsDto result = service.listMyDocuments(user(7L));
+
+        assertThat(result.linked()).isTrue();
+        assertThat(result.clientName()).isEqualTo("Jane Smith");
+        assertThat(result.documents()).hasSize(2);
+        assertThat(result.documents().get(0).year()).isEqualTo(2025);
+        assertThat(result.documents().get(1).year()).isEqualTo(2024);
+    }
+
+    @Test
+    void listMyDocuments_returnsUnlinkedPayloadWhenUserHasNoClient() {
+        when(clientRepo.findByUserId(7L)).thenReturn(Optional.empty());
+
+        MyDocumentsDto result = service.listMyDocuments(user(7L));
+
+        assertThat(result.linked()).isFalse();
+        assertThat(result.clientName()).isNull();
+        assertThat(result.documents()).isEmpty();
+        verify(docRepo, never()).findByClientIdOrderByYearDescUploadedAtDesc(any());
+    }
+
+    @Test
+    void zipForYear_streamsZipWithYearPrefixedEntries(@TempDir Path tmp) throws Exception {
+        Path file1 = tmp.resolve("a.pdf");
+        Path file2 = tmp.resolve("b.pdf");
+        Files.writeString(file1, "PDF content A");
+        Files.writeString(file2, "PDF content B");
+
+        when(clientRepo.findByUserId(7L)).thenReturn(Optional.of(client(99L, "Jane")));
+        ClientDocument d1 = doc(1L, 99L, 2025, "a.pdf", "clients/99/2025/a.pdf");
+        ClientDocument d2 = doc(2L, 99L, 2025, "b.pdf", "clients/99/2025/b.pdf");
+        when(docRepo.findByClientIdAndYearOrderByUploadedAtDesc(99L, 2025)).thenReturn(List.of(d1, d2));
+        when(storage.resolve("clients/99/2025/a.pdf")).thenReturn(file1);
+        when(storage.resolve("clients/99/2025/b.pdf")).thenReturn(file2);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        service.zipForYear(user(7L), 2025, out);
+
+        try (ZipInputStream zis = new ZipInputStream(new java.io.ByteArrayInputStream(out.toByteArray()))) {
+            ZipEntry e1 = zis.getNextEntry();
+            assertThat(e1.getName()).isEqualTo("2025/a.pdf");
+            byte[] body = zis.readAllBytes();
+            assertThat(new String(body)).isEqualTo("PDF content A");
+
+            ZipEntry e2 = zis.getNextEntry();
+            assertThat(e2.getName()).isEqualTo("2025/b.pdf");
+            byte[] body2 = zis.readAllBytes();
+            assertThat(new String(body2)).isEqualTo("PDF content B");
+
+            assertThat(zis.getNextEntry()).isNull();
+        }
+    }
+
+    @Test
+    void zipForYear_throwsWhenUserHasNoClient() {
+        when(clientRepo.findByUserId(7L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.zipForYear(user(7L), 2025, new ByteArrayOutputStream()))
+            .isInstanceOf(DocumentNotFoundException.class);
+    }
+
+    @Test
+    void zipForYear_throwsWhenYearHasNoDocs() {
+        when(clientRepo.findByUserId(7L)).thenReturn(Optional.of(client(99L, "Jane")));
+        when(docRepo.findByClientIdAndYearOrderByUploadedAtDesc(99L, 2025)).thenReturn(List.of());
+
+        assertThatThrownBy(() -> service.zipForYear(user(7L), 2025, new ByteArrayOutputStream()))
+            .isInstanceOf(DocumentNotFoundException.class);
+    }
+
+    @Test
+    void getMyDocumentForDownload_returnsPathWhenDocBelongsToCallerClient() {
+        when(clientRepo.findByUserId(7L)).thenReturn(Optional.of(client(99L, "Jane")));
+        ClientDocument d = doc(42L, 99L, 2025, "a.pdf", "clients/99/2025/a.pdf");
+        when(docRepo.findById(42L)).thenReturn(Optional.of(d));
+        when(storage.resolve("clients/99/2025/a.pdf")).thenReturn(Path.of("/tmp/a.pdf"));
+
+        MeDocumentService.DownloadInfo info = service.getMyDocumentForDownload(user(7L), 42L);
+
+        assertThat(info.filename()).isEqualTo("a.pdf");
+        assertThat(info.mimeType()).isEqualTo("application/pdf");
+        assertThat(info.path()).isEqualTo(Path.of("/tmp/a.pdf"));
+    }
+
+    @Test
+    void getMyDocumentForDownload_throwsWhenDocBelongsToOtherClient() {
+        when(clientRepo.findByUserId(7L)).thenReturn(Optional.of(client(99L, "Jane")));
+        ClientDocument d = doc(42L, 100L, 2025, "a.pdf", "clients/100/2025/a.pdf"); // belongs to client 100
+        when(docRepo.findById(42L)).thenReturn(Optional.of(d));
+
+        assertThatThrownBy(() -> service.getMyDocumentForDownload(user(7L), 42L))
+            .isInstanceOf(DocumentNotFoundException.class);
+    }
+
+    @Test
+    void getMyDocumentForDownload_throwsWhenUserHasNoClient() {
+        when(clientRepo.findByUserId(7L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.getMyDocumentForDownload(user(7L), 42L))
+            .isInstanceOf(DocumentNotFoundException.class);
+    }
+}
