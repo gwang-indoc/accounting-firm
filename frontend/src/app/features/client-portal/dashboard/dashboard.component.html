@@ -26,12 +26,12 @@
       <mat-card-content>
         <div class="overview-stats">
           <div class="stat-cell">
-            <span class="stat-value">—</span>
+            <span class="stat-value">{{ documentCount() ?? '—' }}</span>
             <span class="stat-label">Documents</span>
           </div>
           <mat-divider [vertical]="true" class="stat-divider"></mat-divider>
           <div class="stat-cell">
-            <span class="stat-value">2025</span>
+            <span class="stat-value">{{ mostRecentYear() ?? '—' }}</span>
             <span class="stat-label">Tax Year</span>
           </div>
         </div>
@@ -45,7 +45,7 @@
       </mat-card-header>
       <mat-card-content>
         <div class="action-single">
-          <button mat-button class="action-tile">Upload Document</button>
+          <a mat-button class="action-tile" routerLink="/portal/documents" data-testid="view-documents-link">View Documents</a>
         </div>
       </mat-card-content>
     </mat-card>
