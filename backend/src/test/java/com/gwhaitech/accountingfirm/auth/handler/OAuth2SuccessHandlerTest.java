@@ -3,6 +3,7 @@ package com.gwhaitech.accountingfirm.auth.handler;
 import com.gwhaitech.accountingfirm.auth.domain.User;
 import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
 import com.gwhaitech.accountingfirm.auth.service.JwtService;
+import com.gwhaitech.accountingfirm.client.service.UserClientLinkService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,6 +27,7 @@ class OAuth2SuccessHandlerTest {
 
     private UserRepository mockUserRepo;
     private JwtService mockJwtService;
+    private UserClientLinkService mockLinkService;
     private HttpServletRequest mockRequest;
     private HttpServletResponse mockResponse;
     private OAuth2SuccessHandler handler;
@@ -48,12 +50,14 @@ class OAuth2SuccessHandlerTest {
     void setUp() {
         mockUserRepo = mock(UserRepository.class);
         mockJwtService = mock(JwtService.class);
+        mockLinkService = mock(UserClientLinkService.class);
         mockRequest = mock(HttpServletRequest.class);
         mockResponse = mock(HttpServletResponse.class);
 
         handler = new OAuth2SuccessHandler(
             mockUserRepo,
             mockJwtService,
+            mockLinkService,
             false,
             "http://localhost:4200/portal/dashboard",
             86400000L
@@ -87,6 +91,27 @@ class OAuth2SuccessHandlerTest {
         assertThat(cookie.getMaxAge()).isGreaterThan(0);
 
         verify(mockResponse).sendRedirect("http://localhost:4200/portal/dashboard");
+        verify(mockLinkService).linkIfPossible(any(User.class));
+    }
+
+    @Test
+    void linkIfPossibleIsCalledAfterSave() throws Exception {
+        when(mockUserRepo.findByGoogleSub("google-sub-123")).thenReturn(Optional.empty());
+
+        User savedUser = new User();
+        savedUser.setId(42L);
+        savedUser.setEmail("test@example.com");
+        savedUser.setName("Test User");
+        savedUser.setGoogleSub("google-sub-123");
+        savedUser.setRole("USER");
+        when(mockUserRepo.save(any(User.class))).thenReturn(savedUser);
+        when(mockJwtService.issueToken(any(User.class))).thenReturn("test.jwt.token");
+
+        handler.onAuthenticationSuccess(mockRequest, mockResponse, buildAuth());
+
+        org.mockito.InOrder inOrder = org.mockito.Mockito.inOrder(mockUserRepo, mockLinkService);
+        inOrder.verify(mockUserRepo).save(any(User.class));
+        inOrder.verify(mockLinkService).linkIfPossible(any(User.class));
     }
 
     @Test
