@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Contact page', () => {
+test.describe('Book Consultation page', () => {
   test('happy path: submits form, shows success snackbar, and POST reaches backend', async ({ page }) => {
     const [request] = await Promise.all([
       page.waitForRequest(req => req.url().includes('/api/contact') && req.method() === 'POST'),
       (async () => {
-        await page.goto('/contact');
+        await page.goto('/book-consultation');
         await page.fill('input[formControlName="name"]', 'Jane Doe');
         await page.fill('input[formControlName="email"]', 'jane@example.com');
         await page.fill('input[formControlName="subject"]', 'Test inquiry');
@@ -28,7 +28,7 @@ test.describe('Contact page', () => {
   });
 
   test('negative path: invalid email shows inline error and fires no POST', async ({ page }) => {
-    await page.goto('/contact');
+    await page.goto('/book-consultation');
 
     let postFired = false;
     page.on('request', req => {
@@ -56,7 +56,7 @@ test.describe('Contact page', () => {
 
   test('mobile layout: form and Find Us card stack vertically at 360px', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
-    await page.goto('/contact');
+    await page.goto('/book-consultation');
 
     const formCard = page.locator('mat-card').first();
     const findUsCard = page.locator('mat-card').nth(1);
