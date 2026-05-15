@@ -71,15 +71,17 @@ No guards (both public). No redirects.
 
 ## Navbar and side nav
 
+A `Contact` link pointing to `/contact` already exists in both the desktop navbar and the side nav, so no new link is added — only the `Book Consultation` CTA is repointed.
+
 **`shared/navbar/navbar.component.html`:**
 
-- `Book Consultation` CTA: `routerLink="/contact"` → `routerLink="/book-consultation"`. Keep `mat-flat-button` styling.
-- Add a new `Contact` nav link as a regular nav item (same styling as other nav links), positioned before the CTA button, pointing to `/contact`.
+- `Book Consultation` CTA (line 20): `routerLink="/contact"` → `routerLink="/book-consultation"`. Keep `mat-flat-button` styling.
+- Existing `Contact` link (line 19) is unchanged.
 
-**`app.html` (side nav, line 8):**
+**`app.html` (side nav):**
 
-- `Book Consultation` list item: `routerLink="/contact"` → `routerLink="/book-consultation"`.
-- Add a new `Contact` list item pointing to `/contact`, positioned consistently with the desktop navbar.
+- `Book Consultation` list item (line 8): `routerLink="/contact"` → `routerLink="/book-consultation"`.
+- Existing `Contact` list item (line 7) is unchanged.
 
 ## Page layouts
 
@@ -148,15 +150,24 @@ Form field labels and the submit button text ("Send Message") are unchanged.
 
 - **`book-consultation.component.spec.ts`** — carried over from current `contact.component.spec.ts` via the rename. The form behavior tests (validation, submit, confirmation, honeypot, snackbar on error) stay valid because the form code is unchanged. Update class name and selector references.
 - **`contact.component.spec.ts`** — new, minimal. Asserts: renders the four detail items (Visit Us, Call Us, Email Us, Office Hours), renders the map iframe, no form present.
-- **`navbar.component.spec.ts`** — update the two existing `Book Consultation → /contact` assertions to `/book-consultation`. Add two new assertions: a `Contact` link exists and points to `/contact`.
+- **`navbar.component.spec.ts`** — update the two existing `Book Consultation → /contact` assertions to `/book-consultation`. The existing assertions for the `Contact` link (already in the spec file) need no change.
 
 ### E2E (Playwright)
 
-Per CLAUDE.md / schema `tasks.instruction`, add `e2e/book-consultation.spec.ts` covering:
+Two existing specs currently exercise the form at `/contact`:
 
-1. From `/`, click the navbar `Book Consultation` CTA → lands on `/book-consultation`.
-2. Fill the form (name, email, subject, message) and submit → confirmation block appears.
-3. Click the navbar `Contact` link → lands on `/contact` → office hours visible, no form present.
+- `e2e/contact.spec.ts` (happy path POST, invalid-email negative path, mobile layout test that references `mat-card` selectors and is already stale)
+- `e2e/contact-success-state.spec.ts` (4 tests covering inline confirmation behavior)
+
+Move both to the new URL:
+
+- `git mv e2e/contact.spec.ts e2e/book-consultation.spec.ts` and update `page.goto('/contact')` → `page.goto('/book-consultation')`. Leave the stale `mat-card` mobile test untouched — out of scope to fix.
+- `git mv e2e/contact-success-state.spec.ts e2e/book-consultation-success-state.spec.ts` and update `page.goto('/contact')` → `page.goto('/book-consultation')` in each test.
+
+Then add coverage for the new wiring:
+
+- In `e2e/navbar.spec.ts`, add a test: clicking the `Book Consultation` CTA from `/` navigates to `/book-consultation`. (The existing `Contact link navigates to /contact` test stays as-is.)
+- Add `e2e/contact-info.spec.ts` — small spec asserting `/contact` renders the four detail items (Visit Us, Call Us, Email Us, Office Hours) and does **not** render a form input named `companyUrl`.
 
 ## Backend
 
