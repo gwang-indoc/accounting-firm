@@ -23,7 +23,7 @@ describe('MyDocumentsService', () => {
       linked: true,
       clientName: 'Jane Smith',
       documents: [
-        { id: 1, year: 2025, filename: 'T4.pdf', mimeType: 'application/pdf', sizeBytes: 100, uploadedAt: '2026-02-14T10:23:00' },
+        { id: 1, year: 2025, filename: 'T4.pdf', mimeType: 'application/pdf', sizeBytes: 100, uploadedAt: '2026-02-14T10:23:00', uploadedByMe: false },
       ],
     };
 

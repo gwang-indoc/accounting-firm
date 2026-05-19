@@ -52,7 +52,8 @@ public class MeDocumentService {
                         d.getFilename(),
                         d.getMimeType(),
                         d.getSizeBytes(),
-                        d.getUploadedAt()))
+                        d.getUploadedAt(),
+                        d.getUploadedBy() != null && user.getId().equals(d.getUploadedBy())))
                 .toList();
         return new MyDocumentsDto(true, c.getName(), items);
     }

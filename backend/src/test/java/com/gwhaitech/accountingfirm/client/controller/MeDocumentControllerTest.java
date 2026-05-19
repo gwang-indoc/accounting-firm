@@ -76,7 +76,7 @@ class MeDocumentControllerTest {
     @Test
     void getMyDocuments_returnsLinkedPayload() throws Exception {
         MyDocumentsDto.Item item = new MyDocumentsDto.Item(
-            42L, 2025, "T4.pdf", "application/pdf", 100L, LocalDateTime.parse("2026-02-14T10:23:00"));
+            42L, 2025, "T4.pdf", "application/pdf", 100L, LocalDateTime.parse("2026-02-14T10:23:00"), false);
         when(meDocumentService.listMyDocuments(any())).thenReturn(
             new MyDocumentsDto(true, "Jane Smith", List.of(item)));
 

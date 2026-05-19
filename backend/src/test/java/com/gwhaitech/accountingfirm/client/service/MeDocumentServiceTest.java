@@ -17,7 +17,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -173,5 +175,30 @@ class MeDocumentServiceTest {
 
         assertThatThrownBy(() -> service.getMyDocumentForDownload(user(7L), 42L))
             .isInstanceOf(DocumentNotFoundException.class);
+    }
+
+    @Test
+    void listMyDocuments_setsUploadedByMeBasedOnUploadedByVsRequestingUserId() {
+        Client c = client(99L, "Jane Smith");
+        when(clientRepo.findByUserId(7L)).thenReturn(Optional.of(c));
+
+        ClientDocument fromFirm = doc(1L, 99L, 2024, "Tax-Return-2024.pdf", "clients/99/2024/Tax-Return-2024.pdf");
+        fromFirm.setUploadedBy(99L); // staff user id, NOT me
+
+        ClientDocument fromMe = doc(2L, 99L, 2024, "T4-2024.pdf", "clients/99/2024/T4-2024.pdf");
+        fromMe.setUploadedBy(7L); // me
+
+        when(docRepo.findByClientIdOrderByYearDescUploadedAtDesc(99L)).thenReturn(List.of(fromFirm, fromMe));
+
+        MyDocumentsDto result = service.listMyDocuments(user(7L));
+
+        assertThat(result.linked()).isTrue();
+        assertThat(result.documents()).hasSize(2);
+        Map<String, Boolean> byName = result.documents().stream()
+                .collect(Collectors.toMap(
+                        MyDocumentsDto.Item::filename,
+                        MyDocumentsDto.Item::uploadedByMe));
+        assertThat(byName).containsEntry("Tax-Return-2024.pdf", false);
+        assertThat(byName).containsEntry("T4-2024.pdf", true);
     }
 }

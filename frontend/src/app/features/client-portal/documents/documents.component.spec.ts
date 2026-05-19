@@ -10,9 +10,9 @@ function linkedResponse(): MyDocumentsResponse {
     linked: true,
     clientName: 'Jane Smith',
     documents: [
-      { id: 1, year: 2025, filename: 'T4-2025.pdf',          mimeType: 'application/pdf', sizeBytes: 50_000,  uploadedAt: '2026-02-14T10:23:00' },
-      { id: 2, year: 2025, filename: 'Tax-Return-2025.pdf',  mimeType: 'application/pdf', sizeBytes: 200_000, uploadedAt: '2026-03-02T09:00:00' },
-      { id: 3, year: 2024, filename: 'T4-2024.pdf',          mimeType: 'application/pdf', sizeBytes: 48_000,  uploadedAt: '2025-02-12T10:00:00' },
+      { id: 1, year: 2025, filename: 'T4-2025.pdf',          mimeType: 'application/pdf', sizeBytes: 50_000,  uploadedAt: '2026-02-14T10:23:00', uploadedByMe: false },
+      { id: 2, year: 2025, filename: 'Tax-Return-2025.pdf',  mimeType: 'application/pdf', sizeBytes: 200_000, uploadedAt: '2026-03-02T09:00:00', uploadedByMe: false },
+      { id: 3, year: 2024, filename: 'T4-2024.pdf',          mimeType: 'application/pdf', sizeBytes: 48_000,  uploadedAt: '2025-02-12T10:00:00', uploadedByMe: false },
     ],
   };
 }

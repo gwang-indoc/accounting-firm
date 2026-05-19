@@ -5,6 +5,7 @@ export interface MyDocumentItem {
   mimeType: string | null;
   sizeBytes: number | null;
   uploadedAt: string;
+  uploadedByMe: boolean;
 }
 
 export interface MyDocumentsResponse {

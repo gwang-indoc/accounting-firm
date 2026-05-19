@@ -41,8 +41,8 @@ describe('DashboardComponent', () => {
       linked: true,
       clientName: 'Jane',
       documents: [
-        { id: 1, year: 2025, filename: 'a.pdf', mimeType: 'application/pdf', sizeBytes: 100, uploadedAt: '2026-02-01T00:00:00' },
-        { id: 2, year: 2024, filename: 'b.pdf', mimeType: 'application/pdf', sizeBytes: 100, uploadedAt: '2025-02-01T00:00:00' },
+        { id: 1, year: 2025, filename: 'a.pdf', mimeType: 'application/pdf', sizeBytes: 100, uploadedAt: '2026-02-01T00:00:00', uploadedByMe: false },
+        { id: 2, year: 2024, filename: 'b.pdf', mimeType: 'application/pdf', sizeBytes: 100, uploadedAt: '2025-02-01T00:00:00', uploadedByMe: false },
       ],
     });
     await fixture.whenStable();
@@ -57,8 +57,8 @@ describe('DashboardComponent', () => {
       linked: true,
       clientName: 'Jane',
       documents: [
-        { id: 1, year: 2025, filename: 'a.pdf', mimeType: 'application/pdf', sizeBytes: 100, uploadedAt: '2026-02-01T00:00:00' },
-        { id: 2, year: 2024, filename: 'b.pdf', mimeType: 'application/pdf', sizeBytes: 100, uploadedAt: '2025-02-01T00:00:00' },
+        { id: 1, year: 2025, filename: 'a.pdf', mimeType: 'application/pdf', sizeBytes: 100, uploadedAt: '2026-02-01T00:00:00', uploadedByMe: false },
+        { id: 2, year: 2024, filename: 'b.pdf', mimeType: 'application/pdf', sizeBytes: 100, uploadedAt: '2025-02-01T00:00:00', uploadedByMe: false },
       ],
     });
     await fixture.whenStable();

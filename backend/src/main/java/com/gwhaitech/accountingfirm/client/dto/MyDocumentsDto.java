@@ -14,6 +14,7 @@ public record MyDocumentsDto(
             String filename,
             String mimeType,
             Long sizeBytes,
-            LocalDateTime uploadedAt
+            LocalDateTime uploadedAt,
+            boolean uploadedByMe
     ) {}
 }
