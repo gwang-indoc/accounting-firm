@@ -82,11 +82,19 @@ describe('NavbarComponent', () => {
     expect(contactLink!.textContent?.trim()).toBe('Contact');
   });
 
-  it('"Book Consultation" link has routerLink="/contact"', () => {
+  it('"Book Consultation" link has routerLink="/book-consultation"', () => {
     const nativeEl = fixture.nativeElement as HTMLElement;
-    const ctaLinks = Array.from(nativeEl.querySelectorAll('a[routerLink="/contact"]'));
-    const ctaLink = ctaLinks.find((a) => a.textContent?.trim() === 'Book Consultation');
-    expect(ctaLink).not.toBeUndefined();
+    const ctaLink = nativeEl.querySelector('a[routerLink="/book-consultation"]');
+    expect(ctaLink).not.toBeNull();
+    expect(ctaLink!.textContent?.trim()).toBe('Book Consultation');
+  });
+
+  it('Contact and Book Consultation are separate links pointing to different routes', () => {
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    const contactLink = nativeEl.querySelector('a[routerLink="/contact"]');
+    const ctaLink = nativeEl.querySelector('a[routerLink="/book-consultation"]');
+    expect(contactLink?.textContent?.trim()).toBe('Contact');
+    expect(ctaLink?.textContent?.trim()).toBe('Book Consultation');
   });
 
   it.todo('"Client Portal" renders <app-client-portal-login> inside navbar — mobile drawer replaced by MatSidenav in Group 3');

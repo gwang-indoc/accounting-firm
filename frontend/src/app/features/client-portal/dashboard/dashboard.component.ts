@@ -1,8 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { MyDocumentsService } from '../../../core/services/my-documents.service';
+import { MyDocumentsResponse } from '../../../core/models/my-documents';
 import { MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatAnchor } from '@angular/material/button';
 import { MatDivider } from '@angular/material/divider';
 
 interface PortalMessage {
@@ -15,12 +18,35 @@ interface PortalMessage {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent, MatIcon, MatButton, MatDivider],
+  standalone: true,
+  imports: [
+    RouterLink,
+    MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent,
+    MatIcon, MatButton, MatAnchor, MatDivider,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   protected authService = inject(AuthService);
+  private myDocs = inject(MyDocumentsService);
+
+  response = signal<MyDocumentsResponse | null>(null);
+
+  documentCount = computed(() => this.response()?.documents.length ?? null);
+
+  mostRecentYear = computed<number | null>(() => {
+    const r = this.response();
+    if (!r || r.documents.length === 0) return null;
+    return r.documents.reduce((max, d) => Math.max(max, d.year), 0);
+  });
+
+  ngOnInit(): void {
+    this.myDocs.getAll().subscribe({
+      next: (res) => this.response.set(res),
+      error: () => this.response.set(null),
+    });
+  }
 
   get unreadCount(): number {
     return this.messages.filter(m => !m.read).length;

@@ -5,6 +5,7 @@ import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
 import com.gwhaitech.accountingfirm.auth.dto.LoginRequest;
 import com.gwhaitech.accountingfirm.auth.dto.RegisterRequest;
 import com.gwhaitech.accountingfirm.auth.exception.EmailAlreadyRegisteredException;
+import com.gwhaitech.accountingfirm.client.service.UserClientLinkService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,10 +18,13 @@ import java.util.Objects;
 public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserClientLinkService userClientLinkService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                       UserClientLinkService userClientLinkService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userClientLinkService = userClientLinkService;
     }
 
     public void register(RegisterRequest request) {
@@ -46,6 +50,7 @@ public class AuthService {
         if (user.getPasswordHash() == null || !passwordEncoder.matches(request.password(), user.getPasswordHash())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
+        userClientLinkService.linkIfPossible(user);
         return user;
     }
 }

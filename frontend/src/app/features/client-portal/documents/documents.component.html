@@ -1,0 +1,66 @@
+<div class="documents-page">
+  <header class="page-header">
+    <h1>My Documents</h1>
+    <p class="subtitle">Documents shared with you by GWH Accounting</p>
+  </header>
+
+  @if (response() === null) {
+    <p class="loading">Loading…</p>
+  } @else if (!response()!.linked) {
+    <div class="empty-state">
+      <mat-icon>info_outline</mat-icon>
+      <p>Your portal isn't set up yet. Please contact GWH Accounting to get started.</p>
+    </div>
+  } @else if (response()!.documents.length === 0) {
+    <div class="empty-state">
+      <mat-icon>folder_open</mat-icon>
+      <p>No documents have been shared with you yet. Your accountant will upload them here.</p>
+    </div>
+  } @else {
+    <div class="controls">
+      <label class="year-label">
+        Tax Year:
+        <select class="year-select" (change)="onYearChange($any($event.target).value)">
+          @for (y of years(); track y) {
+            <option [value]="y" [selected]="y === selectedYear()">{{ y }}</option>
+          }
+        </select>
+      </label>
+      <span class="doc-count">· {{ filteredDocs().length }} document{{ filteredDocs().length === 1 ? '' : 's' }}</span>
+
+      <div class="spacer"></div>
+
+      <button mat-flat-button color="primary"
+              class="download-all-btn"
+              [disabled]="filteredDocs().length === 0"
+              (click)="downloadYearZip()">
+        <mat-icon>download</mat-icon>
+        Download All for {{ selectedYear() }}
+      </button>
+    </div>
+
+    @if (filteredDocs().length === 0) {
+      <div class="empty-state">
+        <mat-icon>folder_open</mat-icon>
+        <p>No documents for {{ selectedYear() }}. Try a different year above.</p>
+      </div>
+    } @else {
+      <div class="doc-list">
+        @for (doc of filteredDocs(); track doc.id) {
+          <div class="doc-row">
+            <mat-icon class="doc-icon">description</mat-icon>
+            <div class="doc-info">
+              <div class="doc-filename">{{ doc.filename }}</div>
+              <div class="doc-meta">
+                {{ doc.mimeType || 'file' }} · {{ formatBytes(doc.sizeBytes) }} · uploaded {{ formatUploadedAt(doc.uploadedAt) }}
+              </div>
+            </div>
+            <a mat-stroked-button class="download-link" [attr.href]="downloadHref(doc.id)" download>
+              Download
+            </a>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

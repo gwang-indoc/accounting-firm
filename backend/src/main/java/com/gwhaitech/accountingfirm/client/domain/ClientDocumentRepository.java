@@ -10,4 +10,8 @@ public interface ClientDocumentRepository extends JpaRepository<ClientDocument, 
     List<ClientDocument> findByClientIdAndYear(Long clientId, int year);
 
     Optional<ClientDocument> findByClientIdAndYearAndFilename(Long clientId, int year, String filename);
+
+    List<ClientDocument> findByClientIdOrderByYearDescUploadedAtDesc(Long clientId);
+
+    List<ClientDocument> findByClientIdAndYearOrderByUploadedAtDesc(Long clientId, int year);
 }

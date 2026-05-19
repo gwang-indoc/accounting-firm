@@ -1,0 +1,93 @@
+<div class="contact-shell">
+
+  <!-- LEFT: Intro panel -->
+  <aside class="info-panel">
+    <div class="info-bg-decoration" aria-hidden="true">
+      <div class="deco-circle deco-circle-1"></div>
+      <div class="deco-circle deco-circle-2"></div>
+      <div class="deco-watermark">税</div>
+    </div>
+
+    <div class="info-content">
+      <div class="info-top">
+        <span class="info-eyebrow">GWH Accounting</span>
+        <h1 class="info-heading">Let's<br>Talk.</h1>
+        <p class="info-sub">Ready to take control of your finances? Tell us about your needs and we'll reply within one business day.</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- RIGHT: Form panel -->
+  <main class="form-panel">
+    <div class="form-content">
+      <div class="form-header">
+        <h2 class="form-heading">Book a Consultation</h2>
+        <p class="form-sub">All fields are required.</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" (input)="onFormInput()" class="contact-form" novalidate>
+
+        <div class="field-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Your Name</mat-label>
+            <input matInput formControlName="name" autocomplete="name" />
+            <mat-error>Name is required</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email Address</mat-label>
+            <input matInput type="email" formControlName="email" autocomplete="email" />
+            <mat-error>Enter a valid email address</mat-error>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Subject</mat-label>
+          <input matInput formControlName="subject" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width message-field">
+          <mat-label>Your Message</mat-label>
+          <textarea matInput formControlName="message" rows="5"></textarea>
+          <mat-error>Message is too long (5000 character limit)</mat-error>
+        </mat-form-field>
+
+        <!-- Honeypot: off-screen, invisible to keyboard and screen readers -->
+        <input
+          formControlName="companyUrl"
+          name="companyUrl"
+          tabindex="-1"
+          aria-hidden="true"
+          autocomplete="off"
+          style="position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden;"
+        />
+
+        <button
+          mat-stroked-button
+          color="primary"
+          type="submit"
+          class="submit-btn"
+          [disabled]="form.invalid || submitting()">
+          <span class="btn-label">
+            @if (submitting()) {
+              <mat-icon class="spin-icon">autorenew</mat-icon>
+              Sending…
+            } @else {
+              Send Message
+              <mat-icon>arrow_forward</mat-icon>
+            }
+          </span>
+        </button>
+
+        @if (showConfirmation()) {
+          <div class="confirmation-block" role="status" aria-live="polite">
+            <mat-icon>check_circle</mat-icon>
+            <span>Thanks — we'll reply soon.</span>
+          </div>
+        }
+
+      </form>
+    </div>
+  </main>
+
+</div>

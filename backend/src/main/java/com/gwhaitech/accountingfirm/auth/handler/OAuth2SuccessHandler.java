@@ -3,6 +3,7 @@ package com.gwhaitech.accountingfirm.auth.handler;
 import com.gwhaitech.accountingfirm.auth.domain.User;
 import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
 import com.gwhaitech.accountingfirm.auth.service.JwtService;
+import com.gwhaitech.accountingfirm.client.service.UserClientLinkService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,6 +21,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final UserClientLinkService userClientLinkService;
     private final boolean cookieSecure;
     private final String redirectUri;
     private final long expirationMs;
@@ -27,11 +29,13 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     public OAuth2SuccessHandler(
             UserRepository userRepository,
             JwtService jwtService,
+            UserClientLinkService userClientLinkService,
             @Value("${app.cookie.secure:true}") boolean cookieSecure,
             @Value("${app.oauth2.redirect-uri:http://localhost:4200/portal/dashboard}") String redirectUri,
             @Value("${app.jwt.expiration-ms:86400000}") long expirationMs) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
+        this.userClientLinkService = userClientLinkService;
         this.cookieSecure = cookieSecure;
         this.redirectUri = redirectUri;
         this.expirationMs = expirationMs;
@@ -56,6 +60,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             user.setRole("USER");
         }
         user = userRepository.save(user);
+        userClientLinkService.linkIfPossible(user);
 
         String token = jwtService.issueToken(user);
 

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Contact form — post-submit success state', () => {
+test.describe('Book consultation form — post-submit success state', () => {
   test.beforeEach(async ({ page }) => {
     await page.route('**/api/contact', route =>
       route.fulfill({ status: 202, body: '' })
@@ -8,7 +8,7 @@ test.describe('Contact form — post-submit success state', () => {
   });
 
   test('shows inline confirmation after successful send', async ({ page }) => {
-    await page.goto('/contact');
+    await page.goto('/book-consultation');
     await page.fill('input[formControlName="name"]', 'Jane Doe');
     await page.fill('input[formControlName="email"]', 'jane@example.com');
     await page.fill('input[formControlName="subject"]', 'Test inquiry');
@@ -20,7 +20,7 @@ test.describe('Contact form — post-submit success state', () => {
   });
 
   test('no mat-error visible after successful send', async ({ page }) => {
-    await page.goto('/contact');
+    await page.goto('/book-consultation');
     await page.fill('input[formControlName="name"]', 'Jane Doe');
     await page.fill('input[formControlName="email"]', 'jane@example.com');
     await page.fill('input[formControlName="subject"]', 'Test inquiry');
@@ -32,7 +32,7 @@ test.describe('Contact form — post-submit success state', () => {
   });
 
   test('form fields are cleared after successful send', async ({ page }) => {
-    await page.goto('/contact');
+    await page.goto('/book-consultation');
     await page.fill('input[formControlName="name"]', 'Jane Doe');
     await page.fill('input[formControlName="email"]', 'jane@example.com');
     await page.fill('input[formControlName="subject"]', 'Test inquiry');
@@ -47,7 +47,7 @@ test.describe('Contact form — post-submit success state', () => {
   });
 
   test('confirmation hides when user types in a field', async ({ page }) => {
-    await page.goto('/contact');
+    await page.goto('/book-consultation');
     await page.fill('input[formControlName="name"]', 'Jane Doe');
     await page.fill('input[formControlName="email"]', 'jane@example.com');
     await page.fill('input[formControlName="subject"]', 'Test inquiry');

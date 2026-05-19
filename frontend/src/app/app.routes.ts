@@ -13,9 +13,20 @@ export const routes: Routes = [
       import('./features/contact/contact.component').then(m => m.ContactComponent),
   },
   {
+    path: 'book-consultation',
+    loadComponent: () =>
+      import('./features/book-consultation/book-consultation.component').then(m => m.BookConsultationComponent),
+  },
+  {
     path: 'portal/dashboard',
     loadComponent: () =>
       import('./features/client-portal/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'portal/documents',
+    loadComponent: () =>
+      import('./features/client-portal/documents/documents.component').then(m => m.DocumentsComponent),
     canActivate: [authGuard],
   },
   {

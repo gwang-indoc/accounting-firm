@@ -27,4 +27,22 @@ describe('App', () => {
     await fixture.whenStable();
     expect(fixture.nativeElement.querySelector('mat-sidenav')).not.toBeNull();
   });
+
+  it('side nav has a Contact list item pointing to /contact', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const items = Array.from(fixture.nativeElement.querySelectorAll('mat-sidenav a[mat-list-item]'));
+    const contactItem = items.find((a: any) => a.getAttribute('routerLink') === '/contact');
+    expect(contactItem).not.toBeUndefined();
+    expect((contactItem as HTMLElement).textContent?.trim()).toBe('Contact');
+  });
+
+  it('side nav has a Book Consultation list item pointing to /book-consultation', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const items = Array.from(fixture.nativeElement.querySelectorAll('mat-sidenav a[mat-list-item]'));
+    const ctaItem = items.find((a: any) => a.getAttribute('routerLink') === '/book-consultation');
+    expect(ctaItem).not.toBeUndefined();
+    expect((ctaItem as HTMLElement).textContent?.trim()).toBe('Book Consultation');
+  });
 });
