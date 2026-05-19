@@ -27,8 +27,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(FileValidationException.class)
-    public ResponseEntity<String> handleFileValidation(FileValidationException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+    public ResponseEntity<Map<String, String>> handleFileValidation(FileValidationException ex) {
+        return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)

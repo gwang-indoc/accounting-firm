@@ -20,7 +20,6 @@ import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
@@ -86,7 +85,6 @@ public class MeDocumentService {
         doc.setMimeType(file.getContentType());
         doc.setSizeBytes(file.getSize());
         doc.setUploadedBy(user.getId());
-        doc.setUploadedAt(LocalDateTime.now()); // set before save so the returned item matches DB
         ClientDocument saved = documentRepository.save(doc);
 
         try {
@@ -101,7 +99,7 @@ public class MeDocumentService {
                 saved.getFilename(),
                 saved.getMimeType(),
                 saved.getSizeBytes(),
-                saved.getUploadedAt(),
+                saved.getUploadedAt() != null ? saved.getUploadedAt() : java.time.LocalDateTime.now(),
                 true);
     }
 
