@@ -19,7 +19,7 @@
         <label class="year-label">
           Tax Year:
           <select class="empty-year-select" (change)="onEmptyYearChange($any($event.target).value)">
-            @for (y of emptyStateYearOptions(); track y) {
+            @for (y of emptyStateYearOptions; track y) {
               <option [value]="y" [selected]="y === emptyStateYear()">{{ y }}</option>
             }
           </select>
@@ -49,7 +49,7 @@
 
       <button mat-stroked-button
               class="upload-btn"
-              [disabled]="uploading() || selectedYear() == null"
+              [disabled]="uploading()"
               (click)="onUploadClick()">
         <mat-icon>upload</mat-icon>
         {{ uploading() ? 'Uploading…' : 'Upload' }}
@@ -92,5 +92,5 @@
     }
   }
 
-  <input type="file" hidden #fileInput (change)="onFileSelected($event)">
+  <input type="file" hidden accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls,.csv,.doc,.docx" #fileInput (change)="onFileSelected($event)">
 </div>

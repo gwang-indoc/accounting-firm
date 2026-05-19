@@ -40,10 +40,10 @@ export class DocumentsComponent implements OnInit {
     return r.documents.filter(d => d.year === y);
   });
 
-  emptyStateYearOptions = computed<number[]>(() => {
+  readonly emptyStateYearOptions: number[] = (() => {
     const cur = new Date().getFullYear();
     return [cur, cur - 1, cur - 2, cur - 3, cur - 4];
-  });
+  })();
 
   // Indirection for test stubbing. Default uses window.location.
   navigate: (url: string) => void = (url) => { window.location.href = url; };
