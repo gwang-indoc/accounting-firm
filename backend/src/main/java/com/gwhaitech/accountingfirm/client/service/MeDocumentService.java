@@ -6,16 +6,21 @@ import com.gwhaitech.accountingfirm.client.domain.ClientDocument;
 import com.gwhaitech.accountingfirm.client.domain.ClientDocumentRepository;
 import com.gwhaitech.accountingfirm.client.domain.ClientRepository;
 import com.gwhaitech.accountingfirm.client.dto.MyDocumentsDto;
+import com.gwhaitech.accountingfirm.client.exception.DocumentNameConflictException;
 import com.gwhaitech.accountingfirm.client.exception.DocumentNotFoundException;
+import com.gwhaitech.accountingfirm.client.exception.PortalNotLinkedException;
+import com.gwhaitech.accountingfirm.storage.FileUploadValidator;
 import com.gwhaitech.accountingfirm.storage.LocalStorageService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
@@ -27,13 +32,16 @@ public class MeDocumentService {
     private final ClientRepository clientRepository;
     private final ClientDocumentRepository documentRepository;
     private final LocalStorageService storage;
+    private final FileUploadValidator fileUploadValidator;
 
     public MeDocumentService(ClientRepository clientRepository,
                              ClientDocumentRepository documentRepository,
-                             LocalStorageService storage) {
+                             LocalStorageService storage,
+                             FileUploadValidator fileUploadValidator) {
         this.clientRepository = clientRepository;
         this.documentRepository = documentRepository;
         this.storage = storage;
+        this.fileUploadValidator = fileUploadValidator;
     }
 
     @Transactional(readOnly = true)
@@ -56,6 +64,44 @@ public class MeDocumentService {
                         d.getUploadedBy() != null && user.getId().equals(d.getUploadedBy())))
                 .toList();
         return new MyDocumentsDto(true, c.getName(), items);
+    }
+
+    @Transactional
+    public MyDocumentsDto.Item uploadMyDocument(User user, int year, MultipartFile file) {
+        Client client = clientRepository.findByUserId(user.getId())
+                .orElseThrow(PortalNotLinkedException::new);
+
+        String filename = file.getOriginalFilename();
+        fileUploadValidator.validate(filename, file.getSize());
+
+        documentRepository
+                .findByClientIdAndYearAndFilename(client.getId(), year, filename)
+                .ifPresent(existing -> { throw new DocumentNameConflictException(filename, year); });
+
+        ClientDocument doc = new ClientDocument();
+        doc.setClientId(client.getId());
+        doc.setYear((short) year);
+        doc.setFilename(filename);
+        doc.setFilePath("clients/" + client.getId() + "/" + year + "/" + filename);
+        doc.setMimeType(file.getContentType());
+        doc.setSizeBytes(file.getSize());
+        doc.setUploadedBy(user.getId());
+        ClientDocument saved = documentRepository.save(doc);
+
+        try {
+            storage.store(client.getId(), year, filename, file.getInputStream());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+
+        return new MyDocumentsDto.Item(
+                saved.getId(),
+                (int) saved.getYear(),
+                saved.getFilename(),
+                saved.getMimeType(),
+                saved.getSizeBytes(),
+                saved.getUploadedAt() != null ? saved.getUploadedAt() : LocalDateTime.now(),
+                true);
     }
 
     @Transactional(readOnly = true)

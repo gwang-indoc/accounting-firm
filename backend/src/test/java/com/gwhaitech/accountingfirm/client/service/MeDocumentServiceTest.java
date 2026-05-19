@@ -6,11 +6,17 @@ import com.gwhaitech.accountingfirm.client.domain.ClientDocument;
 import com.gwhaitech.accountingfirm.client.domain.ClientDocumentRepository;
 import com.gwhaitech.accountingfirm.client.domain.ClientRepository;
 import com.gwhaitech.accountingfirm.client.dto.MyDocumentsDto;
+import com.gwhaitech.accountingfirm.client.exception.DocumentNameConflictException;
 import com.gwhaitech.accountingfirm.client.exception.DocumentNotFoundException;
+import com.gwhaitech.accountingfirm.client.exception.FileValidationException;
+import com.gwhaitech.accountingfirm.client.exception.PortalNotLinkedException;
+import com.gwhaitech.accountingfirm.storage.FileUploadValidator;
 import com.gwhaitech.accountingfirm.storage.LocalStorageService;
+import com.gwhaitech.accountingfirm.storage.StorageProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Files;
@@ -29,9 +35,13 @@ import static org.mockito.Mockito.*;
 
 class MeDocumentServiceTest {
 
+    @TempDir
+    Path tempDir;
+
     private ClientRepository clientRepo;
     private ClientDocumentRepository docRepo;
     private LocalStorageService storage;
+    private FileUploadValidator fileUploadValidator;
     private MeDocumentService service;
 
     @BeforeEach
@@ -39,7 +49,10 @@ class MeDocumentServiceTest {
         clientRepo = mock(ClientRepository.class);
         docRepo = mock(ClientDocumentRepository.class);
         storage = mock(LocalStorageService.class);
-        service = new MeDocumentService(clientRepo, docRepo, storage);
+        StorageProperties props = new StorageProperties(
+                tempDir, 10, 100, List.of("exe", "js"));
+        fileUploadValidator = new FileUploadValidator(props);
+        service = new MeDocumentService(clientRepo, docRepo, storage, fileUploadValidator);
     }
 
     private User user(long id) {
@@ -200,5 +213,97 @@ class MeDocumentServiceTest {
                         MyDocumentsDto.Item::uploadedByMe));
         assertThat(byName).containsEntry("Tax-Return-2024.pdf", false);
         assertThat(byName).containsEntry("T4-2024.pdf", true);
+    }
+
+    // ---- uploadMyDocument tests ----
+
+    @Test
+    void uploadMyDocument_storesRowAndFile() throws Exception {
+        Client c = client(99L, "Jane");
+        c.setId(99L);
+        when(clientRepo.findByUserId(7L)).thenReturn(Optional.of(c));
+        when(docRepo.findByClientIdAndYearAndFilename(99L, 2024, "T4-2024.pdf"))
+                .thenReturn(Optional.empty());
+
+        ClientDocument saved = doc(10L, 99L, 2024, "T4-2024.pdf", "clients/99/2024/T4-2024.pdf");
+        saved.setUploadedBy(7L);
+        when(docRepo.save(any(ClientDocument.class))).thenReturn(saved);
+
+        LocalStorageService realStorage = new LocalStorageService(tempDir);
+        StorageProperties props = new StorageProperties(tempDir, 10, 100, List.of("exe", "js"));
+        FileUploadValidator realValidator = new FileUploadValidator(props);
+        MeDocumentService svc = new MeDocumentService(clientRepo, docRepo, realStorage, realValidator);
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "T4-2024.pdf", "application/pdf", "hello".getBytes());
+
+        MyDocumentsDto.Item item = svc.uploadMyDocument(user(7L), 2024, file);
+
+        assertThat(item.filename()).isEqualTo("T4-2024.pdf");
+        assertThat(item.uploadedByMe()).isTrue();
+        assertThat(item.year()).isEqualTo(2024);
+
+        // file was written to disk
+        Path written = tempDir.resolve("clients/99/2024/T4-2024.pdf");
+        assertThat(Files.exists(written)).isTrue();
+        assertThat(Files.readString(written)).isEqualTo("hello");
+    }
+
+    @Test
+    void uploadMyDocument_rejectsDuplicate() {
+        Client c = client(99L, "Jane");
+        when(clientRepo.findByUserId(7L)).thenReturn(Optional.of(c));
+
+        ClientDocument existing = doc(5L, 99L, 2024, "T4-2024.pdf", "clients/99/2024/T4-2024.pdf");
+        when(docRepo.findByClientIdAndYearAndFilename(99L, 2024, "T4-2024.pdf"))
+                .thenReturn(Optional.of(existing));
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "T4-2024.pdf", "application/pdf", "second".getBytes());
+
+        assertThatThrownBy(() -> service.uploadMyDocument(user(7L), 2024, file))
+                .isInstanceOf(DocumentNameConflictException.class);
+
+        verify(docRepo, never()).save(any());
+    }
+
+    @Test
+    void uploadMyDocument_unlinkedUserThrowsPortalNotLinked() {
+        when(clientRepo.findByUserId(8L)).thenReturn(Optional.empty());
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "a.pdf", "application/pdf", "x".getBytes());
+
+        assertThatThrownBy(() -> service.uploadMyDocument(user(8L), 2024, file))
+                .isInstanceOf(PortalNotLinkedException.class);
+    }
+
+    @Test
+    void uploadMyDocument_rejectsBlockedExtension() {
+        Client c = client(99L, "Jane");
+        when(clientRepo.findByUserId(7L)).thenReturn(Optional.of(c));
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "evil.exe", "application/octet-stream", "x".getBytes());
+
+        assertThatThrownBy(() -> service.uploadMyDocument(user(7L), 2024, file))
+                .isInstanceOf(FileValidationException.class);
+
+        verify(docRepo, never()).save(any());
+    }
+
+    @Test
+    void uploadMyDocument_rejectsOversize() {
+        Client c = client(99L, "Jane");
+        when(clientRepo.findByUserId(7L)).thenReturn(Optional.of(c));
+
+        byte[] big = new byte[(int) (11L * 1024 * 1024)];
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "big.pdf", "application/pdf", big);
+
+        assertThatThrownBy(() -> service.uploadMyDocument(user(7L), 2024, file))
+                .isInstanceOf(FileValidationException.class);
+
+        verify(docRepo, never()).save(any());
     }
 }
