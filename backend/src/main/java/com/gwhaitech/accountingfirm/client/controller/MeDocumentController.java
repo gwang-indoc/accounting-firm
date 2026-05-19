@@ -9,7 +9,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URLEncoder;
@@ -23,6 +25,15 @@ public class MeDocumentController {
 
     public MeDocumentController(MeDocumentService meDocumentService) {
         this.meDocumentService = meDocumentService;
+    }
+
+    @PostMapping
+    public ResponseEntity<MyDocumentsDto.Item> upload(@RequestParam("year") int year,
+                                                      @RequestParam("file") MultipartFile file,
+                                                      Authentication authentication) {
+        User user = resolveUser(authentication);
+        MyDocumentsDto.Item item = meDocumentService.uploadMyDocument(user, year, file);
+        return ResponseEntity.status(HttpStatus.CREATED).body(item);
     }
 
     @GetMapping

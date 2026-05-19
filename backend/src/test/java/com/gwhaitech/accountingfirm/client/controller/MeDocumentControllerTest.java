@@ -25,6 +25,11 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.gwhaitech.accountingfirm.client.exception.DocumentNameConflictException;
+import com.gwhaitech.accountingfirm.client.exception.PortalNotLinkedException;
+import com.gwhaitech.accountingfirm.common.exception.GlobalExceptionHandler;
+import org.springframework.mock.web.MockMultipartFile;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -32,13 +37,14 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(MeDocumentController.class)
-@Import(MeDocumentControllerTest.TestSecurityConfig.class)
+@Import({MeDocumentControllerTest.TestSecurityConfig.class, GlobalExceptionHandler.class})
 class MeDocumentControllerTest {
 
     @TestConfiguration
@@ -148,5 +154,64 @@ class MeDocumentControllerTest {
 
         mvc.perform(get("/api/me/documents/zip?year=2025").with(authentication(authForUser(7L))))
             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void upload_returns201WithNewItem() throws Exception {
+        MyDocumentsDto.Item item = new MyDocumentsDto.Item(
+                42L, 2024, "T4-2024.pdf", "application/pdf", 12345L,
+                LocalDateTime.parse("2026-05-19T10:00:00"), true);
+        when(service().uploadMyDocument(any(), eq(2024), any())).thenReturn(item);
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "T4-2024.pdf", "application/pdf", "hello".getBytes());
+
+        mvc.perform(multipart("/api/me/documents")
+                        .file(file)
+                        .param("year", "2024")
+                        .with(authentication(authForUser(7L))))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(42))
+                .andExpect(jsonPath("$.filename").value("T4-2024.pdf"))
+                .andExpect(jsonPath("$.uploadedByMe").value(true));
+    }
+
+    @Test
+    void upload_returns409OnDuplicateName() throws Exception {
+        when(service().uploadMyDocument(any(), eq(2024), any()))
+                .thenThrow(new DocumentNameConflictException("T4-2024.pdf", 2024));
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "T4-2024.pdf", "application/pdf", "x".getBytes());
+
+        mvc.perform(multipart("/api/me/documents")
+                        .file(file)
+                        .param("year", "2024")
+                        .with(authentication(authForUser(7L))))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.filename").value("T4-2024.pdf"))
+                .andExpect(jsonPath("$.year").value(2024));
+    }
+
+    @Test
+    void upload_returns403WhenPortalNotLinked() throws Exception {
+        when(service().uploadMyDocument(any(), eq(2024), any()))
+                .thenThrow(new PortalNotLinkedException());
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "T4-2024.pdf", "application/pdf", "x".getBytes());
+
+        mvc.perform(multipart("/api/me/documents")
+                        .file(file)
+                        .param("year", "2024")
+                        .with(authentication(authForUser(7L))))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value(
+                        org.hamcrest.Matchers.containsString("portal isn't set up")));
+    }
+
+    /** Convenience accessor to keep test bodies short. */
+    private MeDocumentService service() {
+        return meDocumentService;
     }
 }
