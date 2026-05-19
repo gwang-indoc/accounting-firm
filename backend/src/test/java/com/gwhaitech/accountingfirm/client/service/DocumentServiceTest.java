@@ -8,8 +8,8 @@ import com.gwhaitech.accountingfirm.client.dto.DocumentUploadResult;
 import com.gwhaitech.accountingfirm.client.exception.ClientNotFoundException;
 import com.gwhaitech.accountingfirm.client.exception.DocumentNotFoundException;
 import com.gwhaitech.accountingfirm.client.exception.FileValidationException;
+import com.gwhaitech.accountingfirm.storage.FileUploadValidator;
 import com.gwhaitech.accountingfirm.storage.LocalStorageService;
-import com.gwhaitech.accountingfirm.storage.StorageProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,10 +31,11 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 
 @ExtendWith(MockitoExtension.class)
 class DocumentServiceTest {
@@ -49,7 +50,7 @@ class DocumentServiceTest {
     private ClientRepository clientRepository;
 
     @Mock
-    private StorageProperties storageProperties;
+    private FileUploadValidator fileUploadValidator;
 
     @InjectMocks
     private DocumentService documentService;
@@ -74,16 +75,9 @@ class DocumentServiceTest {
         return doc;
     }
 
-    private void stubLooseValidation() {
-        when(storageProperties.maxFilenameLength()).thenReturn(255);
-        when(storageProperties.blockedExtensions()).thenReturn(List.of("exe", "js"));
-        when(storageProperties.maxFileSizeMb()).thenReturn(10);
-    }
-
     @Test
     void upload_newFile_storesFileAndCreatesRecord() {
         when(clientRepository.existsById(1L)).thenReturn(true);
-        stubLooseValidation();
         when(clientDocumentRepository.findByClientIdAndYearAndFilename(1L, 2025, "tax.pdf"))
                 .thenReturn(Optional.empty());
         when(clientDocumentRepository.save(any(ClientDocument.class)))
@@ -106,7 +100,6 @@ class DocumentServiceTest {
     @Test
     void upload_existingFile_overwritesAndUpdatesRecord() {
         when(clientRepository.existsById(1L)).thenReturn(true);
-        stubLooseValidation();
         ClientDocument existing = sampleDoc(99L, "tax.pdf");
         when(clientDocumentRepository.findByClientIdAndYearAndFilename(1L, 2025, "tax.pdf"))
                 .thenReturn(Optional.of(existing));
@@ -126,8 +119,8 @@ class DocumentServiceTest {
     @Test
     void upload_blockedExtension_throwsFileValidationException() {
         when(clientRepository.existsById(1L)).thenReturn(true);
-        when(storageProperties.maxFilenameLength()).thenReturn(255);
-        when(storageProperties.blockedExtensions()).thenReturn(List.of("exe", "js"));
+        doThrow(new FileValidationException("Blocked file extension: .exe"))
+                .when(fileUploadValidator).validate(eq("malware.exe"), anyLong());
 
         InputStream in = new ByteArrayInputStream("bad".getBytes());
 
@@ -141,7 +134,8 @@ class DocumentServiceTest {
     @Test
     void upload_filenameTooLong_throwsFileValidationException() {
         when(clientRepository.existsById(1L)).thenReturn(true);
-        when(storageProperties.maxFilenameLength()).thenReturn(10);
+        doThrow(new FileValidationException("Filename exceeds max length"))
+                .when(fileUploadValidator).validate(eq("way-too-long-filename.pdf"), anyLong());
 
         InputStream in = new ByteArrayInputStream("data".getBytes());
 
@@ -155,12 +149,11 @@ class DocumentServiceTest {
     @Test
     void upload_fileTooLarge_throwsFileValidationException() {
         when(clientRepository.existsById(1L)).thenReturn(true);
-        when(storageProperties.maxFilenameLength()).thenReturn(255);
-        when(storageProperties.blockedExtensions()).thenReturn(List.of("exe"));
-        when(storageProperties.maxFileSizeMb()).thenReturn(1);
+        long twoMb = 2L * 1024L * 1024L;
+        doThrow(new FileValidationException("File exceeds max size of 1 MB"))
+                .when(fileUploadValidator).validate(eq("big.pdf"), eq(twoMb));
 
         InputStream in = new ByteArrayInputStream("data".getBytes());
-        long twoMb = 2L * 1024L * 1024L;
 
         assertThatThrownBy(() -> documentService.upload(
                 1L, 2025, "big.pdf", "application/pdf", twoMb, in, 7L))
@@ -172,7 +165,8 @@ class DocumentServiceTest {
     @Test
     void upload_filenameWithPathTraversal_throwsFileValidationException() {
         when(clientRepository.existsById(1L)).thenReturn(true);
-        when(storageProperties.maxFilenameLength()).thenReturn(255);
+        doThrow(new FileValidationException("Filename contains illegal path characters"))
+                .when(fileUploadValidator).validate(eq("../etc/passwd"), anyLong());
 
         InputStream in = new ByteArrayInputStream("data".getBytes());
 
