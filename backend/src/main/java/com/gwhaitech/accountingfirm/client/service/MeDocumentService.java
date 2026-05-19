@@ -86,6 +86,7 @@ public class MeDocumentService {
         doc.setMimeType(file.getContentType());
         doc.setSizeBytes(file.getSize());
         doc.setUploadedBy(user.getId());
+        doc.setUploadedAt(LocalDateTime.now()); // set before save so the returned item matches DB
         ClientDocument saved = documentRepository.save(doc);
 
         try {
@@ -100,7 +101,7 @@ public class MeDocumentService {
                 saved.getFilename(),
                 saved.getMimeType(),
                 saved.getSizeBytes(),
-                saved.getUploadedAt() != null ? saved.getUploadedAt() : LocalDateTime.now(),
+                saved.getUploadedAt(),
                 true);
     }
 

@@ -229,6 +229,7 @@ class MeDocumentServiceTest {
         saved.setUploadedBy(7L);
         when(docRepo.save(any(ClientDocument.class))).thenReturn(saved);
 
+        // Separate instance with real storage to verify the file actually lands on disk.
         LocalStorageService realStorage = new LocalStorageService(tempDir);
         StorageProperties props = new StorageProperties(tempDir, 10, 100, List.of("exe", "js"));
         FileUploadValidator realValidator = new FileUploadValidator(props);

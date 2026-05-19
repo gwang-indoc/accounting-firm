@@ -29,6 +29,7 @@ import com.gwhaitech.accountingfirm.client.exception.DocumentNameConflictExcepti
 import com.gwhaitech.accountingfirm.client.exception.PortalNotLinkedException;
 import com.gwhaitech.accountingfirm.common.exception.GlobalExceptionHandler;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -161,7 +162,7 @@ class MeDocumentControllerTest {
         MyDocumentsDto.Item item = new MyDocumentsDto.Item(
                 42L, 2024, "T4-2024.pdf", "application/pdf", 12345L,
                 LocalDateTime.parse("2026-05-19T10:00:00"), true);
-        when(service().uploadMyDocument(any(), eq(2024), any())).thenReturn(item);
+        when(meDocumentService.uploadMyDocument(any(), eq(2024), any())).thenReturn(item);
 
         MockMultipartFile file = new MockMultipartFile(
                 "file", "T4-2024.pdf", "application/pdf", "hello".getBytes());
@@ -178,7 +179,7 @@ class MeDocumentControllerTest {
 
     @Test
     void upload_returns409OnDuplicateName() throws Exception {
-        when(service().uploadMyDocument(any(), eq(2024), any()))
+        when(meDocumentService.uploadMyDocument(any(), eq(2024), any()))
                 .thenThrow(new DocumentNameConflictException("T4-2024.pdf", 2024));
 
         MockMultipartFile file = new MockMultipartFile(
@@ -195,7 +196,7 @@ class MeDocumentControllerTest {
 
     @Test
     void upload_returns403WhenPortalNotLinked() throws Exception {
-        when(service().uploadMyDocument(any(), eq(2024), any()))
+        when(meDocumentService.uploadMyDocument(any(), eq(2024), any()))
                 .thenThrow(new PortalNotLinkedException());
 
         MockMultipartFile file = new MockMultipartFile(
@@ -210,8 +211,18 @@ class MeDocumentControllerTest {
                         org.hamcrest.Matchers.containsString("portal isn't set up")));
     }
 
-    /** Convenience accessor to keep test bodies short. */
-    private MeDocumentService service() {
-        return meDocumentService;
+    @Test
+    void upload_returns413WhenFileTooLarge() throws Exception {
+        when(meDocumentService.uploadMyDocument(any(), eq(2024), any()))
+                .thenThrow(new MaxUploadSizeExceededException(10 * 1024 * 1024L));
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "big.pdf", "application/pdf", "x".getBytes());
+
+        mvc.perform(multipart("/api/me/documents")
+                        .file(file)
+                        .param("year", "2024")
+                        .with(authentication(authForUser(7L))))
+                .andExpect(status().isPayloadTooLarge());
     }
 }

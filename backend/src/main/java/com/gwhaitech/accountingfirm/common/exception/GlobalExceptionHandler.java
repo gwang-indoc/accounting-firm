@@ -33,7 +33,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<String> handleMaxUploadSize(MaxUploadSizeExceededException ex) {
-        return ResponseEntity.badRequest().body("File exceeds the maximum allowed upload size");
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+                .body("File exceeds the maximum allowed upload size");
     }
 
     @ExceptionHandler(DocumentNameConflictException.class)
