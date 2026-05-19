@@ -82,7 +82,7 @@ public class MeDocumentService {
         doc.setClientId(client.getId());
         doc.setYear((short) year);
         doc.setFilename(filename);
-        doc.setFilePath("clients/" + client.getId() + "/" + year + "/" + filename);
+        doc.setFilePath(LocalStorageService.relativePath(client.getId(), year, filename));
         doc.setMimeType(file.getContentType());
         doc.setSizeBytes(file.getSize());
         doc.setUploadedBy(user.getId());

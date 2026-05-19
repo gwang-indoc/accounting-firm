@@ -48,7 +48,7 @@ public class DocumentService {
         }
         fileUploadValidator.validate(filename, sizeBytes);
 
-        String filePath = "clients/" + clientId + "/" + year + "/" + filename;
+        String filePath = LocalStorageService.relativePath(clientId, year, filename);
         var existingOpt = clientDocumentRepository
                 .findByClientIdAndYearAndFilename(clientId, year, filename);
 

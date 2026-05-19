@@ -19,13 +19,13 @@ public class LocalStorageService {
         this.baseDir = baseDir;
     }
 
+    public static String relativePath(long clientId, int year, String filename) {
+        return "clients/" + clientId + "/" + year + "/" + filename;
+    }
+
     public void store(long clientId, int year, String filename, InputStream in) {
         Objects.requireNonNull(in, "InputStream must not be null");
-        Path target = baseDir
-                .resolve("clients")
-                .resolve(String.valueOf(clientId))
-                .resolve(String.valueOf(year))
-                .resolve(filename);
+        Path target = baseDir.resolve(relativePath(clientId, year, filename));
         try {
             Files.createDirectories(target.getParent());
             Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
