@@ -14,7 +14,24 @@
   } @else if (response()!.documents.length === 0) {
     <div class="empty-state">
       <mat-icon>folder_open</mat-icon>
-      <p>No documents have been shared with you yet. Your accountant will upload them here.</p>
+      <p>No documents yet — upload your first one below.</p>
+      <div class="empty-controls">
+        <label class="year-label">
+          Tax Year:
+          <select class="empty-year-select" (change)="onEmptyYearChange($any($event.target).value)">
+            @for (y of emptyStateYearOptions(); track y) {
+              <option [value]="y" [selected]="y === emptyStateYear()">{{ y }}</option>
+            }
+          </select>
+        </label>
+        <button mat-flat-button color="primary"
+                class="empty-upload-btn"
+                [disabled]="uploading()"
+                (click)="onUploadClick()">
+          <mat-icon>upload</mat-icon>
+          {{ uploading() ? 'Uploading…' : 'Upload a document' }}
+        </button>
+      </div>
     </div>
   } @else {
     <div class="controls">
@@ -29,6 +46,14 @@
       <span class="doc-count">· {{ filteredDocs().length }} document{{ filteredDocs().length === 1 ? '' : 's' }}</span>
 
       <div class="spacer"></div>
+
+      <button mat-stroked-button
+              class="upload-btn"
+              [disabled]="uploading() || selectedYear() == null"
+              (click)="onUploadClick()">
+        <mat-icon>upload</mat-icon>
+        {{ uploading() ? 'Uploading…' : 'Upload' }}
+      </button>
 
       <button mat-flat-button color="primary"
               class="download-all-btn"
@@ -54,6 +79,9 @@
               <div class="doc-meta">
                 {{ doc.mimeType || 'file' }} · {{ formatBytes(doc.sizeBytes) }} · uploaded {{ formatUploadedAt(doc.uploadedAt) }}
               </div>
+              @if (doc.uploadedByMe) {
+                <mat-chip class="badge-you" disableRipple>Uploaded by you</mat-chip>
+              }
             </div>
             <a mat-stroked-button class="download-link" [attr.href]="downloadHref(doc.id)" download>
               Download
@@ -63,4 +91,6 @@
       </div>
     }
   }
+
+  <input type="file" hidden #fileInput (change)="onFileSelected($event)">
 </div>

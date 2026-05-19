@@ -1,15 +1,17 @@
-import { Component, OnInit, computed, signal, inject } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
+import { Component, OnInit, ViewChild, ElementRef, computed, signal, inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { HttpErrorResponse } from '@angular/common/http';
+import { finalize } from 'rxjs';
 import { MyDocumentsService } from '../../../core/services/my-documents.service';
 import { MyDocumentItem, MyDocumentsResponse } from '../../../core/models/my-documents';
 
 @Component({
   selector: 'app-documents',
   standalone: true,
-  imports: [MatCardModule, MatButtonModule, MatIconModule],
+  imports: [MatIconModule, MatButtonModule, MatChipsModule],
   templateUrl: './documents.component.html',
   styleUrl: './documents.component.css',
 })
@@ -19,6 +21,10 @@ export class DocumentsComponent implements OnInit {
 
   response = signal<MyDocumentsResponse | null>(null);
   selectedYear = signal<number | null>(null);
+  uploading = signal<boolean>(false);
+  emptyStateYear = signal<number>(new Date().getFullYear());
+
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   years = computed<number[]>(() => {
     const r = this.response();
@@ -34,6 +40,11 @@ export class DocumentsComponent implements OnInit {
     return r.documents.filter(d => d.year === y);
   });
 
+  emptyStateYearOptions = computed<number[]>(() => {
+    const cur = new Date().getFullYear();
+    return [cur, cur - 1, cur - 2, cur - 3, cur - 4];
+  });
+
   // Indirection for test stubbing. Default uses window.location.
   navigate: (url: string) => void = (url) => { window.location.href = url; };
 
@@ -42,18 +53,59 @@ export class DocumentsComponent implements OnInit {
       next: (res) => {
         this.response.set(res);
         const ys = this.years();
-        if (ys.length > 0) {
-          this.selectedYear.set(ys[0]);
-        }
+        if (ys.length > 0) this.selectedYear.set(ys[0]);
       },
-      error: () => {
-        this.snackBar.open('Could not load your documents. Please try again.', 'OK');
-      },
+      error: () => this.snackBar.open('Could not load your documents. Please try again.', 'OK'),
     });
   }
 
   onYearChange(value: string): void {
     this.selectedYear.set(Number(value));
+  }
+
+  onEmptyYearChange(value: string): void {
+    this.emptyStateYear.set(Number(value));
+  }
+
+  onUploadClick(): void {
+    this.fileInput?.nativeElement.click();
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    const year = this.selectedYear() ?? this.emptyStateYear();
+    this.uploading.set(true);
+
+    this.myDocs.upload(year, file)
+      .pipe(finalize(() => {
+        this.uploading.set(false);
+        if (input) input.value = '';
+      }))
+      .subscribe({
+        next: (item) => {
+          const current = this.response() ?? { linked: true, clientName: null, documents: [] };
+          this.response.set({ ...current, documents: [...current.documents, item] });
+          if (this.selectedYear() == null) this.selectedYear.set(item.year);
+          this.snackBar.open(`Uploaded ${item.filename}.`, 'OK', { duration: 3000 });
+        },
+        error: (err: HttpErrorResponse) => {
+          this.snackBar.open(this.errorMessageFor(err, file.name, year), 'OK');
+        },
+      });
+  }
+
+  private errorMessageFor(err: HttpErrorResponse, filename: string, year: number): string {
+    const serverMessage = err?.error?.message;
+    switch (err.status) {
+      case 400: return serverMessage ?? 'That file could not be uploaded.';
+      case 403: return serverMessage ?? "Your portal isn't set up yet. Please contact GWH Accounting.";
+      case 409: return serverMessage ?? `A file named "${filename}" already exists for ${year}. Please rename and try again.`;
+      case 413: return 'File is too large. Maximum size is 10 MB.';
+      default:  return 'Upload failed. Please try again.';
+    }
   }
 
   downloadYearZip(): void {
@@ -74,7 +126,6 @@ export class DocumentsComponent implements OnInit {
   }
 
   formatUploadedAt(iso: string): string {
-    const d = new Date(iso);
-    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   }
 }

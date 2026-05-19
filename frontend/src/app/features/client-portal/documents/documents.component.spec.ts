@@ -1,7 +1,8 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, HttpErrorResponse } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
+import { of, throwError } from 'rxjs';
 import { DocumentsComponent } from './documents.component';
 import { MyDocumentsResponse } from '../../../core/models/my-documents';
 
@@ -47,7 +48,7 @@ describe('DocumentsComponent', () => {
     httpMock.expectOne('/api/me/documents').flush({ linked: true, clientName: 'Jane', documents: [] });
     await fixture.whenStable();
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('No documents have been shared with you yet');
+    expect(fixture.nativeElement.textContent).toContain('No documents yet');
   });
 
   it('year dropdown shows unique years sorted descending', async () => {
@@ -115,5 +116,118 @@ describe('DocumentsComponent', () => {
     expect(links.length).toBe(2);
     expect(links[0].getAttribute('href')).toBe('/api/me/documents/1/download');
     expect(links[1].getAttribute('href')).toBe('/api/me/documents/2/download');
+  });
+});
+
+describe('DocumentsComponent — upload', () => {
+  let fixture: ComponentFixture<DocumentsComponent>;
+  let component: DocumentsComponent;
+  let httpMock: HttpTestingController;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [DocumentsComponent],
+      providers: [
+        provideZonelessChangeDetection(),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ],
+    }).compileComponents();
+    fixture = TestBed.createComponent(DocumentsComponent);
+    component = fixture.componentInstance;
+    httpMock = TestBed.inject(HttpTestingController);
+    fixture.detectChanges();
+  });
+
+  afterEach(() => httpMock.verify());
+
+  it('renders the Upload button in the controls row when documents are present', async () => {
+    httpMock.expectOne('/api/me/documents').flush({
+      linked: true, clientName: 'Jane', documents: [
+        { id: 1, year: 2024, filename: 'T4.pdf', mimeType: 'application/pdf', sizeBytes: 100, uploadedAt: '2025-02-12T10:00:00', uploadedByMe: false },
+      ]});
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const btn = fixture.nativeElement.querySelector('button.upload-btn');
+    expect(btn).not.toBeNull();
+    expect(btn.textContent).toContain('Upload');
+  });
+
+  it('renders "Uploaded by you" chip on uploadedByMe rows only', async () => {
+    httpMock.expectOne('/api/me/documents').flush({
+      linked: true, clientName: 'Jane', documents: [
+        { id: 1, year: 2024, filename: 'a.pdf', mimeType: 'application/pdf', sizeBytes: 100, uploadedAt: '2025-02-12T10:00:00', uploadedByMe: true },
+        { id: 2, year: 2024, filename: 'b.pdf', mimeType: 'application/pdf', sizeBytes: 100, uploadedAt: '2025-02-12T10:00:00', uploadedByMe: false },
+      ]});
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const rows = fixture.nativeElement.querySelectorAll('.doc-row');
+    expect(rows[0].querySelector('.badge-you')).not.toBeNull();
+    expect(rows[1].querySelector('.badge-you')).toBeNull();
+  });
+
+  it('upload success appends the new item and clears the uploading flag', async () => {
+    httpMock.expectOne('/api/me/documents').flush({
+      linked: true, clientName: 'Jane', documents: [
+        { id: 1, year: 2024, filename: 'T4.pdf', mimeType: 'application/pdf', sizeBytes: 100, uploadedAt: '2025-02-12T10:00:00', uploadedByMe: false },
+      ]});
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const file = new File(['hello'], 'Receipts-2024.pdf', { type: 'application/pdf' });
+    component.onFileSelected({ target: { files: [file], value: '' } } as any);
+
+    const req = httpMock.expectOne('/api/me/documents?year=2024');
+    req.flush({
+      id: 99, year: 2024, filename: 'Receipts-2024.pdf',
+      mimeType: 'application/pdf', sizeBytes: 5, uploadedAt: '2026-05-19T10:00:00',
+      uploadedByMe: true,
+    });
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(component.uploading()).toBe(false);
+    const rows = fixture.nativeElement.querySelectorAll('.doc-row');
+    expect(rows.length).toBe(2);
+    expect(fixture.nativeElement.textContent).toContain('Receipts-2024.pdf');
+  });
+
+  it('upload 409 surfaces the duplicate error and does not append', async () => {
+    httpMock.expectOne('/api/me/documents').flush({
+      linked: true, clientName: 'Jane', documents: [
+        { id: 1, year: 2024, filename: 'dup.pdf', mimeType: 'application/pdf', sizeBytes: 100, uploadedAt: '2025-02-12T10:00:00', uploadedByMe: false },
+      ]});
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const snackSpy = vi.spyOn((component as any).snackBar, 'open');
+
+    const file = new File(['x'], 'dup.pdf', { type: 'application/pdf' });
+    component.onFileSelected({ target: { files: [file], value: '' } } as any);
+
+    httpMock.expectOne('/api/me/documents?year=2024').flush(
+      { message: 'A file named "dup.pdf" already exists for 2024.', filename: 'dup.pdf', year: 2024 },
+      { status: 409, statusText: 'Conflict' });
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(component.uploading()).toBe(false);
+    const rows = fixture.nativeElement.querySelectorAll('.doc-row');
+    expect(rows.length).toBe(1);
+    expect(snackSpy).toHaveBeenCalled();
+    expect(snackSpy.mock.calls[0][0]).toContain('already exists');
+  });
+
+  it('empty state (linked, zero docs) renders a year picker and Upload button', async () => {
+    httpMock.expectOne('/api/me/documents').flush({
+      linked: true, clientName: 'Jane', documents: [],
+    });
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('select.empty-year-select')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('button.empty-upload-btn')).not.toBeNull();
   });
 });
