@@ -65,13 +65,7 @@ class DocumentServiceTest {
         doc.setMimeType("application/pdf");
         doc.setSizeBytes(1024L);
         doc.setUploadedBy(1L);
-        try {
-            var f = ClientDocument.class.getDeclaredField("uploadedAt");
-            f.setAccessible(true);
-            f.set(doc, LocalDateTime.of(2026, 1, 1, 0, 0));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        doc.setUploadedAt(LocalDateTime.of(2026, 1, 1, 0, 0));
         return doc;
     }
 
@@ -258,6 +252,7 @@ class DocumentServiceTest {
 
         Resource resource = documentService.getDocumentForDownload(1L);
 
+        verify(localStorageService).resolve("clients/1/2025/tax.pdf");
         assertThat(resource).isNotNull();
         assertThat(resource.getFilename()).isEqualTo("tax.pdf");
     }
