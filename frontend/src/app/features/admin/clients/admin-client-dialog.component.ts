@@ -17,20 +17,28 @@ export interface AdminClientDialogData {
   standalone: true,
   imports: [ReactiveFormsModule, MatDialogModule, MatButtonModule, MatFormFieldModule, MatInputModule],
   template: `
-    <h2 mat-dialog-title>{{ isEdit ? 'Edit Client' : 'Add Client' }}</h2>
+    <div class="dlg-header">
+      <div class="dlg-icon">{{ isEdit ? '✎' : '+' }}</div>
+      <div>
+        <div class="dlg-title">{{ isEdit ? 'Edit Client' : 'Add Client' }}</div>
+        <div class="dlg-subtitle">{{ isEdit ? 'Update client information' : 'Create a new client record' }}</div>
+      </div>
+    </div>
+
     <mat-dialog-content>
-      <form [formGroup]="form" id="clientForm" (ngSubmit)="submit()" class="dialog-form">
-        <mat-form-field appearance="outline">
+      <form [formGroup]="form" id="clientForm" (ngSubmit)="submit()" class="dlg-form">
+        <mat-form-field appearance="outline" class="dlg-field">
           <mat-label>Full Name</mat-label>
-          <input matInput formControlName="name" />
+          <input matInput formControlName="name" placeholder="e.g. Jane Smith" />
           @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
             <mat-error>Name is required</mat-error>
           }
         </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Email</mat-label>
-          <input matInput type="email" formControlName="email" />
-          <mat-hint>Must match the client's Google account email</mat-hint>
+
+        <mat-form-field appearance="outline" class="dlg-field dlg-field-email">
+          <mat-label>Email Address</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="e.g. jane@example.com" />
+          <mat-hint>Must match the email the client used when registering their account</mat-hint>
           @if (form.get('email')?.hasError('required') && form.get('email')?.touched) {
             <mat-error>Email is required</mat-error>
           }
@@ -38,20 +46,85 @@ export interface AdminClientDialogData {
             <mat-error>Enter a valid email address</mat-error>
           }
         </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Phone (optional)</mat-label>
-          <input matInput formControlName="phone" />
+
+        <mat-form-field appearance="outline" class="dlg-field">
+          <mat-label>Phone</mat-label>
+          <input matInput formControlName="phone" placeholder="Optional" />
         </mat-form-field>
       </form>
     </mat-dialog-content>
-    <mat-dialog-actions align="end">
-      <button mat-button [mat-dialog-close]="null">Cancel</button>
-      <button mat-flat-button color="primary" form="clientForm" type="submit">
-        {{ isEdit ? 'Save' : 'Add Client' }}
+
+    <mat-dialog-actions class="dlg-actions">
+      <button mat-button class="dlg-cancel" [mat-dialog-close]="null">Cancel</button>
+      <button mat-flat-button color="primary" class="dlg-submit" form="clientForm" type="submit">
+        {{ isEdit ? 'Save Changes' : 'Add Client' }}
       </button>
     </mat-dialog-actions>
   `,
-  styles: [`.dialog-form { display: flex; flex-direction: column; gap: 8px; min-width: 320px; padding-top: 8px; }`],
+  styles: [`
+    .dlg-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 24px 24px 0;
+    }
+    .dlg-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: #0f172a;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .dlg-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.2;
+    }
+    .dlg-subtitle {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+    .dlg-form {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      min-width: 340px;
+      padding-top: 4px;
+    }
+    .dlg-field {
+      width: 100%;
+    }
+    /* ::ng-deep needed — mat-hint renders inside Material's shadow DOM */
+    .dlg-field-email ::ng-deep .mat-mdc-form-field-hint {
+      color: #38bdf8;
+      font-size: 11.5px;
+    }
+    .dlg-actions {
+      padding: 8px 24px 20px !important;
+      gap: 8px;
+      justify-content: flex-end !important;
+    }
+    .dlg-cancel {
+      color: #64748b !important;
+    }
+    .dlg-submit {
+      background: #0f172a !important;
+      color: #38bdf8 !important;
+      font-weight: 700 !important;
+      border-radius: 8px !important;
+      padding: 0 20px !important;
+    }
+    .dlg-submit:hover {
+      background: #1e293b !important;
+    }
+  `],
 })
 export class AdminClientDialogComponent {
   private data = inject<AdminClientDialogData>(MAT_DIALOG_DATA);

@@ -1,8 +1,10 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+
+const PAGE_SIZE = 20;
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { take } from 'rxjs/operators';
 import { AdminClientsService } from '../../../core/services/admin-clients.service';
 import { ClientDto } from '../../../core/models/client.model';
@@ -20,8 +22,35 @@ export class AdminClientsComponent implements OnInit {
   private adminClientsService = inject(AdminClientsService);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
+  private router = inject(Router);
 
   clients = signal<ClientDto[]>([]);
+  nameFilter = signal<string>('');
+  emailFilter = signal<string>('');
+  page = signal<number>(1);
+  readonly pageSize = PAGE_SIZE;
+
+  filteredClients = computed<ClientDto[]>(() => {
+    const name = this.nameFilter().trim().toLowerCase();
+    const email = this.emailFilter().trim().toLowerCase();
+    return this.clients().filter(c => {
+      const nameOk = !name || c.name.toLowerCase().includes(name);
+      const emailOk = !email || (c.email ?? '').toLowerCase().includes(email);
+      return nameOk && emailOk;
+    });
+  });
+
+  pagedClients = computed<ClientDto[]>(() => {
+    const start = (this.page() - 1) * PAGE_SIZE;
+    return this.filteredClients().slice(start, start + PAGE_SIZE);
+  });
+
+  totalPages = computed<number>(() => {
+    return Math.max(1, Math.ceil(this.filteredClients().length / PAGE_SIZE));
+  });
+
+  isFirstPage = computed<boolean>(() => this.page() === 1);
+  isLastPage = computed<boolean>(() => this.page() >= this.totalPages());
 
   ngOnInit(): void {
     this.load();
@@ -32,6 +61,24 @@ export class AdminClientsComponent implements OnInit {
       next: (list) => this.clients.set(list),
       error: () => this.snackBar.open('Failed to load clients.', 'OK'),
     });
+  }
+
+  onNameFilterInput(value: string): void {
+    this.nameFilter.set(value);
+    this.page.set(1);
+  }
+
+  onEmailFilterInput(value: string): void {
+    this.emailFilter.set(value);
+    this.page.set(1);
+  }
+
+  nextPage(): void {
+    if (!this.isLastPage()) this.page.update(p => p + 1);
+  }
+
+  prevPage(): void {
+    if (!this.isFirstPage()) this.page.update(p => p - 1);
   }
 
   openAddDialog(): void {
@@ -50,6 +97,10 @@ export class AdminClientsComponent implements OnInit {
       .subscribe((result: ClientDto | null) => {
         if (result) this.clients.update(list => list.map(c => c.id === result.id ? result : c));
       });
+  }
+
+  openDocuments(client: ClientDto): void {
+    this.router.navigate(['/admin/clients', client.id, 'documents']);
   }
 
   confirmDelete(client: ClientDto): void {

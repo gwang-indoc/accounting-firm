@@ -1,0 +1,46 @@
+<div class="admin-client-docs">
+  <a class="back-link" data-testid="back-to-clients-link" routerLink="/admin/clients">← Back to Clients</a>
+
+  <header class="page-header">
+    <h1 class="page-title">
+      Documents
+      @if (client(); as c) {
+        <span class="client-name">— {{ c.name }}</span>
+      }
+    </h1>
+    <p class="page-subtitle">Upload, download, and delete documents for this client by tax year.</p>
+  </header>
+
+  <div class="controls">
+    <label class="year-label">
+      Tax Year:
+      <select data-testid="year-select" class="year-select"
+              (change)="onYearChange($any($event.target).value)">
+        @for (y of yearOptions; track y) {
+          <option [value]="y" [selected]="y === selectedYear()">{{ y }}</option>
+        }
+      </select>
+    </label>
+    <span class="doc-count">· {{ documents().length }} document{{ documents().length === 1 ? '' : 's' }}</span>
+
+    <div class="spacer"></div>
+
+    <label class="upload-btn">
+      Upload
+      <input type="file"
+             data-testid="admin-upload-input"
+             accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls,.csv,.doc,.docx"
+             (change)="onFileSelected($event)" />
+    </label>
+  </div>
+
+  @for (doc of documents(); track doc.id) {
+    <div data-testid="admin-doc-row" class="doc-row">
+      <span class="doc-filename">{{ doc.filename }}</span>
+      <a data-testid="admin-download-link" class="download-link" [attr.href]="downloadHref(doc.id)" download>Download</a>
+      <button data-testid="admin-delete-doc-btn" class="delete-btn" (click)="confirmDelete(doc)">Delete</button>
+    </div>
+  } @empty {
+    <p class="empty-state">No documents for {{ selectedYear() }}.</p>
+  }
+</div>

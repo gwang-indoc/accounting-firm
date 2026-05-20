@@ -51,4 +51,10 @@ export const routes: Routes = [
       import('./features/admin/clients/admin-clients.component').then(m => m.AdminClientsComponent),
     canActivate: [authGuard, adminGuard],
   },
+  {
+    path: 'admin/clients/:id/documents',
+    loadComponent: () =>
+      import('./features/admin/client-documents/admin-client-documents.component').then(m => m.AdminClientDocumentsComponent),
+    canActivate: [authGuard, adminGuard],
+  },
 ];

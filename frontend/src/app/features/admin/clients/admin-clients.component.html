@@ -2,10 +2,35 @@
   <div class="page-header">
     <div>
       <h1 class="page-title">Clients</h1>
-      <p class="page-subtitle">{{ clients().length }} record{{ clients().length === 1 ? '' : 's' }}</p>
+      <p class="page-subtitle">{{ clients().length }} total client{{ clients().length === 1 ? '' : 's' }}</p>
     </div>
-    <button mat-flat-button color="primary" data-testid="add-client-btn" (click)="openAddDialog()">
-      + Add Client
+  </div>
+
+  <div class="filters">
+    <div class="filter-field">
+      <span class="filter-icon">⌕</span>
+      <input data-testid="filter-name"
+             class="filter-input"
+             placeholder="Search by name…"
+             [value]="nameFilter()"
+             (input)="onNameFilterInput($any($event.target).value)" />
+    </div>
+    <div class="filter-field">
+      <span class="filter-icon">@</span>
+      <input data-testid="filter-email"
+             class="filter-input"
+             placeholder="Search by email…"
+             [value]="emailFilter()"
+             (input)="onEmailFilterInput($any($event.target).value)" />
+    </div>
+  </div>
+
+  <div class="table-toolbar">
+    <span class="result-count">
+      {{ filteredClients().length }} of {{ clients().length }} record{{ clients().length === 1 ? '' : 's' }}
+    </span>
+    <button mat-flat-button color="primary" class="add-btn" data-testid="add-client-btn" (click)="openAddDialog()">
+      <span class="add-icon">+</span> Add Client
     </button>
   </div>
 
@@ -21,11 +46,11 @@
         </tr>
       </thead>
       <tbody>
-        @for (client of clients(); track client.id) {
+        @for (client of pagedClients(); track client.id) {
           <tr data-testid="client-row">
             <td class="name-cell">{{ client.name }}</td>
-            <td>{{ client.email ?? '—' }}</td>
-            <td>{{ client.phone ?? '—' }}</td>
+            <td class="muted-cell">{{ client.email ?? '—' }}</td>
+            <td class="muted-cell">{{ client.phone ?? '—' }}</td>
             <td>
               @if (client.linkedUserId) {
                 <span class="badge badge-linked">Linked</span>
@@ -34,18 +59,33 @@
               }
             </td>
             <td class="actions-cell">
-              <button mat-button color="primary" (click)="openEditDialog(client)">Edit</button>
-              <button mat-button color="warn" (click)="confirmDelete(client)">Delete</button>
+              <button mat-button class="action-btn action-edit" (click)="openEditDialog(client)">Edit</button>
+              <button mat-button class="action-btn action-delete" (click)="confirmDelete(client)">Delete</button>
+              <button mat-button class="action-btn action-docs" data-testid="client-documents-btn" (click)="openDocuments(client)">Documents</button>
             </td>
           </tr>
         } @empty {
           <tr>
-            <td colspan="5" class="empty-cell">No clients yet. Click "+ Add Client" to create one.</td>
+            <td colspan="5" class="empty-cell">
+              @if (clients().length === 0) {
+                No clients yet — click <strong>+ Add Client</strong> to create one.
+              } @else {
+                No clients match your search.
+              }
+            </td>
           </tr>
         }
       </tbody>
     </table>
   </div>
+
+  @if (filteredClients().length > pageSize) {
+    <div class="pagination">
+      <button mat-stroked-button data-testid="prev-page-btn" [disabled]="isFirstPage()" (click)="prevPage()">← Prev</button>
+      <span class="page-indicator" data-testid="page-indicator">Page {{ page() }} of {{ totalPages() }}</span>
+      <button mat-stroked-button data-testid="next-page-btn" [disabled]="isLastPage()" (click)="nextPage()">Next →</button>
+    </div>
+  }
 
   <a mat-button routerLink="/portal/dashboard" class="back-link">← Back to Portal</a>
 </div>
