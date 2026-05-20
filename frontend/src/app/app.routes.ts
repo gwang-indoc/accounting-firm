@@ -31,6 +31,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'portal/messages',
+    loadComponent: () =>
+      import('./features/client-portal/messages/portal-inbox.component').then(m => m.PortalInboxComponent),
+    canActivate: [authGuard],
+  },
+  {
     path: 'login',
     loadComponent: () =>
       import('./features/auth/login/login.component').then(m => m.LoginComponent),
