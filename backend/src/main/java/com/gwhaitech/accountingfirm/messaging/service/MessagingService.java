@@ -103,6 +103,33 @@ public class MessagingService {
         return toMessageDto(m);
     }
 
+    @Transactional
+    public MessageThreadDto getThreadAsAdmin(Long threadId) {
+        var t = threadRepo.findById(threadId)
+                .orElseThrow(() -> new com.gwhaitech.accountingfirm.messaging.exception.ThreadNotFoundException(threadId));
+        if (t.getAdminUnreadCount() != 0) {
+            t.setAdminUnreadCount(0);
+            threadRepo.save(t);
+        }
+        var msgs = messageRepo.findByThreadIdOrderBySentAtAsc(threadId)
+                .stream().map(this::toMessageDto).toList();
+        return toThreadDto(t, msgs);
+    }
+
+    @Transactional
+    public MessageThreadDto getThreadAsClient(Long threadId, Long callerUserId) {
+        var t = threadRepo.findById(threadId)
+                .orElseThrow(() -> new com.gwhaitech.accountingfirm.messaging.exception.ThreadNotFoundException(threadId));
+        verifyClientOwnsThread(callerUserId, t);
+        if (t.getClientUnreadCount() != 0) {
+            t.setClientUnreadCount(0);
+            threadRepo.save(t);
+        }
+        var msgs = messageRepo.findByThreadIdOrderBySentAtAsc(threadId)
+                .stream().map(this::toMessageDto).toList();
+        return toThreadDto(t, msgs);
+    }
+
     private void verifyClientOwnsThread(Long callerUserId, MessageThread t) {
         var c = clientRepo.findByUserId(callerUserId)
                 .orElseThrow(com.gwhaitech.accountingfirm.messaging.exception.NoLinkedClientException::new);

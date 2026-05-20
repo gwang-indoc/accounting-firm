@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -151,6 +152,56 @@ class MessagingServiceTest {
 
         org.assertj.core.api.Assertions.assertThatThrownBy(
                 () -> service.postClientReply(50L, "x", 99L))
+            .isInstanceOf(com.gwhaitech.accountingfirm.messaging.exception.ThreadForbiddenException.class);
+    }
+
+    @Test
+    void getThreadAsAdmin_zerosAdminUnread_returnsAllMessagesOrdered() {
+        MessageThread t = new MessageThread();
+        t.setClientId(7L); t.setSubject("x");
+        t.setAdminUnreadCount(3); t.setClientUnreadCount(2);
+        var spied = spy(t); when(spied.getId()).thenReturn(50L);
+        when(threadRepo.findById(50L)).thenReturn(Optional.of(spied));
+        Message m1 = new Message(); m1.setBody("a");
+        Message m2 = new Message(); m2.setBody("b");
+        when(messageRepo.findByThreadIdOrderBySentAtAsc(50L)).thenReturn(java.util.List.of(m1, m2));
+        when(threadRepo.save(any(MessageThread.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        MessageThreadDto dto = service.getThreadAsAdmin(50L);
+
+        assertThat(spied.getAdminUnreadCount()).isEqualTo(0);
+        assertThat(spied.getClientUnreadCount()).isEqualTo(2);
+        verify(threadRepo).save(spied);
+        assertThat(dto.messages()).hasSize(2);
+        assertThat(dto.messages()).extracting(MessageDto::body).containsExactly("a", "b");
+    }
+
+    @Test
+    void getThreadAsClient_whenOwner_zerosClientUnread_returnsMessages() {
+        Client client = new Client(); client.setId(7L); client.setUserId(99L);
+        MessageThread t = new MessageThread();
+        t.setClientId(7L); t.setSubject("x"); t.setClientUnreadCount(5); t.setAdminUnreadCount(1);
+        var spied = spy(t); when(spied.getId()).thenReturn(50L);
+        when(threadRepo.findById(50L)).thenReturn(Optional.of(spied));
+        when(clientRepo.findByUserId(99L)).thenReturn(Optional.of(client));
+        when(messageRepo.findByThreadIdOrderBySentAtAsc(50L)).thenReturn(java.util.List.of());
+        when(threadRepo.save(any(MessageThread.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        service.getThreadAsClient(50L, 99L);
+
+        assertThat(spied.getClientUnreadCount()).isEqualTo(0);
+        assertThat(spied.getAdminUnreadCount()).isEqualTo(1);
+    }
+
+    @Test
+    void getThreadAsClient_whenNotOwner_throwsForbidden() {
+        Client client = new Client(); client.setId(8L); client.setUserId(99L);
+        MessageThread t = new MessageThread(); t.setClientId(7L); t.setSubject("x");
+        var spied = spy(t); when(spied.getId()).thenReturn(50L);
+        when(threadRepo.findById(50L)).thenReturn(Optional.of(spied));
+        when(clientRepo.findByUserId(99L)).thenReturn(Optional.of(client));
+        org.assertj.core.api.Assertions.assertThatThrownBy(
+                () -> service.getThreadAsClient(50L, 99L))
             .isInstanceOf(com.gwhaitech.accountingfirm.messaging.exception.ThreadForbiddenException.class);
     }
 }
