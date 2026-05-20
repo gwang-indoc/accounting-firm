@@ -77,6 +77,20 @@
   text-decoration: none;
 }
 
+.nav-badge {
+  display: inline-block;
+  margin-left: 5px;
+  padding: 0 6px;
+  height: 16px;
+  line-height: 16px;
+  background: #38bdf8;
+  color: #0f172a;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 10px;
+  vertical-align: 1px;
+}
+
 .lang-toggle {
   display: flex;
   gap: 4px;

@@ -2,9 +2,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
 import { EventEmitter } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
+import { of } from 'rxjs';
 import { vi } from 'vitest';
 import { NavbarComponent } from './navbar.component';
 import { AuthService } from '../../core/services/auth.service';
+import { PortalMessagesService } from '../../core/services/portal-messages.service';
 
 function mockSidenav() {
   return { toggle: vi.fn(), opened: false, openedChange: new EventEmitter<boolean>() } as any;
@@ -177,5 +179,55 @@ describe('NavbarComponent', () => {
     const nativeEl = fixture.nativeElement as HTMLElement;
     expect(nativeEl.querySelector('[data-testid="logout-btn"]')).not.toBeNull();
     expect(nativeEl.querySelector('[data-testid="client-login-btn"]')).toBeNull();
+  });
+});
+
+describe('Messages navigation', () => {
+  let fixture: ComponentFixture<NavbarComponent>;
+  let component: NavbarComponent;
+
+  function setupWithUnreadCount(unreadCount: number) {
+    const mockPortalMessagesService = {
+      getUnreadCount: vi.fn().mockReturnValue(of({ unreadCount })),
+    };
+    TestBed.configureTestingModule({
+      imports: [NavbarComponent, RouterModule.forRoot([])],
+      providers: [
+        provideHttpClient(),
+        { provide: PortalMessagesService, useValue: mockPortalMessagesService },
+      ],
+    });
+    fixture = TestBed.createComponent(NavbarComponent);
+    component = fixture.componentInstance;
+    const authService = TestBed.inject(AuthService);
+    authService.currentUser.set({ id: 1, email: 'a@b.com', name: 'Alice', role: 'USER' });
+    fixture.detectChanges();
+  }
+
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  });
+
+  it('renders Messages link with routerLink /portal/messages', () => {
+    setupWithUnreadCount(0);
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    const link = nativeEl.querySelector('[data-testid="messages-nav-link"]');
+    expect(link).not.toBeNull();
+    expect(link!.getAttribute('routerLink')).toBe('/portal/messages');
+  });
+
+  it('shows unread badge when count > 0 and hides it when count is 0', async () => {
+    // Badge visible when count > 0
+    setupWithUnreadCount(3);
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    const badge = nativeEl.querySelector('[data-testid="messages-unread-badge"]');
+    expect(badge).not.toBeNull();
+    expect(badge!.textContent?.trim()).toBe('3');
+
+    // Reset and re-setup with count 0
+    TestBed.resetTestingModule();
+    setupWithUnreadCount(0);
+    const noBadge = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="messages-unread-badge"]');
+    expect(noBadge).toBeNull();
   });
 });
