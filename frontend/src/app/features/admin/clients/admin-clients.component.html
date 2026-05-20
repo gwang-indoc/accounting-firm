@@ -1,0 +1,51 @@
+<div class="admin-clients">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Clients</h1>
+      <p class="page-subtitle">{{ clients().length }} record{{ clients().length === 1 ? '' : 's' }}</p>
+    </div>
+    <button mat-flat-button color="primary" data-testid="add-client-btn" (click)="openAddDialog()">
+      + Add Client
+    </button>
+  </div>
+
+  <div class="table-card">
+    <table class="clients-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Portal Link</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (client of clients(); track client.id) {
+          <tr data-testid="client-row">
+            <td class="name-cell">{{ client.name }}</td>
+            <td>{{ client.email ?? '—' }}</td>
+            <td>{{ client.phone ?? '—' }}</td>
+            <td>
+              @if (client.linkedUserId) {
+                <span class="badge badge-linked">Linked</span>
+              } @else {
+                <span class="badge badge-unlinked">Not linked</span>
+              }
+            </td>
+            <td class="actions-cell">
+              <button mat-button color="primary" (click)="openEditDialog(client)">Edit</button>
+              <button mat-button color="warn" (click)="confirmDelete(client)">Delete</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="empty-cell">No clients yet. Click "+ Add Client" to create one.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <a mat-button routerLink="/portal/dashboard" class="back-link">← Back to Portal</a>
+</div>
