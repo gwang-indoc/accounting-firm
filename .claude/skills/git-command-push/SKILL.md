@@ -1,6 +1,7 @@
 ---
 name: Git Commit and Push
 description: Stage all changes (including new files), commit with a descriptive message, and push to GitHub. Use this skill when the user asks to commit, push, or save changes to git.
+model: haiku
 ---
 
 # Git Commit and Push Skill

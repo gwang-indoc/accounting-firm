@@ -2,6 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
 import { DocumentsComponent } from './documents.component';
 import { MyDocumentsResponse } from '../../../core/models/my-documents';
 
@@ -25,7 +26,7 @@ describe('DocumentsComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [DocumentsComponent],
-      providers: [provideZonelessChangeDetection(), provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideZonelessChangeDetection(), provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
     fixture = TestBed.createComponent(DocumentsComponent);
     component = fixture.componentInstance;
@@ -34,6 +35,15 @@ describe('DocumentsComponent', () => {
   });
 
   afterEach(() => httpMock.verify());
+
+  it('renders a back link to the dashboard', async () => {
+    httpMock.expectOne('/api/me/documents').flush(linkedResponse());
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const link = fixture.nativeElement.querySelector('[data-testid="back-to-dashboard-link"]');
+    expect(link).not.toBeNull();
+    expect(link.getAttribute('routerLink')).toBe('/portal/dashboard');
+  });
 
   it('renders not-set-up empty state when linked is false', async () => {
     httpMock.expectOne('/api/me/documents').flush({ linked: false, clientName: null, documents: [] });
@@ -135,6 +145,7 @@ describe('DocumentsComponent — upload', () => {
       imports: [DocumentsComponent],
       providers: [
         provideZonelessChangeDetection(),
+        provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
       ],

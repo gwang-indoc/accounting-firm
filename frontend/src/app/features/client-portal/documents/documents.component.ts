@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, computed, signal, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
@@ -11,7 +12,7 @@ import { MyDocumentItem, MyDocumentsResponse } from '../../../core/models/my-doc
 @Component({
   selector: 'app-documents',
   standalone: true,
-  imports: [MatIconModule, MatButtonModule, MatChipsModule],
+  imports: [RouterLink, MatIconModule, MatButtonModule, MatChipsModule],
   templateUrl: './documents.component.html',
   styleUrl: './documents.component.css',
 })
