@@ -4,9 +4,11 @@ import com.gwhaitech.accountingfirm.client.domain.ClientRepository;
 import com.gwhaitech.accountingfirm.client.exception.ClientNotFoundException;
 import com.gwhaitech.accountingfirm.messaging.domain.*;
 import com.gwhaitech.accountingfirm.messaging.dto.*;
+import com.gwhaitech.accountingfirm.messaging.event.MessagePostedEvent;
 import com.gwhaitech.accountingfirm.messaging.exception.NoLinkedClientException;
 import com.gwhaitech.accountingfirm.messaging.exception.ThreadForbiddenException;
 import com.gwhaitech.accountingfirm.messaging.exception.ThreadNotFoundException;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,13 +21,16 @@ public class MessagingService {
     private final MessageThreadRepository threadRepo;
     private final MessageRepository messageRepo;
     private final ClientRepository clientRepo;
+    private final ApplicationEventPublisher eventPublisher;
 
     public MessagingService(MessageThreadRepository threadRepo,
                             MessageRepository messageRepo,
-                            ClientRepository clientRepo) {
+                            ClientRepository clientRepo,
+                            ApplicationEventPublisher eventPublisher) {
         this.threadRepo = threadRepo;
         this.messageRepo = messageRepo;
         this.clientRepo = clientRepo;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -46,6 +51,7 @@ public class MessagingService {
         m.setSenderUserId(adminUserId);
         m.setBody(body);
         messageRepo.save(m);
+        eventPublisher.publishEvent(new MessagePostedEvent(saved, m));
 
         return toThreadDto(saved, List.of(toMessageDto(m)));
     }
@@ -67,6 +73,7 @@ public class MessagingService {
         m.setSenderUserId(callerUserId);
         m.setBody(body);
         messageRepo.save(m);
+        eventPublisher.publishEvent(new MessagePostedEvent(saved, m));
 
         return toThreadDto(saved, java.util.List.of(toMessageDto(m)));
     }
@@ -88,6 +95,7 @@ public class MessagingService {
         m.setSenderUserId(adminUserId);
         m.setBody(body);
         messageRepo.save(m);
+        eventPublisher.publishEvent(new MessagePostedEvent(t, m));
         return toMessageDto(m);
     }
 
@@ -106,6 +114,7 @@ public class MessagingService {
         m.setSenderUserId(callerUserId);
         m.setBody(body);
         messageRepo.save(m);
+        eventPublisher.publishEvent(new MessagePostedEvent(t, m));
         return toMessageDto(m);
     }
 

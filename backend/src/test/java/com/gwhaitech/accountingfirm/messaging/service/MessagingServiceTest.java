@@ -4,9 +4,11 @@ import com.gwhaitech.accountingfirm.client.domain.Client;
 import com.gwhaitech.accountingfirm.client.domain.ClientRepository;
 import com.gwhaitech.accountingfirm.messaging.domain.*;
 import com.gwhaitech.accountingfirm.messaging.dto.*;
+import com.gwhaitech.accountingfirm.messaging.event.MessagePostedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -20,6 +22,7 @@ class MessagingServiceTest {
     private MessageThreadRepository threadRepo;
     private MessageRepository messageRepo;
     private ClientRepository clientRepo;
+    private ApplicationEventPublisher eventPublisher;
     private MessagingService service;
 
     @BeforeEach
@@ -27,7 +30,8 @@ class MessagingServiceTest {
         threadRepo = mock(MessageThreadRepository.class);
         messageRepo = mock(MessageRepository.class);
         clientRepo = mock(ClientRepository.class);
-        service = new MessagingService(threadRepo, messageRepo, clientRepo);
+        eventPublisher = mock(ApplicationEventPublisher.class);
+        service = new MessagingService(threadRepo, messageRepo, clientRepo, eventPublisher);
     }
 
     @Test
@@ -252,5 +256,81 @@ class MessagingServiceTest {
         when(clientRepo.findByUserId(99L)).thenReturn(Optional.empty());
         int count = service.getPortalUnreadCount(99L);
         assertThat(count).isEqualTo(0);
+    }
+
+    @Test
+    void createThreadAsAdmin_publishesEvent() {
+        Client client = new Client();
+        client.setId(7L); client.setName("Jane");
+        when(clientRepo.findById(7L)).thenReturn(Optional.of(client));
+        when(threadRepo.save(any(MessageThread.class))).thenAnswer(inv -> {
+            MessageThread t = inv.getArgument(0);
+            t = spy(t); when(t.getId()).thenReturn(100L); return t;
+        });
+        when(messageRepo.save(any(Message.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        service.createThreadAsAdmin(7L, "Tax filing", "Hi Jane", 42L);
+
+        ArgumentCaptor<MessagePostedEvent> captor = ArgumentCaptor.forClass(MessagePostedEvent.class);
+        verify(eventPublisher).publishEvent(captor.capture());
+        MessagePostedEvent event = captor.getValue();
+        assertThat(event.thread().getSubject()).isEqualTo("Tax filing");
+        assertThat(event.message().getBody()).isEqualTo("Hi Jane");
+    }
+
+    @Test
+    void createThreadAsClient_publishesEvent() {
+        Client client = new Client(); client.setId(7L); client.setUserId(99L); client.setName("Jane");
+        when(clientRepo.findByUserId(99L)).thenReturn(Optional.of(client));
+        when(threadRepo.save(any(MessageThread.class))).thenAnswer(inv -> {
+            MessageThread t = inv.getArgument(0);
+            t = spy(t); when(t.getId()).thenReturn(200L); return t;
+        });
+        when(messageRepo.save(any(Message.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        service.createThreadAsClient(99L, "Question", "I have a question");
+
+        ArgumentCaptor<MessagePostedEvent> captor = ArgumentCaptor.forClass(MessagePostedEvent.class);
+        verify(eventPublisher).publishEvent(captor.capture());
+        MessagePostedEvent event = captor.getValue();
+        assertThat(event.thread().getSubject()).isEqualTo("Question");
+        assertThat(event.message().getBody()).isEqualTo("I have a question");
+    }
+
+    @Test
+    void postAdminReply_publishesEvent() {
+        MessageThread existing = new MessageThread();
+        existing.setClientId(7L); existing.setSubject("Tax filing"); existing.setClientUnreadCount(0);
+        existing.setLastMessageAt(LocalDateTime.now().minusDays(1));
+        var spied = spy(existing); when(spied.getId()).thenReturn(50L);
+        when(threadRepo.findById(50L)).thenReturn(Optional.of(spied));
+        when(messageRepo.save(any(Message.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        service.postAdminReply(7L, 50L, "Got it", 42L);
+
+        ArgumentCaptor<MessagePostedEvent> captor = ArgumentCaptor.forClass(MessagePostedEvent.class);
+        verify(eventPublisher).publishEvent(captor.capture());
+        MessagePostedEvent event = captor.getValue();
+        assertThat(event.thread().getSubject()).isEqualTo("Tax filing");
+        assertThat(event.message().getBody()).isEqualTo("Got it");
+    }
+
+    @Test
+    void postClientReply_publishesEvent() {
+        Client client = new Client(); client.setId(7L); client.setUserId(99L);
+        MessageThread t = new MessageThread();
+        t.setClientId(7L); t.setSubject("Tax filing"); t.setAdminUnreadCount(0);
+        var spied = spy(t); when(spied.getId()).thenReturn(50L);
+        when(threadRepo.findById(50L)).thenReturn(Optional.of(spied));
+        when(clientRepo.findByUserId(99L)).thenReturn(Optional.of(client));
+        when(messageRepo.save(any(Message.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        service.postClientReply(50L, "My reply", 99L);
+
+        ArgumentCaptor<MessagePostedEvent> captor = ArgumentCaptor.forClass(MessagePostedEvent.class);
+        verify(eventPublisher).publishEvent(captor.capture());
+        MessagePostedEvent event = captor.getValue();
+        assertThat(event.thread().getSubject()).isEqualTo("Tax filing");
+        assertThat(event.message().getBody()).isEqualTo("My reply");
     }
 }
