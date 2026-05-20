@@ -12,6 +12,9 @@
     <a mat-button href="#security">Security</a>
     @if (authService.isAuthenticated()) {
       <span class="nav-user-name">{{ authService.currentUser()?.name }}</span>
+      @if (authService.currentUser()?.role === 'ADMIN') {
+        <a mat-button routerLink="/admin/clients" data-testid="admin-nav-link">Admin</a>
+      }
       <button mat-button data-testid="logout-btn" (click)="logout()">Logout</button>
     } @else {
       <a mat-button routerLink="/login" data-testid="client-login-btn">Client Login</a>
