@@ -63,47 +63,66 @@ test.describe('Admin ↔ Client messaging roundtrip', () => {
     // ── Step 1: Admin login + /admin/clients — no badge initially ─────────────
     await fakeAdminAuth(page);
 
+    await page.route('**/api/clients/unread-counts', route => route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    }));
+
     await page.route('**/api/clients', route => route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify([{ ...TEST_CLIENT, unreadMessageCount: 0 }]),
+      body: JSON.stringify([TEST_CLIENT]),
     }));
 
     await page.goto('/admin/clients');
     await expect(page.getByTestId('client-row')).toHaveCount(1);
-    await expect(page.getByTestId('client-row').first()).not.toContainText('Messages·');
+    // No unread badge initially
+    await expect(page.getByTestId('client-messages-badge')).toHaveCount(0);
 
     // ── Step 2: Open thread list for client ───────────────────────────────────
-    await page.route('**/api/clients/7/messages', async route => {
+    await page.route('**/api/clients/7/threads', async route => {
       if (route.request().method() === 'GET') {
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
-          body: JSON.stringify(threads),
+          body: JSON.stringify(threads.map((t: any) => ({
+            id: t.id,
+            clientId: 7,
+            subject: t.subject,
+            lastMessageAt: t.lastMessageAt,
+            unreadCount: t.adminUnreadCount ?? 0,
+            lastMessagePreview: messagesByThread[t.id]?.length
+              ? (messagesByThread[t.id][messagesByThread[t.id].length - 1] as any).body.slice(0, 80)
+              : '',
+          }))),
         });
       } else if (route.request().method() === 'POST') {
         const body = JSON.parse(route.request().postData() || '{}');
-        const thread = {
-          id: nextThreadId,
+        const id = nextThreadId++;
+        const thread: any = {
+          id,
+          clientId: 7,
           subject: body.subject,
           createdAt: '2026-05-20T10:00:00',
-          unreadCount: 0,
-          lastMessage: body.body,
+          lastMessageAt: '2026-05-20T10:00:00',
+          adminUnreadCount: 0,
+          clientUnreadCount: 1,
+          messages: [],
         };
-        messagesByThread[nextThreadId] = [{
+        messagesByThread[id] = [{
           id: nextMessageId++,
-          threadId: nextThreadId,
-          senderName: 'Admin',
-          senderRole: 'ADMIN',
+          threadId: id,
+          senderType: 'ADMIN',
+          senderUserId: 1,
           body: body.body,
           sentAt: '2026-05-20T10:00:00',
         }];
         threads.push(thread);
-        nextThreadId++;
         await route.fulfill({
           status: 201,
           contentType: 'application/json',
-          body: JSON.stringify(thread),
+          body: JSON.stringify({ ...thread, messages: messagesByThread[id] }),
         });
       }
     });
@@ -115,32 +134,21 @@ test.describe('Admin ↔ Client messaging roundtrip', () => {
     // ── Step 3: Create new thread ─────────────────────────────────────────────
     await page.getByTestId('new-thread-btn').click();
     await page.getByLabel('Subject').fill('E2E Tax Thread');
-    await page.getByLabel('Message').fill('Hello from admin');
-    await page.getByRole('button', { name: 'Send' }).click();
+    await page.getByLabel('Your message').fill('Hello from admin');
+    await page.getByRole('button', { name: 'Send Message' }).click();
 
     await expect(page.getByTestId('thread-row')).toHaveCount(1);
     await expect(page.getByTestId('thread-row').first()).toContainText('E2E Tax Thread');
 
     // ── Step 4: Open thread and verify sent message ───────────────────────────
-    await page.route('**/api/clients/7/messages/1', async route => {
-      if (route.request().method() === 'GET') {
-        const thread = threads.find((t: any) => t.id === 1) as any;
-        if (thread) thread.unreadCount = 0;
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            thread: threads.find((t: any) => t.id === 1),
-            messages: messagesByThread[1] || [],
-          }),
-        });
-      } else if (route.request().method() === 'POST') {
+    await page.route('**/api/clients/7/threads/1/messages', async route => {
+      if (route.request().method() === 'POST') {
         const body = JSON.parse(route.request().postData() || '{}');
-        const msg = {
+        const msg: any = {
           id: nextMessageId++,
           threadId: 1,
-          senderName: 'Admin',
-          senderRole: 'ADMIN',
+          senderType: 'ADMIN',
+          senderUserId: 1,
           body: body.body,
           sentAt: '2026-05-20T10:01:00',
         };
@@ -153,27 +161,47 @@ test.describe('Admin ↔ Client messaging roundtrip', () => {
       }
     });
 
+    await page.route('**/api/clients/7/threads/1', async route => {
+      if (route.request().method() === 'GET') {
+        const thread = threads.find((t: any) => t.id === 1) as any;
+        if (thread) thread.adminUnreadCount = 0;
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ ...thread, messages: messagesByThread[1] || [] }),
+        });
+      }
+    });
+
     await page.getByTestId('thread-row').first().click();
     await expect(page).toHaveURL('/admin/clients/7/messages/1');
-    await expect(page.getByTestId('message-item')).toHaveCount(1);
-    await expect(page.getByTestId('message-item').first()).toContainText('Hello from admin');
+    await expect(page.locator('.bubble')).toHaveCount(1);
+    await expect(page.locator('.bubble').first()).toContainText('Hello from admin');
 
     // ── Step 5: Switch to client session ─────────────────────────────────────
-    // Clear admin routes and cookies, set up client session
     await page.context().clearCookies();
     await page.unrouteAll({ behavior: 'ignoreErrors' });
 
     await fakeClientAuth(page);
 
-    // Client's portal/messages lists threads for the linked client
-    await page.route('**/api/me/messages', async route => {
+    // Portal routes for messages
+    await page.route('**/api/portal/messages/unread-count', route => route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ unreadCount: 1 }),
+    }));
+
+    await page.route('**/api/portal/threads', async route => {
       if (route.request().method() === 'GET') {
-        // The admin's thread should appear unread for the client
         const clientThreads = threads.map((t: any) => ({
-          ...t,
-          unreadCount: messagesByThread[t.id]
-            ? messagesByThread[t.id].filter((m: any) => m.senderRole === 'ADMIN').length
-            : 0,
+          id: t.id,
+          clientId: 7,
+          subject: t.subject,
+          lastMessageAt: t.lastMessageAt,
+          unreadCount: (t.clientUnreadCount ?? 0),
+          lastMessagePreview: messagesByThread[t.id]?.length
+            ? (messagesByThread[t.id][messagesByThread[t.id].length - 1] as any).body.slice(0, 80)
+            : '',
         }));
         await route.fulfill({
           status: 200,
@@ -183,30 +211,19 @@ test.describe('Admin ↔ Client messaging roundtrip', () => {
       }
     });
 
-    await page.route('**/api/me/messages/1', async route => {
-      if (route.request().method() === 'GET') {
-        const thread = threads.find((t: any) => t.id === 1) as any;
-        if (thread) thread.unreadCount = 0;
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            thread,
-            messages: messagesByThread[1] || [],
-          }),
-        });
-      } else if (route.request().method() === 'POST') {
+    await page.route('**/api/portal/threads/1/messages', async route => {
+      if (route.request().method() === 'POST') {
         const body = JSON.parse(route.request().postData() || '{}');
-        const msg = {
+        const msg: any = {
           id: nextMessageId++,
           threadId: 1,
-          senderName: 'Test Client',
-          senderRole: 'USER',
+          senderType: 'CLIENT',
+          senderUserId: 42,
           body: body.body,
           sentAt: '2026-05-20T10:02:00',
         };
         messagesByThread[1].push(msg);
-        // Mark admin messages as read by client, thread has 1 unread for admin
+        // Mark thread as having admin unread
         const thread = threads.find((t: any) => t.id === 1) as any;
         if (thread) thread.adminUnreadCount = 1;
         await route.fulfill({
@@ -217,25 +234,37 @@ test.describe('Admin ↔ Client messaging roundtrip', () => {
       }
     });
 
+    await page.route('**/api/portal/threads/1', async route => {
+      if (route.request().method() === 'GET') {
+        const thread = threads.find((t: any) => t.id === 1) as any;
+        if (thread) thread.clientUnreadCount = 0;
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ ...thread, messages: messagesByThread[1] || [] }),
+        });
+      }
+    });
+
     // ── Step 6: Client opens /portal/messages — sees unread badge ─────────────
     await page.goto('/portal/messages');
     await expect(page.getByTestId('thread-row')).toHaveCount(1);
     await expect(page.getByTestId('thread-row').first()).toContainText('E2E Tax Thread');
-    // Unread badge visible (admin sent 1 message, client hasn't read it yet)
-    await expect(page.getByTestId('thread-row').first()).toContainText('1');
+    // Unread badge visible
+    await expect(page.getByTestId('unread-chip')).toHaveCount(1);
 
     // ── Step 7: Client opens thread, sees admin message ───────────────────────
     await page.getByTestId('thread-row').first().click();
     await expect(page).toHaveURL('/portal/messages/1');
-    await expect(page.getByTestId('message-item')).toHaveCount(1);
-    await expect(page.getByTestId('message-item').first()).toContainText('Hello from admin');
+    await expect(page.locator('.bubble')).toHaveCount(1);
+    await expect(page.locator('.bubble').first()).toContainText('Hello from admin');
 
     // ── Step 8: Client replies ────────────────────────────────────────────────
-    await page.getByLabel('Reply').fill('Hi from client');
-    await page.getByRole('button', { name: 'Send' }).click();
+    await page.getByTestId('reply-textarea').fill('Hi from client');
+    await page.getByTestId('send-btn').click();
 
-    await expect(page.getByTestId('message-item')).toHaveCount(2);
-    await expect(page.getByTestId('message-item').nth(1)).toContainText('Hi from client');
+    await expect(page.locator('.bubble')).toHaveCount(2);
+    await expect(page.locator('.bubble').nth(1)).toContainText('Hi from client');
 
     // ── Step 9: Switch back to admin ─────────────────────────────────────────
     await page.context().clearCookies();
@@ -244,34 +273,47 @@ test.describe('Admin ↔ Client messaging roundtrip', () => {
     await fakeAdminAuth(page);
 
     // Clients list now shows unread badge (client replied)
+    await page.route('**/api/clients/unread-counts', route => route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([{ clientId: 7, unreadCount: 1 }]),
+    }));
+
     await page.route('**/api/clients', route => route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify([{ ...TEST_CLIENT, unreadMessageCount: 1 }]),
+      body: JSON.stringify([TEST_CLIENT]),
     }));
 
     await page.goto('/admin/clients');
     await expect(page.getByTestId('client-row')).toHaveCount(1);
-    await expect(page.getByTestId('client-row').first()).toContainText('Messages·1');
+    await expect(page.getByTestId('client-messages-badge')).toHaveCount(1);
+    await expect(page.getByTestId('client-messages-badge').first()).toContainText('1');
 
     // ── Step 10: Admin opens thread, sees reply, badge clears ─────────────────
-    await page.route('**/api/clients/7/messages', route => route.fulfill({
+    await page.route('**/api/clients/7/threads', route => route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify(threads),
+      body: JSON.stringify(threads.map((t: any) => ({
+        id: t.id,
+        clientId: 7,
+        subject: t.subject,
+        lastMessageAt: t.lastMessageAt,
+        unreadCount: t.adminUnreadCount ?? 0,
+        lastMessagePreview: messagesByThread[t.id]?.length
+          ? (messagesByThread[t.id][messagesByThread[t.id].length - 1] as any).body.slice(0, 80)
+          : '',
+      }))),
     }));
 
-    await page.route('**/api/clients/7/messages/1', async route => {
+    await page.route('**/api/clients/7/threads/1', async route => {
       if (route.request().method() === 'GET') {
         const thread = threads.find((t: any) => t.id === 1) as any;
-        if (thread) thread.unreadCount = 0;
+        if (thread) thread.adminUnreadCount = 0;
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
-          body: JSON.stringify({
-            thread,
-            messages: messagesByThread[1] || [],
-          }),
+          body: JSON.stringify({ ...thread, messages: messagesByThread[1] || [] }),
         });
       }
     });
@@ -283,11 +325,11 @@ test.describe('Admin ↔ Client messaging roundtrip', () => {
     await expect(page).toHaveURL('/admin/clients/7/messages/1');
 
     // Both messages visible
-    await expect(page.getByTestId('message-item')).toHaveCount(2);
-    await expect(page.getByTestId('message-item').first()).toContainText('Hello from admin');
-    await expect(page.getByTestId('message-item').nth(1)).toContainText('Hi from client');
+    await expect(page.locator('.bubble')).toHaveCount(2);
+    await expect(page.locator('.bubble').first()).toContainText('Hello from admin');
+    await expect(page.locator('.bubble').nth(1)).toContainText('Hi from client');
 
-    // After viewing, badge should be gone (unreadCount cleared by GET)
+    // After viewing, unread chip should be gone (adminUnreadCount cleared by GET)
     await page.goto('/admin/clients/7/messages');
     const firstThread = page.getByTestId('thread-row').first();
     await expect(firstThread).not.toContainText('·1');

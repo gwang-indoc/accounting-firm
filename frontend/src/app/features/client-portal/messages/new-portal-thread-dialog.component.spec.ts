@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { NewPortalThreadDialogComponent } from './new-portal-thread-dialog.component';
@@ -6,6 +6,7 @@ import { vi } from 'vitest';
 
 describe('NewPortalThreadDialogComponent', () => {
   let component: NewPortalThreadDialogComponent;
+  let fixture: ComponentFixture<NewPortalThreadDialogComponent>;
   let mockDialogRef: any;
 
   beforeEach(async () => {
@@ -19,17 +20,17 @@ describe('NewPortalThreadDialogComponent', () => {
       ],
     }).compileComponents();
 
-    const fixture = TestBed.createComponent(NewPortalThreadDialogComponent);
+    fixture = TestBed.createComponent(NewPortalThreadDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
   it('renders subject and body form fields', () => {
-    const compiled = component.getHostElement();
-    const fields = compiled.querySelectorAll('mat-form-field');
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    const fields = nativeEl.querySelectorAll('mat-form-field');
     expect(fields.length).toBe(2);
 
-    const labels = Array.from(compiled.querySelectorAll('mat-label')).map(el => el.textContent?.trim());
+    const labels = Array.from(nativeEl.querySelectorAll('mat-label')).map((el: Element) => el.textContent?.trim());
     expect(labels).toContain('Subject');
     expect(labels).toContain('Your message');
   });

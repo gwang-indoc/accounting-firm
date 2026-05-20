@@ -316,6 +316,33 @@ class MessagingServiceTest {
     }
 
     @Test
+    void getThreadAsAdmin_whenThreadBelongsToDifferentClient_throwsNotFound() {
+        MessageThread thread = new MessageThread();
+        thread.setClientId(2L);  // belongs to client 2
+        thread.setSubject("Other");
+        thread.setAdminUnreadCount(0);
+        thread.setClientUnreadCount(0);
+        var spied = spy(thread); when(spied.getId()).thenReturn(99L);
+        when(threadRepo.findById(99L)).thenReturn(Optional.of(spied));
+        when(messageRepo.findByThreadIdOrderBySentAtAsc(99L)).thenReturn(java.util.List.of());
+
+        // Passing clientId=1 but thread belongs to clientId=2 → should throw
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> service.getThreadAsAdmin(1L, 99L))
+            .isInstanceOf(com.gwhaitech.accountingfirm.messaging.exception.ThreadNotFoundException.class);
+    }
+
+    @Test
+    void postAdminReply_whenThreadBelongsToDifferentClient_throwsNotFound() {
+        MessageThread thread = new MessageThread();
+        thread.setClientId(2L);
+        var spied = spy(thread); when(spied.getId()).thenReturn(99L);
+        when(threadRepo.findById(99L)).thenReturn(Optional.of(spied));
+
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> service.postAdminReply(1L, 99L, "body", 10L))
+            .isInstanceOf(com.gwhaitech.accountingfirm.messaging.exception.ThreadNotFoundException.class);
+    }
+
+    @Test
     void postClientReply_publishesEvent() {
         Client client = new Client(); client.setId(7L); client.setUserId(99L);
         MessageThread t = new MessageThread();

@@ -112,8 +112,4 @@ export class NewPortalThreadDialogComponent {
     const v = this.form.getRawValue();
     this.dialogRef.close({ subject: v.subject!, body: v.body! });
   }
-
-  getHostElement() {
-    return document.querySelector('[ng-container]') || document.body;
-  }
 }

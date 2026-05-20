@@ -12,12 +12,14 @@
     <a mat-button href="#security">Security</a>
     @if (authService.isAuthenticated()) {
       <span class="nav-user-name">{{ authService.currentUser()?.name }}</span>
-      <a mat-button routerLink="/portal/messages" routerLinkActive="active" data-testid="messages-nav-link">
-        Messages
-        @if (unreadCount() > 0) {
-          <span class="nav-badge" data-testid="messages-unread-badge">{{ unreadCount() }}</span>
-        }
-      </a>
+      @if (authService.currentUser()?.role !== 'ADMIN') {
+        <a mat-button routerLink="/portal/messages" routerLinkActive="active" data-testid="messages-nav-link">
+          Messages
+          @if (unreadCount() > 0) {
+            <span class="nav-badge" data-testid="messages-unread-badge">{{ unreadCount() }}</span>
+          }
+        </a>
+      }
       @if (authService.currentUser()?.role === 'ADMIN') {
         <a mat-button routerLink="/admin/clients" data-testid="admin-nav-link">Admin</a>
       }

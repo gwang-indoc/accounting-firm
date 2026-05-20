@@ -216,6 +216,26 @@ describe('Messages navigation', () => {
     expect(link!.getAttribute('routerLink')).toBe('/portal/messages');
   });
 
+  it('hides Messages link for ADMIN role', () => {
+    const mockPortalMessagesService = {
+      getUnreadCount: vi.fn().mockReturnValue(of({ unreadCount: 0 })),
+    };
+    TestBed.configureTestingModule({
+      imports: [NavbarComponent, RouterModule.forRoot([])],
+      providers: [
+        provideHttpClient(),
+        { provide: PortalMessagesService, useValue: mockPortalMessagesService },
+      ],
+    });
+    fixture = TestBed.createComponent(NavbarComponent);
+    component = fixture.componentInstance;
+    const authService = TestBed.inject(AuthService);
+    authService.currentUser.set({ id: 1, email: 'admin@firm.com', name: 'Admin', role: 'ADMIN' });
+    fixture.detectChanges();
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    expect(nativeEl.querySelector('[data-testid="messages-nav-link"]')).toBeNull();
+  });
+
   it('shows unread badge when count > 0 and hides it when count is 0', async () => {
     // Badge visible when count > 0
     setupWithUnreadCount(3);
