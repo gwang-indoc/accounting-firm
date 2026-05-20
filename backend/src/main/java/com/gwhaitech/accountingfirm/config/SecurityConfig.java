@@ -44,6 +44,8 @@ public class SecurityConfig {
                 .requestMatchers("/oauth2/**", "/login/oauth2/**", "/api/auth/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
                 .requestMatchers("/api/clients", "/api/clients/*", "/api/clients/*/documents", "/api/clients/*/documents/**").hasRole("ADMIN")
+                .requestMatchers("/api/clients/*/threads", "/api/clients/*/threads/**", "/api/clients/unread-counts").hasRole("ADMIN")
+                .requestMatchers("/api/portal/**").authenticated()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().denyAll()
             )
