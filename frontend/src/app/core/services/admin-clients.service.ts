@@ -11,11 +11,11 @@ export class AdminClientsService {
     return this.http.get<ClientDto[]>('/api/clients');
   }
 
-  create(req: { name: string; email: string; phone: string }): Observable<ClientDto> {
+  create(req: { name: string; email: string; phone: string | null }): Observable<ClientDto> {
     return this.http.post<ClientDto>('/api/clients', req);
   }
 
-  update(id: number, req: { name: string; email: string; phone: string }): Observable<ClientDto> {
+  update(id: number, req: { name: string; email: string; phone: string | null }): Observable<ClientDto> {
     return this.http.put<ClientDto>(`/api/clients/${id}`, req);
   }
 

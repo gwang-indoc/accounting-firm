@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { take } from 'rxjs/operators';
 import { AdminClientsService } from '../../../core/services/admin-clients.service';
 import { ClientDto } from '../../../core/models/client.model';
 
@@ -68,12 +69,13 @@ export class AdminClientDialogComponent {
       this.form.markAllAsTouched();
       return;
     }
-    const req = this.form.value as { name: string; email: string; phone: string };
+    const raw = this.form.getRawValue();
+    const req = { name: raw.name!, email: raw.email!, phone: raw.phone || null };
     const obs$ = this.isEdit
       ? this.adminClientsService.update(this.data.client!.id, req)
       : this.adminClientsService.create(req);
 
-    obs$.subscribe({
+    obs$.pipe(take(1)).subscribe({
       next: (result) => this.dialogRef.close(result),
       error: () => this.snackBar.open('Failed to save client. Please try again.', 'OK'),
     });
