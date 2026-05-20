@@ -23,9 +23,14 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.gwhaitech.accountingfirm.client.dto.UpdateClientRequest;
 
 @WebMvcTest(ClientController.class)
 @Import(ClientControllerTest.TestSecurityConfig.class)
@@ -107,6 +112,58 @@ class ClientControllerTest {
         when(clientService.findById(999L)).thenThrow(new ClientNotFoundException(999L));
 
         mockMvc.perform(get("/api/clients/999"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void putClient_existing_returns200AndDto() throws Exception {
+        when(clientService.updateClient(eq(1L), any())).thenReturn(sampleDto());
+
+        mockMvc.perform(put("/api/clients/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name":"Updated","email":"u@u.com","phone":"111"}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1));
+    }
+
+    @Test
+    void putClient_withoutName_returns400() throws Exception {
+        mockMvc.perform(put("/api/clients/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":"u@u.com"}
+                                """))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void putClient_notFound_returns404() throws Exception {
+        when(clientService.updateClient(eq(999L), any()))
+                .thenThrow(new ClientNotFoundException(999L));
+
+        mockMvc.perform(put("/api/clients/999")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name":"X"}
+                                """))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteClient_existing_returns204() throws Exception {
+        doNothing().when(clientService).deleteClient(1L);
+
+        mockMvc.perform(delete("/api/clients/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deleteClient_notFound_returns404() throws Exception {
+        doThrow(new ClientNotFoundException(999L)).when(clientService).deleteClient(999L);
+
+        mockMvc.perform(delete("/api/clients/999"))
                 .andExpect(status().isNotFound());
     }
 }
