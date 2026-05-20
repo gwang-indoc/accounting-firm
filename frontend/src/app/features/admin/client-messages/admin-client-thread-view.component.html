@@ -1,0 +1,37 @@
+<div class="thread-view">
+  <button class="back-link" data-testid="back-link" (click)="goBack()">← Back to Messages</button>
+
+  <div class="page-header">
+    <h1 class="page-title">{{ thread()?.subject }}</h1>
+    @if (client()) {
+      <p class="page-subtitle">with {{ client()!.name }}</p>
+    }
+  </div>
+
+  <div class="messages-container">
+    @for (msg of messages; track msg.id) {
+      <div class="msg-wrapper" [class.msg-admin]="msg.senderType === 'ADMIN'" [class.msg-client]="msg.senderType === 'CLIENT'">
+        <div class="sender-label">{{ senderLabel(msg) }}</div>
+        <div class="bubble">{{ msg.body }}</div>
+        <div class="timestamp">{{ msg.sentAt | date:'short' }}</div>
+      </div>
+    }
+  </div>
+
+  <div class="compose-area">
+    <textarea
+      class="reply-textarea"
+      data-testid="reply-textarea"
+      rows="3"
+      placeholder="Write a reply…"
+      [value]="replyBody()"
+      (input)="onReplyInput($event)"
+    ></textarea>
+    <button
+      class="send-btn"
+      data-testid="send-btn"
+      [disabled]="!canSend"
+      (click)="send()"
+    >Send</button>
+  </div>
+</div>

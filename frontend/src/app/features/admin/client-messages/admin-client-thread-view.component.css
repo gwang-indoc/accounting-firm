@@ -1,0 +1,145 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #0f172a;
+}
+
+.thread-view {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 28px 60px;
+}
+
+.back-link {
+  display: inline-block;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #475569;
+  font-size: 13px;
+  text-decoration: none;
+  margin-bottom: 20px;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.back-link:hover { color: #94a3b8; }
+
+.page-header {
+  margin-bottom: 28px;
+}
+
+.page-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0 0 4px;
+  letter-spacing: -0.3px;
+}
+
+.page-subtitle {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.messages-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  max-height: 500px;
+  overflow-y: auto;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.msg-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.msg-wrapper.msg-admin {
+  align-items: flex-end;
+}
+
+.msg-wrapper.msg-client {
+  align-items: flex-start;
+}
+
+.msg-wrapper.msg-admin .bubble {
+  background: #38bdf8;
+  color: #0f172a;
+  border-radius: 12px;
+  padding: 10px 14px;
+  max-width: 70%;
+}
+
+.msg-wrapper.msg-client .bubble {
+  background: #1e293b;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 10px 14px;
+  max-width: 70%;
+}
+
+.sender-label {
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  color: #94a3b8;
+}
+
+.timestamp {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.compose-area {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reply-textarea {
+  width: 100%;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #f1f5f9;
+  font-size: 14px;
+  padding: 10px 14px;
+  resize: vertical;
+  box-sizing: border-box;
+  outline: none;
+  font-family: inherit;
+}
+
+.reply-textarea::placeholder { color: #475569; }
+.reply-textarea:focus { border-color: #38bdf8; }
+
+.send-btn {
+  align-self: flex-end;
+  background: #38bdf8;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 14px;
+  border: none;
+  border-radius: 7px;
+  padding: 8px 24px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.send-btn:not(:disabled):hover {
+  opacity: 0.85;
+}

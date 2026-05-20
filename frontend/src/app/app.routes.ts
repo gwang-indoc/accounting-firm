@@ -63,4 +63,10 @@ export const routes: Routes = [
       import('./features/admin/client-messages/admin-client-threads.component').then(m => m.AdminClientThreadsComponent),
     canActivate: [authGuard, adminGuard],
   },
+  {
+    path: 'admin/clients/:id/messages/:threadId',
+    loadComponent: () =>
+      import('./features/admin/client-messages/admin-client-thread-view.component').then(m => m.AdminClientThreadViewComponent),
+    canActivate: [authGuard, adminGuard],
+  },
 ];
