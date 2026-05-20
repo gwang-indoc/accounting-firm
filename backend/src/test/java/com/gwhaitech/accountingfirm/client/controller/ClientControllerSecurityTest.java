@@ -32,7 +32,7 @@ class ClientControllerSecurityTest {
             http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/clients/**").hasRole("ADMIN")
+                    .requestMatchers("/api/clients", "/api/clients/*").hasRole("ADMIN")
                     .anyRequest().permitAll()
                 );
             return http.build();

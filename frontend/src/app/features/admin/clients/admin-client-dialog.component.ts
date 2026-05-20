@@ -73,7 +73,7 @@ export class AdminClientDialogComponent {
       return;
     }
     const raw = this.form.getRawValue();
-    const req = { name: raw.name!, email: raw.email!, phone: raw.phone || null };
+    const req = { name: raw.name!, email: raw.email!, phone: raw.phone?.trim() || null };
     const obs$ = this.isEdit
       ? this.adminClientsService.update(this.data.client!.id, req)
       : this.adminClientsService.create(req);
