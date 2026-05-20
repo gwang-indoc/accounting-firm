@@ -57,4 +57,10 @@ export const routes: Routes = [
       import('./features/admin/client-documents/admin-client-documents.component').then(m => m.AdminClientDocumentsComponent),
     canActivate: [authGuard, adminGuard],
   },
+  {
+    path: 'admin/clients/:id/messages',
+    loadComponent: () =>
+      import('./features/admin/client-messages/admin-client-threads.component').then(m => m.AdminClientThreadsComponent),
+    canActivate: [authGuard, adminGuard],
+  },
 ];

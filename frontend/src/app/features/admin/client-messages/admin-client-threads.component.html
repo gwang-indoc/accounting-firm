@@ -1,0 +1,31 @@
+<div class="admin-threads">
+  <a routerLink="/admin/clients" class="back-link">← Back to Clients</a>
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Messages</h1>
+      @if (client()) {
+        <p class="page-subtitle">with {{ client()!.name }}</p>
+      }
+    </div>
+    <button mat-flat-button class="new-btn" data-testid="new-thread-btn" (click)="openNewThread()">+ New Thread</button>
+  </div>
+
+  <div class="threads-list">
+    @for (t of threads(); track t.id) {
+      <div class="thread-row" data-testid="thread-row" (click)="openThread(t)">
+        <div class="thread-main">
+          <div class="thread-subject">{{ t.subject }}</div>
+          <div class="thread-preview">{{ t.lastMessagePreview }}</div>
+        </div>
+        <div class="thread-meta">
+          <div class="thread-date">{{ t.lastMessageAt | date:'short' }}</div>
+          @if (t.unreadCount > 0) {
+            <span class="thread-chip" data-testid="thread-unread-chip">·{{ t.unreadCount }}</span>
+          }
+        </div>
+      </div>
+    } @empty {
+      <div class="empty-state">No conversations yet. Click + New Thread to start one.</div>
+    }
+  </div>
+</div>
