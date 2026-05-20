@@ -4,6 +4,9 @@ import com.gwhaitech.accountingfirm.client.domain.ClientRepository;
 import com.gwhaitech.accountingfirm.client.exception.ClientNotFoundException;
 import com.gwhaitech.accountingfirm.messaging.domain.*;
 import com.gwhaitech.accountingfirm.messaging.dto.*;
+import com.gwhaitech.accountingfirm.messaging.exception.NoLinkedClientException;
+import com.gwhaitech.accountingfirm.messaging.exception.ThreadForbiddenException;
+import com.gwhaitech.accountingfirm.messaging.exception.ThreadNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,7 +53,7 @@ public class MessagingService {
     @Transactional
     public MessageThreadDto createThreadAsClient(Long callerUserId, String subject, String body) {
         var client = clientRepo.findByUserId(callerUserId)
-                .orElseThrow(com.gwhaitech.accountingfirm.messaging.exception.NoLinkedClientException::new);
+                .orElseThrow(NoLinkedClientException::new);
         MessageThread t = new MessageThread();
         t.setClientId(client.getId());
         t.setSubject(subject);
@@ -69,9 +72,12 @@ public class MessagingService {
     }
 
     @Transactional
-    public MessageDto postAdminReply(Long threadId, String body, Long adminUserId) {
+    public MessageDto postAdminReply(Long clientId, Long threadId, String body, Long adminUserId) {
         var t = threadRepo.findById(threadId)
-                .orElseThrow(() -> new com.gwhaitech.accountingfirm.messaging.exception.ThreadNotFoundException(threadId));
+                .orElseThrow(() -> new ThreadNotFoundException(threadId));
+        if (!t.getClientId().equals(clientId)) {
+            throw new ThreadNotFoundException(threadId);
+        }
         t.setClientUnreadCount(t.getClientUnreadCount() + 1);
         t.setLastMessageAt(java.time.LocalDateTime.now());
         threadRepo.save(t);
@@ -88,7 +94,7 @@ public class MessagingService {
     @Transactional
     public MessageDto postClientReply(Long threadId, String body, Long callerUserId) {
         var t = threadRepo.findById(threadId)
-                .orElseThrow(() -> new com.gwhaitech.accountingfirm.messaging.exception.ThreadNotFoundException(threadId));
+                .orElseThrow(() -> new ThreadNotFoundException(threadId));
         verifyClientOwnsThread(callerUserId, t);
         t.setAdminUnreadCount(t.getAdminUnreadCount() + 1);
         t.setLastMessageAt(java.time.LocalDateTime.now());
@@ -104,9 +110,12 @@ public class MessagingService {
     }
 
     @Transactional
-    public MessageThreadDto getThreadAsAdmin(Long threadId) {
+    public MessageThreadDto getThreadAsAdmin(Long clientId, Long threadId) {
         var t = threadRepo.findById(threadId)
-                .orElseThrow(() -> new com.gwhaitech.accountingfirm.messaging.exception.ThreadNotFoundException(threadId));
+                .orElseThrow(() -> new ThreadNotFoundException(threadId));
+        if (!t.getClientId().equals(clientId)) {
+            throw new ThreadNotFoundException(threadId);
+        }
         if (t.getAdminUnreadCount() != 0) {
             t.setAdminUnreadCount(0);
             threadRepo.save(t);
@@ -119,7 +128,7 @@ public class MessagingService {
     @Transactional
     public MessageThreadDto getThreadAsClient(Long threadId, Long callerUserId) {
         var t = threadRepo.findById(threadId)
-                .orElseThrow(() -> new com.gwhaitech.accountingfirm.messaging.exception.ThreadNotFoundException(threadId));
+                .orElseThrow(() -> new ThreadNotFoundException(threadId));
         verifyClientOwnsThread(callerUserId, t);
         if (t.getClientUnreadCount() != 0) {
             t.setClientUnreadCount(0);
@@ -130,6 +139,7 @@ public class MessagingService {
         return toThreadDto(t, msgs);
     }
 
+    @Transactional(readOnly = true)
     public java.util.List<MessageThreadSummaryDto> listAdminThreads(Long clientId) {
         return threadRepo.findByClientIdOrderByLastMessageAtDesc(clientId)
                 .stream()
@@ -137,12 +147,14 @@ public class MessagingService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public java.util.List<ClientUnreadCountDto> getAdminUnreadCounts() {
         return threadRepo.sumAdminUnreadByClient().stream()
                 .map(r -> new ClientUnreadCountDto(r.getClientId(), r.getUnreadCount()))
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public java.util.List<MessageThreadSummaryDto> listPortalThreads(Long callerUserId) {
         var c = clientRepo.findByUserId(callerUserId);
         if (c.isEmpty()) return java.util.List.of();
@@ -152,6 +164,7 @@ public class MessagingService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public int getPortalUnreadCount(Long callerUserId) {
         var c = clientRepo.findByUserId(callerUserId);
         if (c.isEmpty()) return 0;
@@ -168,9 +181,9 @@ public class MessagingService {
 
     private void verifyClientOwnsThread(Long callerUserId, MessageThread t) {
         var c = clientRepo.findByUserId(callerUserId)
-                .orElseThrow(com.gwhaitech.accountingfirm.messaging.exception.NoLinkedClientException::new);
+                .orElseThrow(NoLinkedClientException::new);
         if (!c.getId().equals(t.getClientId())) {
-            throw new com.gwhaitech.accountingfirm.messaging.exception.ThreadForbiddenException();
+            throw new ThreadForbiddenException();
         }
     }
 

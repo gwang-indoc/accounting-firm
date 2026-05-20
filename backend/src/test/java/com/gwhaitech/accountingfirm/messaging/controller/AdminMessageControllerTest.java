@@ -103,7 +103,7 @@ class AdminMessageControllerTest {
     void getThread_returnsThread() throws Exception {
         var msg = new MessageDto(1L, 50L, SenderType.ADMIN, 42L, "hello", LocalDateTime.now());
         var resp = new MessageThreadDto(50L, 7L, "x", LocalDateTime.now(), LocalDateTime.now(), 0, 0, List.of(msg));
-        when(service.getThreadAsAdmin(50L)).thenReturn(resp);
+        when(service.getThreadAsAdmin(7L, 50L)).thenReturn(resp);
         mvc.perform(get("/api/clients/7/threads/50").with(authentication(adminAuth())))
            .andExpect(status().isOk())
            .andExpect(jsonPath("$.id").value(50))
@@ -113,13 +113,24 @@ class AdminMessageControllerTest {
     @Test
     void postReply_returns201() throws Exception {
         var resp = new MessageDto(2L, 50L, SenderType.ADMIN, 42L, "follow-up", LocalDateTime.now());
-        when(service.postAdminReply(eq(50L), eq("follow-up"), anyLong())).thenReturn(resp);
+        when(service.postAdminReply(eq(7L), eq(50L), eq("follow-up"), anyLong())).thenReturn(resp);
         mvc.perform(post("/api/clients/7/threads/50/messages")
                 .with(authentication(adminAuth()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.writeValueAsString(new NewMessageRequest("follow-up"))))
            .andExpect(status().isCreated())
            .andExpect(jsonPath("$.body").value("follow-up"));
+    }
+
+    @Test
+    void createThread_whenClientNotFound_returns404() throws Exception {
+        when(service.createThreadAsAdmin(anyLong(), anyString(), anyString(), anyLong()))
+            .thenThrow(new com.gwhaitech.accountingfirm.client.exception.ClientNotFoundException(99L));
+        mvc.perform(post("/api/clients/99/threads")
+                .with(authentication(adminAuth()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.writeValueAsString(new NewThreadRequest("x", "y"))))
+           .andExpect(status().isNotFound());
     }
 
     @Test

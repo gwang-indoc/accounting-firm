@@ -35,7 +35,7 @@ public class AdminMessageController {
 
     @GetMapping("/{clientId}/threads/{threadId}")
     public MessageThreadDto getThread(@PathVariable Long clientId, @PathVariable Long threadId) {
-        return service.getThreadAsAdmin(threadId);
+        return service.getThreadAsAdmin(clientId, threadId);
     }
 
     @PostMapping("/{clientId}/threads/{threadId}/messages")
@@ -44,7 +44,7 @@ public class AdminMessageController {
                                                 @Valid @RequestBody NewMessageRequest req,
                                                 Authentication auth) {
         return ResponseEntity.status(201).body(
-            service.postAdminReply(threadId, req.body(), resolveAdminId(auth)));
+            service.postAdminReply(clientId, threadId, req.body(), resolveAdminId(auth)));
     }
 
     @GetMapping("/unread-counts")

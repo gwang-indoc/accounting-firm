@@ -106,7 +106,7 @@ class MessagingServiceTest {
         when(threadRepo.findById(50L)).thenReturn(Optional.of(spied));
         when(messageRepo.save(any(Message.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        MessageDto dto = service.postAdminReply(50L, "Got it", 42L);
+        MessageDto dto = service.postAdminReply(7L, 50L, "Got it", 42L);
 
         assertThat(spied.getClientUnreadCount()).isEqualTo(3);
         assertThat(spied.getLastMessageAt()).isAfter(java.time.LocalDateTime.now().minusSeconds(5));
@@ -122,7 +122,7 @@ class MessagingServiceTest {
     void postAdminReply_whenThreadMissing_throwsThreadNotFound() {
         when(threadRepo.findById(50L)).thenReturn(Optional.empty());
         org.assertj.core.api.Assertions.assertThatThrownBy(
-                () -> service.postAdminReply(50L, "x", 42L))
+                () -> service.postAdminReply(7L, 50L, "x", 42L))
             .isInstanceOf(com.gwhaitech.accountingfirm.messaging.exception.ThreadNotFoundException.class);
     }
 
@@ -167,7 +167,7 @@ class MessagingServiceTest {
         when(messageRepo.findByThreadIdOrderBySentAtAsc(50L)).thenReturn(java.util.List.of(m1, m2));
         when(threadRepo.save(any(MessageThread.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        MessageThreadDto dto = service.getThreadAsAdmin(50L);
+        MessageThreadDto dto = service.getThreadAsAdmin(7L, 50L);
 
         assertThat(spied.getAdminUnreadCount()).isEqualTo(0);
         assertThat(spied.getClientUnreadCount()).isEqualTo(2);
@@ -238,5 +238,19 @@ class MessagingServiceTest {
         assertThat(counts).hasSize(1);
         assertThat(counts.get(0).clientId()).isEqualTo(7L);
         assertThat(counts.get(0).unreadCount()).isEqualTo(3L);
+    }
+
+    @Test
+    void listPortalThreads_whenUserHasNoLinkedClient_returnsEmptyList() {
+        when(clientRepo.findByUserId(99L)).thenReturn(Optional.empty());
+        var list = service.listPortalThreads(99L);
+        assertThat(list).isEmpty();
+    }
+
+    @Test
+    void getPortalUnreadCount_whenUserHasNoLinkedClient_returnsZero() {
+        when(clientRepo.findByUserId(99L)).thenReturn(Optional.empty());
+        int count = service.getPortalUnreadCount(99L);
+        assertThat(count).isEqualTo(0);
     }
 }

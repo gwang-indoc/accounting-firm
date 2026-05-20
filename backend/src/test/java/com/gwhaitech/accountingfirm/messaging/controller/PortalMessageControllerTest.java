@@ -125,4 +125,23 @@ class PortalMessageControllerTest {
            .andExpect(status().isOk())
            .andExpect(jsonPath("$.unreadCount").value(4));
     }
+
+    @Test
+    void createThread_whenNoLinkedClient_returns409() throws Exception {
+        when(service.createThreadAsClient(anyLong(), anyString(), anyString()))
+            .thenThrow(new com.gwhaitech.accountingfirm.messaging.exception.NoLinkedClientException());
+        mvc.perform(post("/api/portal/threads")
+                .with(authentication(portalUser()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.writeValueAsString(new NewThreadRequest("x", "y"))))
+           .andExpect(status().isConflict());
+    }
+
+    @Test
+    void getThread_whenForbidden_returns403() throws Exception {
+        when(service.getThreadAsClient(eq(50L), anyLong()))
+            .thenThrow(new com.gwhaitech.accountingfirm.messaging.exception.ThreadForbiddenException());
+        mvc.perform(get("/api/portal/threads/50").with(authentication(portalUser())))
+           .andExpect(status().isForbidden());
+    }
 }
