@@ -34,6 +34,9 @@ export interface AdminClientDialogData {
           @if (form.get('email')?.hasError('required') && form.get('email')?.touched) {
             <mat-error>Email is required</mat-error>
           }
+          @if (form.get('email')?.hasError('email') && form.get('email')?.touched) {
+            <mat-error>Enter a valid email address</mat-error>
+          }
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>Phone (optional)</mat-label>
@@ -60,7 +63,7 @@ export class AdminClientDialogComponent {
 
   form = new FormGroup({
     name: new FormControl(this.data.client?.name ?? '', Validators.required),
-    email: new FormControl(this.data.client?.email ?? '', Validators.required),
+    email: new FormControl(this.data.client?.email ?? '', [Validators.required, Validators.email]),
     phone: new FormControl(this.data.client?.phone ?? ''),
   });
 

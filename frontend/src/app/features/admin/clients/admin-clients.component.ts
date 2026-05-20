@@ -3,6 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
+import { take } from 'rxjs/operators';
 import { AdminClientsService } from '../../../core/services/admin-clients.service';
 import { ClientDto } from '../../../core/models/client.model';
 import { AdminClientDialogComponent } from './admin-client-dialog.component';
@@ -36,6 +37,7 @@ export class AdminClientsComponent implements OnInit {
   openAddDialog(): void {
     this.dialog.open(AdminClientDialogComponent, { data: { client: null }, width: '420px' })
       .afterClosed()
+      .pipe(take(1))
       .subscribe((result: ClientDto | null) => {
         if (result) this.clients.update(list => [...list, result]);
       });
@@ -44,6 +46,7 @@ export class AdminClientsComponent implements OnInit {
   openEditDialog(client: ClientDto): void {
     this.dialog.open(AdminClientDialogComponent, { data: { client }, width: '420px' })
       .afterClosed()
+      .pipe(take(1))
       .subscribe((result: ClientDto | null) => {
         if (result) this.clients.update(list => list.map(c => c.id === result.id ? result : c));
       });
@@ -58,6 +61,7 @@ export class AdminClientsComponent implements OnInit {
       width: '380px',
     })
       .afterClosed()
+      .pipe(take(1))
       .subscribe((confirmed: boolean) => {
         if (!confirmed) return;
         this.adminClientsService.delete(client.id).subscribe({
