@@ -1,6 +1,7 @@
 package com.gwhaitech.accountingfirm.client.domain;
 
 import com.gwhaitech.accountingfirm.auth.domain.User;
+import com.gwhaitech.accountingfirm.client.domain.ClientDocumentRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -27,7 +28,16 @@ class ClientRepositoryTest {
     ClientRepository repo;
 
     @Autowired
+    ClientDocumentRepository docRepo;
+
+    @Autowired
     TestEntityManager em;
+
+    @org.junit.jupiter.api.BeforeEach
+    void cleanup() {
+        docRepo.deleteAll();
+        repo.deleteAll();
+    }
 
     @Test
     void findByEmailIgnoreCaseOrderById_matchesRegardlessOfCase_inIdOrder() {
