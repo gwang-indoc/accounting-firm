@@ -50,13 +50,20 @@ describe('DocumentsComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('No documents yet');
   });
 
-  it('year dropdown shows unique years sorted descending', async () => {
+  it('year dropdown includes doc years and the current year + 9 prior, sorted descending', async () => {
     httpMock.expectOne('/api/me/documents').flush(linkedResponse());
     await fixture.whenStable();
     fixture.detectChanges();
     const options = Array.from(fixture.nativeElement.querySelectorAll('select.year-select option')) as HTMLOptionElement[];
     const values = options.map(o => o.value);
-    expect(values).toEqual(['2025', '2024']);
+    const currentYear = new Date().getFullYear();
+    expect(values).toContain('2025');
+    expect(values).toContain('2024');
+    for (let i = 0; i <= 9; i++) {
+      expect(values).toContain(String(currentYear - i));
+    }
+    const numeric = values.map(Number);
+    expect(numeric).toEqual([...numeric].sort((a, b) => b - a));
   });
 
   it('default selected year is the most recent year', async () => {
@@ -217,6 +224,36 @@ describe('DocumentsComponent — upload', () => {
     expect(rows.length).toBe(1);
     expect(snackSpy).toHaveBeenCalled();
     expect(snackSpy.mock.calls[0][0]).toContain('already exists');
+  });
+
+  it('can upload to a year that has no existing documents', async () => {
+    httpMock.expectOne('/api/me/documents').flush({
+      linked: true, clientName: 'Jane', documents: [
+        { id: 1, year: 2024, filename: 'T4.pdf', mimeType: 'application/pdf', sizeBytes: 100, uploadedAt: '2025-02-12T10:00:00', uploadedByMe: false },
+      ]});
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const newYear = new Date().getFullYear();
+    component.selectedYear.set(newYear);
+    fixture.detectChanges();
+
+    const file = new File(['hello'], 'Q1.pdf', { type: 'application/pdf' });
+    component.onFileSelected({ target: { files: [file], value: '' } } as any);
+
+    const req = httpMock.expectOne(`/api/me/documents?year=${newYear}`);
+    req.flush({
+      id: 99, year: newYear, filename: 'Q1.pdf',
+      mimeType: 'application/pdf', sizeBytes: 5, uploadedAt: '2026-05-19T10:00:00',
+      uploadedByMe: true,
+    });
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(component.uploading()).toBe(false);
+    const rows = fixture.nativeElement.querySelectorAll('.doc-row');
+    expect(rows.length).toBe(1);
+    expect(rows[0].textContent).toContain('Q1.pdf');
   });
 
   it('empty state (linked, zero docs) renders a year picker and Upload button', async () => {

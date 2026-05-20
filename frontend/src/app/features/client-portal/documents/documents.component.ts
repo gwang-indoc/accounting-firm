@@ -26,11 +26,15 @@ export class DocumentsComponent implements OnInit {
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
-  years = computed<number[]>(() => {
+  docYears = computed<number[]>(() => {
     const r = this.response();
     if (!r) return [];
-    const uniq = Array.from(new Set(r.documents.map(d => d.year)));
-    return uniq.sort((a, b) => b - a);
+    return Array.from(new Set(r.documents.map(d => d.year))).sort((a, b) => b - a);
+  });
+
+  years = computed<number[]>(() => {
+    const union = new Set<number>([...this.emptyStateYearOptions, ...this.docYears()]);
+    return Array.from(union).sort((a, b) => b - a);
   });
 
   filteredDocs = computed<MyDocumentItem[]>(() => {
@@ -42,7 +46,7 @@ export class DocumentsComponent implements OnInit {
 
   readonly emptyStateYearOptions: number[] = (() => {
     const cur = new Date().getFullYear();
-    return [cur, cur - 1, cur - 2, cur - 3, cur - 4];
+    return Array.from({ length: 10 }, (_, i) => cur - i);
   })();
 
   // Indirection for test stubbing. Default uses window.location.
@@ -52,8 +56,8 @@ export class DocumentsComponent implements OnInit {
     this.myDocs.getAll().subscribe({
       next: (res) => {
         this.response.set(res);
-        const ys = this.years();
-        if (ys.length > 0) this.selectedYear.set(ys[0]);
+        const dy = this.docYears();
+        if (dy.length > 0) this.selectedYear.set(dy[0]);
       },
       error: () => this.snackBar.open('Could not load your documents. Please try again.', 'OK'),
     });
