@@ -40,6 +40,9 @@ temp/
 # Build outputs (Java)
 backend/target/
 
+# Local uploads
+backend/uploads/
+
 # Tool artifacts
 .playwright-mcp/
 .superpowers/

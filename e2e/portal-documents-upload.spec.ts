@@ -32,7 +32,7 @@ test.describe('/portal/documents — upload', () => {
   test('happy path: upload appears with "Uploaded by you" chip', async ({ page }) => {
     await fakeAuth(page);
 
-    await page.route('**/api/me/documents', route => {
+    await page.route('**/api/me/documents**', route => {
       if (route.request().method() === 'GET') {
         return route.fulfill({
           status: 200,
@@ -69,7 +69,7 @@ test.describe('/portal/documents — upload', () => {
   test('duplicate filename: snackbar shows the error and no row is added', async ({ page }) => {
     await fakeAuth(page);
 
-    await page.route('**/api/me/documents', route => {
+    await page.route('**/api/me/documents**', route => {
       if (route.request().method() === 'GET') {
         return route.fulfill({
           status: 200,
