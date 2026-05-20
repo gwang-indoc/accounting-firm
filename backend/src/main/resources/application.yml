@@ -26,6 +26,7 @@ contact:
   notification-email: ${CONTACT_NOTIFICATION_EMAIL}
 
 app:
+  publicBaseUrl: "http://localhost:4200"
   jwt:
     secret: ${JWT_SECRET}
     expiration-ms: 86400000
