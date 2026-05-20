@@ -47,6 +47,70 @@ public class MessagingService {
         return toThreadDto(saved, List.of(toMessageDto(m)));
     }
 
+    @Transactional
+    public MessageThreadDto createThreadAsClient(Long callerUserId, String subject, String body) {
+        var client = clientRepo.findByUserId(callerUserId)
+                .orElseThrow(com.gwhaitech.accountingfirm.messaging.exception.NoLinkedClientException::new);
+        MessageThread t = new MessageThread();
+        t.setClientId(client.getId());
+        t.setSubject(subject);
+        t.setAdminUnreadCount(1);
+        t.setLastMessageAt(java.time.LocalDateTime.now());
+        MessageThread saved = threadRepo.save(t);
+
+        Message m = new Message();
+        m.setThreadId(saved.getId());
+        m.setSenderType(SenderType.CLIENT);
+        m.setSenderUserId(callerUserId);
+        m.setBody(body);
+        messageRepo.save(m);
+
+        return toThreadDto(saved, java.util.List.of(toMessageDto(m)));
+    }
+
+    @Transactional
+    public MessageDto postAdminReply(Long threadId, String body, Long adminUserId) {
+        var t = threadRepo.findById(threadId)
+                .orElseThrow(() -> new com.gwhaitech.accountingfirm.messaging.exception.ThreadNotFoundException(threadId));
+        t.setClientUnreadCount(t.getClientUnreadCount() + 1);
+        t.setLastMessageAt(java.time.LocalDateTime.now());
+        threadRepo.save(t);
+
+        Message m = new Message();
+        m.setThreadId(threadId);
+        m.setSenderType(SenderType.ADMIN);
+        m.setSenderUserId(adminUserId);
+        m.setBody(body);
+        messageRepo.save(m);
+        return toMessageDto(m);
+    }
+
+    @Transactional
+    public MessageDto postClientReply(Long threadId, String body, Long callerUserId) {
+        var t = threadRepo.findById(threadId)
+                .orElseThrow(() -> new com.gwhaitech.accountingfirm.messaging.exception.ThreadNotFoundException(threadId));
+        verifyClientOwnsThread(callerUserId, t);
+        t.setAdminUnreadCount(t.getAdminUnreadCount() + 1);
+        t.setLastMessageAt(java.time.LocalDateTime.now());
+        threadRepo.save(t);
+
+        Message m = new Message();
+        m.setThreadId(threadId);
+        m.setSenderType(SenderType.CLIENT);
+        m.setSenderUserId(callerUserId);
+        m.setBody(body);
+        messageRepo.save(m);
+        return toMessageDto(m);
+    }
+
+    private void verifyClientOwnsThread(Long callerUserId, MessageThread t) {
+        var c = clientRepo.findByUserId(callerUserId)
+                .orElseThrow(com.gwhaitech.accountingfirm.messaging.exception.NoLinkedClientException::new);
+        if (!c.getId().equals(t.getClientId())) {
+            throw new com.gwhaitech.accountingfirm.messaging.exception.ThreadForbiddenException();
+        }
+    }
+
     private MessageDto toMessageDto(Message m) {
         return new MessageDto(m.getId(), m.getThreadId(), m.getSenderType(),
                 m.getSenderUserId(), m.getBody(), m.getSentAt());

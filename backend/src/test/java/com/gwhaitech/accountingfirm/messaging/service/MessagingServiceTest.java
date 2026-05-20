@@ -62,4 +62,95 @@ class MessagingServiceTest {
         assertThat(dto.subject()).isEqualTo("Tax filing");
         assertThat(dto.clientUnreadCount()).isEqualTo(1);
     }
+
+    @Test
+    void createThreadAsClient_persists_andBumpsAdminUnread() {
+        Client client = new Client(); client.setId(7L); client.setUserId(99L); client.setName("Jane");
+        when(clientRepo.findByUserId(99L)).thenReturn(Optional.of(client));
+        when(threadRepo.save(any(MessageThread.class))).thenAnswer(inv -> {
+            MessageThread t = inv.getArgument(0);
+            t = spy(t); when(t.getId()).thenReturn(200L); return t;
+        });
+        when(messageRepo.save(any(Message.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        MessageThreadDto dto = service.createThreadAsClient(99L, "Question", "I have a question");
+
+        ArgumentCaptor<MessageThread> cap = ArgumentCaptor.forClass(MessageThread.class);
+        verify(threadRepo).save(cap.capture());
+        assertThat(cap.getValue().getAdminUnreadCount()).isEqualTo(1);
+        assertThat(cap.getValue().getClientUnreadCount()).isEqualTo(0);
+        assertThat(dto.clientId()).isEqualTo(7L);
+
+        ArgumentCaptor<Message> msgCap = ArgumentCaptor.forClass(Message.class);
+        verify(messageRepo).save(msgCap.capture());
+        assertThat(msgCap.getValue().getSenderType()).isEqualTo(SenderType.CLIENT);
+        assertThat(msgCap.getValue().getSenderUserId()).isEqualTo(99L);
+    }
+
+    @Test
+    void createThreadAsClient_whenUserHasNoLinkedClient_throwsNoLinkedClient() {
+        when(clientRepo.findByUserId(99L)).thenReturn(Optional.empty());
+        org.assertj.core.api.Assertions.assertThatThrownBy(
+                () -> service.createThreadAsClient(99L, "x", "y"))
+            .isInstanceOf(com.gwhaitech.accountingfirm.messaging.exception.NoLinkedClientException.class);
+    }
+
+    @Test
+    void postAdminReply_appendsMessage_bumpsClientUnread_updatesLastMessageAt() {
+        MessageThread existing = new MessageThread();
+        existing.setClientId(7L); existing.setSubject("x");
+        existing.setClientUnreadCount(2);
+        existing.setLastMessageAt(java.time.LocalDateTime.now().minusDays(1));
+        var spied = spy(existing); when(spied.getId()).thenReturn(50L);
+        when(threadRepo.findById(50L)).thenReturn(Optional.of(spied));
+        when(messageRepo.save(any(Message.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        MessageDto dto = service.postAdminReply(50L, "Got it", 42L);
+
+        assertThat(spied.getClientUnreadCount()).isEqualTo(3);
+        assertThat(spied.getLastMessageAt()).isAfter(java.time.LocalDateTime.now().minusSeconds(5));
+        verify(threadRepo).save(spied);
+
+        ArgumentCaptor<Message> msgCap = ArgumentCaptor.forClass(Message.class);
+        verify(messageRepo).save(msgCap.capture());
+        assertThat(msgCap.getValue().getSenderType()).isEqualTo(SenderType.ADMIN);
+        assertThat(dto.body()).isEqualTo("Got it");
+    }
+
+    @Test
+    void postAdminReply_whenThreadMissing_throwsThreadNotFound() {
+        when(threadRepo.findById(50L)).thenReturn(Optional.empty());
+        org.assertj.core.api.Assertions.assertThatThrownBy(
+                () -> service.postAdminReply(50L, "x", 42L))
+            .isInstanceOf(com.gwhaitech.accountingfirm.messaging.exception.ThreadNotFoundException.class);
+    }
+
+    @Test
+    void postClientReply_whenCallerOwnsThread_appendsAndBumpsAdminUnread() {
+        Client client = new Client(); client.setId(7L); client.setUserId(99L);
+        MessageThread t = new MessageThread();
+        t.setClientId(7L); t.setSubject("x"); t.setAdminUnreadCount(0);
+        var spied = spy(t); when(spied.getId()).thenReturn(50L);
+        when(threadRepo.findById(50L)).thenReturn(Optional.of(spied));
+        when(clientRepo.findByUserId(99L)).thenReturn(Optional.of(client));
+        when(messageRepo.save(any(Message.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        MessageDto dto = service.postClientReply(50L, "reply", 99L);
+
+        assertThat(spied.getAdminUnreadCount()).isEqualTo(1);
+        assertThat(dto.senderType()).isEqualTo(SenderType.CLIENT);
+    }
+
+    @Test
+    void postClientReply_whenCallerDoesNotOwnThread_throwsForbidden() {
+        Client client = new Client(); client.setId(8L); client.setUserId(99L);
+        MessageThread t = new MessageThread(); t.setClientId(7L); t.setSubject("x");
+        var spied = spy(t); when(spied.getId()).thenReturn(50L);
+        when(threadRepo.findById(50L)).thenReturn(Optional.of(spied));
+        when(clientRepo.findByUserId(99L)).thenReturn(Optional.of(client));
+
+        org.assertj.core.api.Assertions.assertThatThrownBy(
+                () -> service.postClientReply(50L, "x", 99L))
+            .isInstanceOf(com.gwhaitech.accountingfirm.messaging.exception.ThreadForbiddenException.class);
+    }
 }
