@@ -6,6 +6,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { provideRouter, Router } from '@angular/router';
 import { AdminClientsComponent } from './admin-clients.component';
 import { AdminClientsService } from '../../../core/services/admin-clients.service';
+import { AdminClientMessagesService } from '../../../core/services/admin-client-messages.service';
 import { ClientDto } from '../../../core/models/client.model';
 import { of } from 'rxjs';
 
@@ -41,6 +42,7 @@ async function setup(clients: ClientDto[]): Promise<ComponentFixture<AdminClient
       provideHttpClientTesting(),
       provideAnimationsAsync(),
       { provide: AdminClientsService, useValue: mockService },
+      { provide: AdminClientMessagesService, useValue: { getUnreadCounts: vi.fn().mockReturnValue(of([])) } },
       provideRouter([]),
     ],
   }).compileComponents();
@@ -216,4 +218,60 @@ describe('AdminClientsComponent', () => {
       expect(rows[0].textContent).toContain('Bob Lee');
     });
   });
+
+  describe('Messages action and unread badge', () => {
+    it('renders Messages button on each row', async () => {
+      const fixture = await setup(sampleClients);
+      const btns = fixture.nativeElement.querySelectorAll('[data-testid="client-messages-btn"]');
+      expect(btns.length).toBe(2);
+    });
+
+    it('renders unread badge only when count > 0 for that client', async () => {
+      const mockMsgService = {
+        getUnreadCounts: vi.fn().mockReturnValue(of([{ clientId: sampleClients[0].id, unreadCount: 3 }])),
+      };
+      const fixture = await setupWithMessages(sampleClients, mockMsgService);
+      const badges = fixture.nativeElement.querySelectorAll('[data-testid="client-messages-badge"]');
+      expect(badges.length).toBe(1);
+      expect(badges[0].textContent.trim()).toContain('3');
+    });
+
+    it('clicking Messages navigates to /admin/clients/:id/messages', async () => {
+      const fixture = await setup(sampleClients);
+      const router = TestBed.inject(Router);
+      const navSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+      const btn: HTMLButtonElement = fixture.nativeElement.querySelector('[data-testid="client-messages-btn"]');
+      btn.click();
+      expect(navSpy).toHaveBeenCalledWith(['/admin/clients', sampleClients[0].id, 'messages']);
+    });
+  });
 });
+
+async function setupWithMessages(
+  clients: ClientDto[],
+  msgService: Partial<AdminClientMessagesService>
+): Promise<ComponentFixture<AdminClientsComponent>> {
+  const mockService: Partial<AdminClientsService> = {
+    getAll: vi.fn().mockReturnValue(of(clients)),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+  };
+  await TestBed.configureTestingModule({
+    imports: [AdminClientsComponent],
+    providers: [
+      provideZonelessChangeDetection(),
+      provideHttpClient(),
+      provideHttpClientTesting(),
+      provideAnimationsAsync(),
+      { provide: AdminClientsService, useValue: mockService },
+      { provide: AdminClientMessagesService, useValue: msgService },
+      provideRouter([]),
+    ],
+  }).compileComponents();
+  const fixture = TestBed.createComponent(AdminClientsComponent);
+  fixture.detectChanges();
+  await fixture.whenStable();
+  fixture.detectChanges();
+  return fixture;
+}
