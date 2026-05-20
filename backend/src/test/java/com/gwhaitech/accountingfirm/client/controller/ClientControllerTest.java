@@ -56,7 +56,7 @@ class ClientControllerTest {
 
     private ClientDto sampleDto() {
         return new ClientDto(1L, "Acme Corp", "contact@acme.com", "555-1234",
-                LocalDateTime.of(2026, 1, 1, 0, 0));
+                LocalDateTime.of(2026, 1, 1, 0, 0), null);
     }
 
     @Test

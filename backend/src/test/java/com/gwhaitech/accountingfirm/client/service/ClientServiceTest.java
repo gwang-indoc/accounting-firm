@@ -59,6 +59,7 @@ class ClientServiceTest {
         assertThat(dto.email()).isEqualTo("contact@acme.com");
         assertThat(dto.phone()).isEqualTo("555-1234");
         assertThat(dto.createdAt()).isNotNull();
+        assertThat(dto.linkedUserId()).isNull();
     }
 
     @Test

@@ -7,5 +7,6 @@ public record ClientDto(
         String name,
         String email,
         String phone,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        Long linkedUserId
 ) {}

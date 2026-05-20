@@ -39,6 +39,6 @@ public class ClientService {
     }
 
     private ClientDto toDto(Client c) {
-        return new ClientDto(c.getId(), c.getName(), c.getEmail(), c.getPhone(), c.getCreatedAt());
+        return new ClientDto(c.getId(), c.getName(), c.getEmail(), c.getPhone(), c.getCreatedAt(), c.getUserId());
     }
 }
