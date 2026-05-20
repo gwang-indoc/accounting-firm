@@ -37,6 +37,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'portal/messages/:threadId',
+    loadComponent: () =>
+      import('./features/client-portal/messages/portal-thread-view.component').then(m => m.PortalThreadViewComponent),
+    canActivate: [authGuard],
+  },
+  {
     path: 'login',
     loadComponent: () =>
       import('./features/auth/login/login.component').then(m => m.LoginComponent),
