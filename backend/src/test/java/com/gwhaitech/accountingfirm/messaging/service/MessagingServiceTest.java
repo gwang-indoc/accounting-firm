@@ -204,4 +204,39 @@ class MessagingServiceTest {
                 () -> service.getThreadAsClient(50L, 99L))
             .isInstanceOf(com.gwhaitech.accountingfirm.messaging.exception.ThreadForbiddenException.class);
     }
+
+    @Test
+    void listAdminThreads_returnsSummariesWithUnreadAndPreview() {
+        MessageThread t = new MessageThread();
+        t.setClientId(7L); t.setSubject("Tax filing");
+        t.setLastMessageAt(java.time.LocalDateTime.now()); t.setAdminUnreadCount(2);
+        var spied = spy(t); when(spied.getId()).thenReturn(50L);
+        when(threadRepo.findByClientIdOrderByLastMessageAtDesc(7L)).thenReturn(java.util.List.of(spied));
+
+        Message latest = new Message();
+        latest.setBody("This is a long body that should be truncated at 80 chars when rendered as preview in the UI for admin list");
+        when(messageRepo.findByThreadIdOrderBySentAtAsc(50L)).thenReturn(java.util.List.of(new Message(), latest));
+
+        var list = service.listAdminThreads(7L);
+
+        assertThat(list).hasSize(1);
+        assertThat(list.get(0).subject()).isEqualTo("Tax filing");
+        assertThat(list.get(0).unreadCount()).isEqualTo(2);
+        assertThat(list.get(0).lastMessagePreview()).hasSizeLessThanOrEqualTo(80);
+    }
+
+    @Test
+    void getAdminUnreadCounts_returnsProjections() {
+        com.gwhaitech.accountingfirm.messaging.domain.ClientUnreadRow row =
+                mock(com.gwhaitech.accountingfirm.messaging.domain.ClientUnreadRow.class);
+        when(row.getClientId()).thenReturn(7L);
+        when(row.getUnreadCount()).thenReturn(3L);
+        when(threadRepo.sumAdminUnreadByClient()).thenReturn(java.util.List.of(row));
+
+        var counts = service.getAdminUnreadCounts();
+
+        assertThat(counts).hasSize(1);
+        assertThat(counts.get(0).clientId()).isEqualTo(7L);
+        assertThat(counts.get(0).unreadCount()).isEqualTo(3L);
+    }
 }

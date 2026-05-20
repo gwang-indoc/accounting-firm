@@ -130,6 +130,42 @@ public class MessagingService {
         return toThreadDto(t, msgs);
     }
 
+    public java.util.List<MessageThreadSummaryDto> listAdminThreads(Long clientId) {
+        return threadRepo.findByClientIdOrderByLastMessageAtDesc(clientId)
+                .stream()
+                .map(t -> toSummaryDto(t, t.getAdminUnreadCount()))
+                .toList();
+    }
+
+    public java.util.List<ClientUnreadCountDto> getAdminUnreadCounts() {
+        return threadRepo.sumAdminUnreadByClient().stream()
+                .map(r -> new ClientUnreadCountDto(r.getClientId(), r.getUnreadCount()))
+                .toList();
+    }
+
+    public java.util.List<MessageThreadSummaryDto> listPortalThreads(Long callerUserId) {
+        var c = clientRepo.findByUserId(callerUserId);
+        if (c.isEmpty()) return java.util.List.of();
+        return threadRepo.findByClientIdOrderByLastMessageAtDesc(c.get().getId())
+                .stream()
+                .map(t -> toSummaryDto(t, t.getClientUnreadCount()))
+                .toList();
+    }
+
+    public int getPortalUnreadCount(Long callerUserId) {
+        var c = clientRepo.findByUserId(callerUserId);
+        if (c.isEmpty()) return 0;
+        return threadRepo.sumClientUnreadForClient(c.get().getId());
+    }
+
+    private MessageThreadSummaryDto toSummaryDto(MessageThread t, int unread) {
+        var msgs = messageRepo.findByThreadIdOrderBySentAtAsc(t.getId());
+        String preview = msgs.isEmpty() ? "" : msgs.get(msgs.size() - 1).getBody();
+        if (preview != null && preview.length() > 80) preview = preview.substring(0, 77) + "...";
+        return new MessageThreadSummaryDto(t.getId(), t.getClientId(), t.getSubject(),
+                t.getLastMessageAt(), unread, preview);
+    }
+
     private void verifyClientOwnsThread(Long callerUserId, MessageThread t) {
         var c = clientRepo.findByUserId(callerUserId)
                 .orElseThrow(com.gwhaitech.accountingfirm.messaging.exception.NoLinkedClientException::new);
