@@ -4,6 +4,7 @@ import com.gwhaitech.accountingfirm.client.domain.Client;
 import com.gwhaitech.accountingfirm.client.domain.ClientRepository;
 import com.gwhaitech.accountingfirm.client.dto.ClientDto;
 import com.gwhaitech.accountingfirm.client.dto.CreateClientRequest;
+import com.gwhaitech.accountingfirm.client.dto.UpdateClientRequest;
 import com.gwhaitech.accountingfirm.client.exception.ClientNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +37,21 @@ public class ClientService {
         return clientRepository.findById(id)
                 .map(this::toDto)
                 .orElseThrow(() -> new ClientNotFoundException(id));
+    }
+
+    public ClientDto updateClient(Long id, UpdateClientRequest request) {
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new ClientNotFoundException(id));
+        client.setName(request.name());
+        client.setEmail(request.email());
+        client.setPhone(request.phone());
+        return toDto(clientRepository.save(client));
+    }
+
+    public void deleteClient(Long id) {
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new ClientNotFoundException(id));
+        clientRepository.delete(client);
     }
 
     private ClientDto toDto(Client c) {

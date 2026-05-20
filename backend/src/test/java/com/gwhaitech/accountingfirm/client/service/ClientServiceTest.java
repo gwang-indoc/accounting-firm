@@ -19,6 +19,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+
+import com.gwhaitech.accountingfirm.client.dto.UpdateClientRequest;
 
 @ExtendWith(MockitoExtension.class)
 class ClientServiceTest {
@@ -87,6 +90,48 @@ class ClientServiceTest {
         when(clientRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> clientService.findById(999L))
+                .isInstanceOf(ClientNotFoundException.class);
+    }
+
+    @Test
+    void updateClient_updatesAndReturnsDto() {
+        Client existing = sampleClient();
+        when(clientRepository.findById(1L)).thenReturn(Optional.of(existing));
+        when(clientRepository.save(any(Client.class))).thenReturn(existing);
+
+        UpdateClientRequest req = new UpdateClientRequest("New Name", "new@email.com", "999-0000");
+        ClientDto dto = clientService.updateClient(1L, req);
+
+        assertThat(dto.name()).isEqualTo("New Name");
+        assertThat(dto.email()).isEqualTo("new@email.com");
+        assertThat(dto.phone()).isEqualTo("999-0000");
+        verify(clientRepository).save(existing);
+    }
+
+    @Test
+    void updateClient_throwsClientNotFoundException_whenMissing() {
+        when(clientRepository.findById(99L)).thenReturn(Optional.empty());
+
+        UpdateClientRequest req = new UpdateClientRequest("X", null, null);
+        assertThatThrownBy(() -> clientService.updateClient(99L, req))
+                .isInstanceOf(ClientNotFoundException.class);
+    }
+
+    @Test
+    void deleteClient_deletesById() {
+        Client existing = sampleClient();
+        when(clientRepository.findById(1L)).thenReturn(Optional.of(existing));
+
+        clientService.deleteClient(1L);
+
+        verify(clientRepository).delete(existing);
+    }
+
+    @Test
+    void deleteClient_throwsClientNotFoundException_whenMissing() {
+        when(clientRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> clientService.deleteClient(99L))
                 .isInstanceOf(ClientNotFoundException.class);
     }
 }
