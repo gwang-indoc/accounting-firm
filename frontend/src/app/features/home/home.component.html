@@ -1,18 +1,185 @@
-<main>
+<div class="home-page">
+
+  <!-- ─────────── HERO ─────────── -->
   <section class="hero">
-    <h1 class="mat-headline-4">Expert Accounting Services</h1>
-    <p class="mat-body-1">Trusted financial guidance for businesses and individuals.</p>
+    <div class="hero-kanji" aria-hidden="true">税</div>
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Trusted financial guidance · Est. 2009
+      </div>
+      <h1 class="hero-heading">
+        Financial clarity,<br><em>from every angle.</em>
+      </h1>
+      <p class="hero-sub">
+        GWH Accounting delivers expert tax preparation, bookkeeping, and strategic financial consulting for businesses and individuals who demand precision.
+      </p>
+      <div class="hero-actions">
+        <a routerLink="/book-consultation" class="btn-primary">
+          Book a Free Consultation
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd"/>
+          </svg>
+        </a>
+        <a routerLink="/login" class="btn-ghost">Client Portal</a>
+      </div>
+    </div>
+    <div class="hero-scroll" aria-hidden="true">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
   </section>
-  <section id="services" class="services">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>Our Services</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <p>Tax preparation, bookkeeping, and financial consulting.</p>
-      </mat-card-content>
-    </mat-card>
+
+  <!-- ─────────── STATS ─────────── -->
+  <section class="stats-section">
+    <div class="stats-inner">
+      <div class="stat-item">
+        <div class="stat-number">15<span>+</span></div>
+        <div class="stat-label">Years of expertise</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-number">500<span>+</span></div>
+        <div class="stat-label">Clients served</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-number">$12M<span>+</span></div>
+        <div class="stat-label">In tax savings</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-number">98<span>%</span></div>
+        <div class="stat-label">Client retention rate</div>
+      </div>
+    </div>
   </section>
-  <section id="security">
+
+  <!-- ─────────── SERVICES PREVIEW ─────────── -->
+  <section class="services-section">
+    <div class="section-eyebrow">What We Do</div>
+    <div class="services-header">
+      <h2 class="services-heading">Comprehensive services<br>for every financial need.</h2>
+      <a routerLink="/services" class="view-all-link">View all services →</a>
+    </div>
+    <div class="services-grid">
+      <div class="service-card" style="--delay: 0.05s">
+        <div class="service-icon-wrap">
+          <mat-icon>receipt_long</mat-icon>
+        </div>
+        <div class="service-tag">Year-round support</div>
+        <h3>Tax Preparation</h3>
+        <p>Comprehensive individual and business tax filing. We navigate complex tax codes so you pay only what you owe — nothing more.</p>
+        <a routerLink="/services" class="service-cta">Learn more →</a>
+      </div>
+      <div class="service-card" style="--delay: 0.15s">
+        <div class="service-icon-wrap">
+          <mat-icon>menu_book</mat-icon>
+        </div>
+        <div class="service-tag">Monthly &amp; quarterly</div>
+        <h3>Bookkeeping</h3>
+        <p>Accurate monthly records, bank reconciliations, and financial statements that give you a clear picture of your business health.</p>
+        <a routerLink="/services" class="service-cta">Learn more →</a>
+      </div>
+      <div class="service-card" style="--delay: 0.25s">
+        <div class="service-icon-wrap">
+          <mat-icon>trending_up</mat-icon>
+        </div>
+        <div class="service-tag">Strategy sessions</div>
+        <h3>Financial Consulting</h3>
+        <p>Strategic guidance on cash flow, growth planning, and investment decisions tailored to your goals and risk profile.</p>
+        <a routerLink="/services" class="service-cta">Learn more →</a>
+      </div>
+    </div>
   </section>
-</main>
+
+  <!-- ─────────── CLIENT PORTAL ─────────── -->
+  <section class="portal-section">
+    <div class="portal-text">
+      <div class="section-eyebrow accent">Client Portal</div>
+      <h2 class="portal-heading">Your documents,<br>always at hand.</h2>
+      <p class="portal-desc">Access all your tax documents, financial reports, and secure messages with your accountant — encrypted and available from anywhere, anytime.</p>
+      <div class="portal-actions">
+        <a routerLink="/login" class="btn-dark">Sign in to portal</a>
+        <a routerLink="/register" class="portal-register-link">New client? Register →</a>
+      </div>
+    </div>
+
+    <!-- Stylized portal mock-up -->
+    <div class="portal-visual" aria-hidden="true">
+      <div class="portal-mock">
+        <div class="mock-header">
+          <div class="mock-dot red"></div>
+          <div class="mock-dot yellow"></div>
+          <div class="mock-dot green"></div>
+          <span class="mock-title">Client Dashboard</span>
+        </div>
+        <div class="mock-body">
+          <div class="mock-section-title">Recent Documents</div>
+          <div class="mock-row">
+            <div class="mock-file-icon"></div>
+            <span>2024_Tax_Return.pdf</span>
+            <span class="mock-badge">New</span>
+          </div>
+          <div class="mock-row">
+            <div class="mock-file-icon"></div>
+            <span>Q3_Financial_Report.pdf</span>
+          </div>
+          <div class="mock-row">
+            <div class="mock-file-icon"></div>
+            <span>W2_2024.pdf</span>
+          </div>
+          <div class="mock-section-title top-gap">Messages</div>
+          <div class="mock-msg">
+            <div class="mock-avatar">GW</div>
+            <div class="mock-msg-content">
+              <div class="mock-msg-from">GWH Accounting</div>
+              <div class="mock-msg-text">Your Q4 tax documents are ready for review...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────── SECURITY ─────────── -->
+  <section class="security-section">
+    <div class="section-eyebrow">Security First</div>
+    <h2 class="security-heading">Your data is always protected.</h2>
+    <div class="security-badges">
+      <div class="security-badge">
+        <mat-icon>lock</mat-icon><span>AES-256 Encryption</span>
+      </div>
+      <div class="security-badge">
+        <mat-icon>verified_user</mat-icon><span>Google OAuth2</span>
+      </div>
+      <div class="security-badge">
+        <mat-icon>folder_special</mat-icon><span>Isolated Storage</span>
+      </div>
+      <div class="security-badge">
+        <mat-icon>policy</mat-icon><span>GDPR &amp; CCPA</span>
+      </div>
+    </div>
+    <a routerLink="/security" class="security-link">Learn about our security practices →</a>
+  </section>
+
+  <!-- ─────────── FINAL CTA ─────────── -->
+  <section class="cta-section">
+    <div class="cta-kanji" aria-hidden="true">税</div>
+    <div class="cta-inner">
+      <h2 class="cta-heading">
+        Ready to take control<br>of your <em>finances?</em>
+      </h2>
+      <p class="cta-sub">Schedule a free 30-minute consultation. No obligation, no pressure.</p>
+      <a routerLink="/book-consultation" class="btn-primary btn-large">
+        Book your free consultation
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd"/>
+        </svg>
+      </a>
+      <a routerLink="/contact" class="cta-contact-link">Or reach out with a question →</a>
+    </div>
+  </section>
+
+</div>
