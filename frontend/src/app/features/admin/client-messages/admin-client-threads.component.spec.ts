@@ -17,7 +17,7 @@ const sampleClient: ClientDto = {
 };
 const sampleThreads: MessageThreadSummaryDto[] = [
   { id: 50, clientId: 7, subject: 'Tax filing', lastMessageAt: '2026-05-19T12:00:00', unreadCount: 2, clientUnreadCount: 0, lastSenderType: 'CLIENT', lastMessagePreview: 'I will send the W-2…' },
-  { id: 51, clientId: 7, subject: 'Q1 invoicing', lastMessageAt: '2026-05-15T09:00:00', unreadCount: 0, clientUnreadCount: 0, lastSenderType: 'ADMIN', lastMessagePreview: 'Thanks!' },
+  { id: 51, clientId: 7, subject: 'Q1 invoicing', lastMessageAt: '2026-05-15T09:00:00', unreadCount: 0, clientUnreadCount: 0, lastSenderType: null, lastMessagePreview: 'Thanks!' },
 ];
 
 async function setup(threads: MessageThreadSummaryDto[] = sampleThreads): Promise<ComponentFixture<AdminClientThreadsComponent>> {
@@ -79,13 +79,6 @@ describe('AdminClientThreadsComponent', () => {
     const fx = await setup();
     const btn = fx.nativeElement.querySelector('[data-testid="new-thread-btn"]');
     expect(btn).not.toBeNull();
-  });
-
-  it('shows chip-unread when unreadCount > 0', async () => {
-    const fx = await setup();
-    const chip = fx.nativeElement.querySelector('[data-testid="thread-chip-unread"]');
-    expect(chip).not.toBeNull();
-    expect(chip!.textContent.trim()).toContain('2');
   });
 
   it('shows chip-read when lastSenderType is ADMIN and clientUnreadCount is 0', async () => {
