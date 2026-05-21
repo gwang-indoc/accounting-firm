@@ -63,16 +63,16 @@ describe('NavbarComponent', () => {
     expect(component.lang()).toBe('en');
   });
 
-  it('"Services" link has href="#services"', () => {
+  it('"Services" link has routerLink="/services"', () => {
     const nativeEl = fixture.nativeElement as HTMLElement;
-    const link = nativeEl.querySelector('a[href="#services"]');
+    const link = nativeEl.querySelector('a[routerLink="/services"]');
     expect(link).not.toBeNull();
     expect(link!.textContent).toContain('Services');
   });
 
-  it('"Security" link has href="#security"', () => {
+  it('"Security" link has routerLink="/security"', () => {
     const nativeEl = fixture.nativeElement as HTMLElement;
-    const link = nativeEl.querySelector('a[href="#security"]');
+    const link = nativeEl.querySelector('a[routerLink="/security"]');
     expect(link).not.toBeNull();
     expect(link!.textContent).toContain('Security');
   });

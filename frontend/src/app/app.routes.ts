@@ -9,6 +9,16 @@ export const routes: Routes = [
       import('./features/home/home.component').then(m => m.HomeComponent),
   },
   {
+    path: 'services',
+    loadComponent: () =>
+      import('./features/services/services-page.component').then(m => m.ServicesPageComponent),
+  },
+  {
+    path: 'security',
+    loadComponent: () =>
+      import('./features/security/security-page.component').then(m => m.SecurityPageComponent),
+  },
+  {
     path: 'contact',
     loadComponent: () =>
       import('./features/contact/contact.component').then(m => m.ContactComponent),

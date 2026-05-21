@@ -8,8 +8,8 @@
   </a>
 
   <div class="nav-links">
-    <a mat-button href="#services">Services</a>
-    <a mat-button href="#security">Security</a>
+    <a mat-button routerLink="/services" routerLinkActive="active">Services</a>
+    <a mat-button routerLink="/security" routerLinkActive="active">Security</a>
     @if (authService.isAuthenticated()) {
       <span class="nav-user-name">{{ authService.currentUser()?.name }}</span>
       @if (authService.currentUser()?.role !== 'ADMIN') {
