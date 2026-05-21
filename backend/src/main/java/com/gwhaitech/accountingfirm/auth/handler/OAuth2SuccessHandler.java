@@ -23,7 +23,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final JwtService jwtService;
     private final UserClientLinkService userClientLinkService;
     private final boolean cookieSecure;
-    private final String redirectUri;
+    private final String adminRedirectUri;
+    private final String userRedirectUri;
     private final long expirationMs;
 
     public OAuth2SuccessHandler(
@@ -31,13 +32,15 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             JwtService jwtService,
             UserClientLinkService userClientLinkService,
             @Value("${app.cookie.secure:true}") boolean cookieSecure,
-            @Value("${app.oauth2.redirect-uri:http://localhost:4200/portal/dashboard}") String redirectUri,
+            @Value("${app.oauth2.redirect-uri.admin:http://localhost:4200/admin/clients}") String adminRedirectUri,
+            @Value("${app.oauth2.redirect-uri.user:http://localhost:4200/portal/dashboard}") String userRedirectUri,
             @Value("${app.jwt.expiration-ms:86400000}") long expirationMs) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.userClientLinkService = userClientLinkService;
         this.cookieSecure = cookieSecure;
-        this.redirectUri = redirectUri;
+        this.adminRedirectUri = adminRedirectUri;
+        this.userRedirectUri = userRedirectUri;
         this.expirationMs = expirationMs;
     }
 
@@ -72,6 +75,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         cookie.setAttribute("SameSite", "Strict");
         response.addCookie(cookie);
 
-        response.sendRedirect(redirectUri);
+        String target = "ADMIN".equals(user.getRole()) ? adminRedirectUri : userRedirectUri;
+        response.sendRedirect(target);
     }
 }

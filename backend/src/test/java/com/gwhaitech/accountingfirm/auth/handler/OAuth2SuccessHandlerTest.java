@@ -59,6 +59,7 @@ class OAuth2SuccessHandlerTest {
             mockJwtService,
             mockLinkService,
             false,
+            "http://localhost:4200/admin/clients",
             "http://localhost:4200/portal/dashboard",
             86400000L
         );
@@ -141,5 +142,51 @@ class OAuth2SuccessHandlerTest {
         User captured = userCaptor.getValue();
         assertThat(captured.getName()).isEqualTo("Test User");
         assertThat(captured.getEmail()).isEqualTo("test@example.com");
+    }
+
+    @Test
+    void adminUser_redirectsToAdminClients() throws Exception {
+        OAuth2SuccessHandler adminHandler = new OAuth2SuccessHandler(
+            mockUserRepo, mockJwtService, mockLinkService,
+            false,
+            "http://localhost:4200/admin/clients",
+            "http://localhost:4200/portal/dashboard",
+            86400000L
+        );
+
+        User adminUser = new User();
+        adminUser.setId(1L); adminUser.setGoogleSub("google-sub-123");
+        adminUser.setEmail("admin@firm.com"); adminUser.setName("Admin");
+        adminUser.setRole("ADMIN");
+        when(mockUserRepo.findByGoogleSub("google-sub-123")).thenReturn(Optional.empty());
+        when(mockUserRepo.save(any(User.class))).thenReturn(adminUser);
+        when(mockJwtService.issueToken(any(User.class))).thenReturn("jwt.token");
+
+        adminHandler.onAuthenticationSuccess(mockRequest, mockResponse, buildAuth());
+
+        verify(mockResponse).sendRedirect("http://localhost:4200/admin/clients");
+    }
+
+    @Test
+    void userRole_redirectsToPortalDashboard() throws Exception {
+        OAuth2SuccessHandler userHandler = new OAuth2SuccessHandler(
+            mockUserRepo, mockJwtService, mockLinkService,
+            false,
+            "http://localhost:4200/admin/clients",
+            "http://localhost:4200/portal/dashboard",
+            86400000L
+        );
+
+        User normalUser = new User();
+        normalUser.setId(2L); normalUser.setGoogleSub("google-sub-123");
+        normalUser.setEmail("test@example.com"); normalUser.setName("Test User");
+        normalUser.setRole("USER");
+        when(mockUserRepo.findByGoogleSub("google-sub-123")).thenReturn(Optional.empty());
+        when(mockUserRepo.save(any(User.class))).thenReturn(normalUser);
+        when(mockJwtService.issueToken(any(User.class))).thenReturn("jwt.token");
+
+        userHandler.onAuthenticationSuccess(mockRequest, mockResponse, buildAuth());
+
+        verify(mockResponse).sendRedirect("http://localhost:4200/portal/dashboard");
     }
 }

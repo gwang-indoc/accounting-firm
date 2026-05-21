@@ -44,7 +44,9 @@ app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
   oauth2:
-    redirect-uri: ${OAUTH2_REDIRECT_URI:http://localhost:4200/portal/dashboard}
+    redirect-uri:
+      admin: ${OAUTH2_REDIRECT_URI_ADMIN:http://localhost:4200/admin/clients}
+      user: ${OAUTH2_REDIRECT_URI_USER:http://localhost:4200/portal/dashboard}
   storage:
     upload-dir: ${UPLOAD_DIR:./uploads}
     max-file-size-mb: ${UPLOAD_MAX_FILE_SIZE_MB:10}
