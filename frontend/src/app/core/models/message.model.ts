@@ -26,6 +26,8 @@ export interface MessageThreadSummaryDto {
   subject: string;
   lastMessageAt: string;
   unreadCount: number;
+  clientUnreadCount: number;
+  lastSenderType: SenderType | null;
   lastMessagePreview: string;
 }
 

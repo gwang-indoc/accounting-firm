@@ -9,8 +9,8 @@ import { PortalMessagesService } from '../../../core/services/portal-messages.se
 import { MessageThreadSummaryDto } from '../../../core/models/message.model';
 
 const sampleThreads: MessageThreadSummaryDto[] = [
-  { id: 10, clientId: 1, subject: 'Tax filing', lastMessageAt: '2026-05-19T12:00:00', unreadCount: 3, lastMessagePreview: 'I will send the W-2…' },
-  { id: 11, clientId: 1, subject: 'Q1 invoicing', lastMessageAt: '2026-05-15T09:00:00', unreadCount: 0, lastMessagePreview: 'Thanks!' },
+  { id: 10, clientId: 1, subject: 'Tax filing', lastMessageAt: '2026-05-19T12:00:00', unreadCount: 3, clientUnreadCount: 0, lastSenderType: null, lastMessagePreview: 'I will send the W-2…' },
+  { id: 11, clientId: 1, subject: 'Q1 invoicing', lastMessageAt: '2026-05-15T09:00:00', unreadCount: 0, clientUnreadCount: 0, lastSenderType: null, lastMessagePreview: 'Thanks!' },
 ];
 
 async function setup(

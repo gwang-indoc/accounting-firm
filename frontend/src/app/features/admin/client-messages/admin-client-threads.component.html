@@ -19,8 +19,16 @@
         </div>
         <div class="thread-meta">
           <div class="thread-date">{{ t.lastMessageAt | date:'short' }}</div>
-          @if (t.unreadCount > 0) {
-            <span class="thread-chip" data-testid="thread-unread-chip">·{{ t.unreadCount }}</span>
+          @switch (threadStatus(t)) {
+            @case ('unread') {
+              <span class="thread-chip chip-unread" data-testid="thread-chip-unread">·{{ t.unreadCount }}</span>
+            }
+            @case ('awaiting') {
+              <span class="thread-chip chip-awaiting" data-testid="thread-chip-awaiting">Awaiting client</span>
+            }
+            @case ('read') {
+              <span class="thread-chip chip-read" data-testid="thread-chip-read">Client read</span>
+            }
           }
         </div>
       </div>

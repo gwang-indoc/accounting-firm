@@ -45,6 +45,13 @@ export class AdminClientThreadsComponent implements OnInit {
     this.router.navigate(['/admin/clients', this.clientId(), 'messages', t.id]);
   }
 
+  threadStatus(t: MessageThreadSummaryDto): 'unread' | 'awaiting' | 'read' | 'none' {
+    if (t.unreadCount > 0) return 'unread';
+    if (t.lastSenderType === 'ADMIN' && t.clientUnreadCount > 0) return 'awaiting';
+    if (t.lastSenderType === 'ADMIN' && t.clientUnreadCount === 0) return 'read';
+    return 'none';
+  }
+
   openNewThread(): void {
     this.dialog.open(NewThreadDialogComponent, { width: '480px' })
       .afterClosed().pipe(take(1)).subscribe((result: { subject: string; body: string } | null) => {
