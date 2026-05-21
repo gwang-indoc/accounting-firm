@@ -1,11 +1,11 @@
 <mat-toolbar color="primary" class="navbar-toolbar">
-  <div class="brand">
+  <a class="brand" [routerLink]="brandLink()" data-testid="brand-link">
     <div class="logo-icon">税</div>
     <div class="brand-text">
       <span class="company-name">GWH Accounting</span>
       <span class="tagline">Secure Tax & Accounting Portal</span>
     </div>
-  </div>
+  </a>
 
   <div class="nav-links">
     <a mat-button href="#services">Services</a>
@@ -13,15 +13,12 @@
     @if (authService.isAuthenticated()) {
       <span class="nav-user-name">{{ authService.currentUser()?.name }}</span>
       @if (authService.currentUser()?.role !== 'ADMIN') {
-        <a mat-button routerLink="/portal/messages" routerLinkActive="active" data-testid="messages-nav-link">
-          Messages
+        <a mat-button routerLink="/portal/dashboard" routerLinkActive="active" data-testid="dashboard-nav-link">
+          Dashboard
           @if (unreadCount() > 0) {
             <span class="nav-badge" data-testid="messages-unread-badge">{{ unreadCount() }}</span>
           }
         </a>
-      }
-      @if (authService.currentUser()?.role === 'ADMIN') {
-        <a mat-button routerLink="/admin/clients" data-testid="admin-nav-link">Admin</a>
       }
       <button mat-button data-testid="logout-btn" (click)="logout()">Logout</button>
     } @else {
@@ -32,18 +29,8 @@
   </div>
 
   <div class="lang-toggle">
-    <button
-      data-testid="lang-en"
-      class="lang-pill"
-      [class.active]="lang() === 'en'"
-      (click)="setLang('en')"
-    >EN</button>
-    <button
-      data-testid="lang-zh"
-      class="lang-pill"
-      [class.active]="lang() === 'zh'"
-      (click)="setLang('zh')"
-    >中文</button>
+    <button data-testid="lang-en" class="lang-pill" [class.active]="lang() === 'en'" (click)="setLang('en')">EN</button>
+    <button data-testid="lang-zh" class="lang-pill" [class.active]="lang() === 'zh'" (click)="setLang('zh')">中文</button>
   </div>
 
   <button mat-icon-button class="hamburger" data-testid="hamburger" (click)="toggleSidenav()">{{ sidenavOpen() ? '✕' : '☰' }}</button>

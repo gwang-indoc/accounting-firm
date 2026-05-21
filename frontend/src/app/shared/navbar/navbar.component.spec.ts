@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, provideNgReflectAttributes } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 import { vi } from 'vitest';
@@ -182,11 +182,11 @@ describe('NavbarComponent', () => {
   });
 });
 
-describe('Messages navigation', () => {
+describe('Navigation links', () => {
   let fixture: ComponentFixture<NavbarComponent>;
   let component: NavbarComponent;
 
-  function setupWithUnreadCount(unreadCount: number) {
+  function setup(role: 'USER' | 'ADMIN' | null, unreadCount = 0) {
     const mockPortalMessagesService = {
       getUnreadCount: vi.fn().mockReturnValue(of({ unreadCount })),
     };
@@ -194,60 +194,71 @@ describe('Messages navigation', () => {
       imports: [NavbarComponent, RouterModule.forRoot([])],
       providers: [
         provideHttpClient(),
+        provideNgReflectAttributes(),
         { provide: PortalMessagesService, useValue: mockPortalMessagesService },
       ],
     });
     fixture = TestBed.createComponent(NavbarComponent);
     component = fixture.componentInstance;
     const authService = TestBed.inject(AuthService);
-    authService.currentUser.set({ id: 1, email: 'a@b.com', name: 'Alice', role: 'USER' });
+    if (role) {
+      authService.currentUser.set({ id: 1, email: 'a@b.com', name: 'Alice', role });
+    }
     fixture.detectChanges();
   }
 
-  afterEach(() => {
-    TestBed.resetTestingModule();
+  afterEach(() => TestBed.resetTestingModule());
+
+  it('does not render messages-nav-link for USER', () => {
+    setup('USER');
+    expect(fixture.nativeElement.querySelector('[data-testid="messages-nav-link"]')).toBeNull();
   });
 
-  it('renders Messages link with routerLink /portal/messages', () => {
-    setupWithUnreadCount(0);
-    const nativeEl = fixture.nativeElement as HTMLElement;
-    const link = nativeEl.querySelector('[data-testid="messages-nav-link"]');
+  it('does not render admin-nav-link for ADMIN', () => {
+    setup('ADMIN');
+    expect(fixture.nativeElement.querySelector('[data-testid="admin-nav-link"]')).toBeNull();
+  });
+
+  it('renders dashboard-nav-link for USER', () => {
+    setup('USER');
+    const link = fixture.nativeElement.querySelector('[data-testid="dashboard-nav-link"]');
     expect(link).not.toBeNull();
-    expect(link!.getAttribute('routerLink')).toBe('/portal/messages');
+    expect(link.getAttribute('routerLink')).toBe('/portal/dashboard');
   });
 
-  it('hides Messages link for ADMIN role', () => {
-    const mockPortalMessagesService = {
-      getUnreadCount: vi.fn().mockReturnValue(of({ unreadCount: 0 })),
-    };
-    TestBed.configureTestingModule({
-      imports: [NavbarComponent, RouterModule.forRoot([])],
-      providers: [
-        provideHttpClient(),
-        { provide: PortalMessagesService, useValue: mockPortalMessagesService },
-      ],
-    });
-    fixture = TestBed.createComponent(NavbarComponent);
-    component = fixture.componentInstance;
-    const authService = TestBed.inject(AuthService);
-    authService.currentUser.set({ id: 1, email: 'admin@firm.com', name: 'Admin', role: 'ADMIN' });
-    fixture.detectChanges();
-    const nativeEl = fixture.nativeElement as HTMLElement;
-    expect(nativeEl.querySelector('[data-testid="messages-nav-link"]')).toBeNull();
+  it('does not render dashboard-nav-link for ADMIN', () => {
+    setup('ADMIN');
+    expect(fixture.nativeElement.querySelector('[data-testid="dashboard-nav-link"]')).toBeNull();
   });
 
-  it('shows unread badge when count > 0 and hides it when count is 0', async () => {
-    // Badge visible when count > 0
-    setupWithUnreadCount(3);
-    const nativeEl = fixture.nativeElement as HTMLElement;
-    const badge = nativeEl.querySelector('[data-testid="messages-unread-badge"]');
+  it('shows unread badge on dashboard link when unreadCount > 0', () => {
+    setup('USER', 3);
+    const badge = fixture.nativeElement.querySelector('[data-testid="messages-unread-badge"]');
     expect(badge).not.toBeNull();
-    expect(badge!.textContent?.trim()).toBe('3');
+    expect(badge.textContent.trim()).toBe('3');
+  });
 
-    // Reset and re-setup with count 0
-    TestBed.resetTestingModule();
-    setupWithUnreadCount(0);
-    const noBadge = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="messages-unread-badge"]');
-    expect(noBadge).toBeNull();
+  it('hides unread badge when unreadCount is 0', () => {
+    setup('USER', 0);
+    expect(fixture.nativeElement.querySelector('[data-testid="messages-unread-badge"]')).toBeNull();
+  });
+
+  it('brand-link points to /admin/clients for ADMIN', () => {
+    setup('ADMIN');
+    const brand = fixture.nativeElement.querySelector('[data-testid="brand-link"]');
+    expect(brand).not.toBeNull();
+    expect(brand.getAttribute('ng-reflect-router-link')).toContain('admin/clients');
+  });
+
+  it('brand-link points to / for USER', () => {
+    setup('USER');
+    const brand = fixture.nativeElement.querySelector('[data-testid="brand-link"]');
+    expect(brand.getAttribute('ng-reflect-router-link')).toBe('/');
+  });
+
+  it('brand-link points to / when unauthenticated', () => {
+    setup(null);
+    const brand = fixture.nativeElement.querySelector('[data-testid="brand-link"]');
+    expect(brand.getAttribute('ng-reflect-router-link')).toBe('/');
   });
 });

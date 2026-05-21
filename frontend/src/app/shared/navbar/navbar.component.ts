@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, Input, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, Input, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatToolbar } from '@angular/material/toolbar';
@@ -20,6 +20,9 @@ export class NavbarComponent implements OnInit {
   lang = signal<'en' | 'zh'>('en');
   sidenavOpen = signal(false);
   unreadCount = signal<number>(0);
+  brandLink = computed(() =>
+    this.authService.currentUser()?.role === 'ADMIN' ? '/admin/clients' : '/'
+  );
 
   protected readonly authService = inject(AuthService);
   private readonly router = inject(Router);
