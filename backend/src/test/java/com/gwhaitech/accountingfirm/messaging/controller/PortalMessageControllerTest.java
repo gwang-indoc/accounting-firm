@@ -69,10 +69,20 @@ class PortalMessageControllerTest {
     @Test
     void listMyThreads_returnsOk() throws Exception {
         when(service.listPortalThreads(99L)).thenReturn(
-            List.of(new MessageThreadSummaryDto(50L, 7L, "Tax", LocalDateTime.now(), 1, "preview")));
+            List.of(new MessageThreadSummaryDto(50L, 7L, "Tax", LocalDateTime.now(), 1, 0, "ADMIN", "preview")));
         mvc.perform(get("/api/portal/threads").with(authentication(portalUser())))
            .andExpect(status().isOk())
            .andExpect(jsonPath("$[0].id").value(50));
+    }
+
+    @Test
+    void listThreads_portalHasClientUnreadCountZeroAndLastSenderType() throws Exception {
+        var dto = new MessageThreadSummaryDto(50L, 7L, "Tax", LocalDateTime.now(), 1, 0, "CLIENT", "preview");
+        when(service.listPortalThreads(anyLong())).thenReturn(List.of(dto));
+        mvc.perform(get("/api/portal/threads").with(authentication(portalUser())))
+           .andExpect(status().isOk())
+           .andExpect(jsonPath("$[0].clientUnreadCount").value(0))
+           .andExpect(jsonPath("$[0].lastSenderType").value("CLIENT"));
     }
 
     @Test

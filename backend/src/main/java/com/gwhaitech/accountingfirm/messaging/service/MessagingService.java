@@ -152,7 +152,7 @@ public class MessagingService {
     public java.util.List<MessageThreadSummaryDto> listAdminThreads(Long clientId) {
         return threadRepo.findByClientIdOrderByLastMessageAtDesc(clientId)
                 .stream()
-                .map(t -> toSummaryDto(t, t.getAdminUnreadCount()))
+                .map(t -> toSummaryDto(t, t.getAdminUnreadCount(), t.getClientUnreadCount()))
                 .toList();
     }
 
@@ -169,7 +169,7 @@ public class MessagingService {
         if (c.isEmpty()) return java.util.List.of();
         return threadRepo.findByClientIdOrderByLastMessageAtDesc(c.get().getId())
                 .stream()
-                .map(t -> toSummaryDto(t, t.getClientUnreadCount()))
+                .map(t -> toSummaryDto(t, t.getClientUnreadCount(), 0))
                 .toList();
     }
 
@@ -180,12 +180,14 @@ public class MessagingService {
         return threadRepo.sumClientUnreadForClient(c.get().getId());
     }
 
-    private MessageThreadSummaryDto toSummaryDto(MessageThread t, int unread) {
+    private MessageThreadSummaryDto toSummaryDto(MessageThread t, int unread, int clientUnread) {
         var msgs = messageRepo.findByThreadIdOrderBySentAtAsc(t.getId());
         String preview = msgs.isEmpty() ? "" : msgs.get(msgs.size() - 1).getBody();
         if (preview != null && preview.length() > 80) preview = preview.substring(0, 77) + "...";
+        var lastSender = msgs.isEmpty() ? null : msgs.get(msgs.size() - 1).getSenderType();
+        String lastSenderType = lastSender == null ? null : lastSender.name();
         return new MessageThreadSummaryDto(t.getId(), t.getClientId(), t.getSubject(),
-                t.getLastMessageAt(), unread, preview);
+                t.getLastMessageAt(), unread, clientUnread, lastSenderType, preview);
     }
 
     private void verifyClientOwnsThread(Long callerUserId, MessageThread t) {

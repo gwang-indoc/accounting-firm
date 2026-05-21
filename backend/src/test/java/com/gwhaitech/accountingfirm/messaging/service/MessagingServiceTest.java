@@ -230,6 +230,45 @@ class MessagingServiceTest {
     }
 
     @Test
+    void listAdminThreads_includesClientUnreadCountAndLastSenderType() {
+        MessageThread t = new MessageThread();
+        t.setClientId(7L); t.setSubject("Tax");
+        t.setLastMessageAt(java.time.LocalDateTime.now());
+        t.setAdminUnreadCount(0); t.setClientUnreadCount(3);
+        var spied = spy(t); when(spied.getId()).thenReturn(50L);
+        when(threadRepo.findByClientIdOrderByLastMessageAtDesc(7L)).thenReturn(java.util.List.of(spied));
+
+        Message m = new Message(); m.setBody("Hello"); m.setSenderType(SenderType.ADMIN);
+        when(messageRepo.findByThreadIdOrderBySentAtAsc(50L)).thenReturn(java.util.List.of(m));
+
+        var list = service.listAdminThreads(7L);
+
+        assertThat(list.get(0).clientUnreadCount()).isEqualTo(3);
+        assertThat(list.get(0).lastSenderType()).isEqualTo("ADMIN");
+    }
+
+    @Test
+    void listPortalThreads_setsClientUnreadCountToZeroAndIncludesLastSenderType() {
+        Client client = new Client(); client.setId(7L); client.setUserId(99L);
+        when(clientRepo.findByUserId(99L)).thenReturn(Optional.of(client));
+
+        MessageThread t = new MessageThread();
+        t.setClientId(7L); t.setSubject("Tax");
+        t.setLastMessageAt(java.time.LocalDateTime.now());
+        t.setClientUnreadCount(2);
+        var spied = spy(t); when(spied.getId()).thenReturn(50L);
+        when(threadRepo.findByClientIdOrderByLastMessageAtDesc(7L)).thenReturn(java.util.List.of(spied));
+
+        Message m = new Message(); m.setBody("Hi"); m.setSenderType(SenderType.CLIENT);
+        when(messageRepo.findByThreadIdOrderBySentAtAsc(50L)).thenReturn(java.util.List.of(m));
+
+        var list = service.listPortalThreads(99L);
+
+        assertThat(list.get(0).clientUnreadCount()).isEqualTo(0);
+        assertThat(list.get(0).lastSenderType()).isEqualTo("CLIENT");
+    }
+
+    @Test
     void getAdminUnreadCounts_returnsProjections() {
         com.gwhaitech.accountingfirm.messaging.domain.ClientUnreadRow row =
                 mock(com.gwhaitech.accountingfirm.messaging.domain.ClientUnreadRow.class);

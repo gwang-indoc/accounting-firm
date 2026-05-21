@@ -8,5 +8,7 @@ public record MessageThreadSummaryDto(
         String subject,
         LocalDateTime lastMessageAt,
         int unreadCount,
+        int clientUnreadCount,
+        String lastSenderType,
         String lastMessagePreview
 ) {}

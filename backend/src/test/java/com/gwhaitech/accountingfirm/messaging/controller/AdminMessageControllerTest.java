@@ -70,12 +70,22 @@ class AdminMessageControllerTest {
 
     @Test
     void listThreads_returnsOk() throws Exception {
-        var dto = new MessageThreadSummaryDto(50L, 7L, "Tax", LocalDateTime.now(), 2, "preview");
+        var dto = new MessageThreadSummaryDto(50L, 7L, "Tax", LocalDateTime.now(), 2, 0, null, "preview");
         when(service.listAdminThreads(7L)).thenReturn(List.of(dto));
         mvc.perform(get("/api/clients/7/threads").with(authentication(adminAuth())))
            .andExpect(status().isOk())
            .andExpect(jsonPath("$[0].id").value(50))
            .andExpect(jsonPath("$[0].subject").value("Tax"));
+    }
+
+    @Test
+    void listThreads_includesClientUnreadCountAndLastSenderType() throws Exception {
+        var dto = new MessageThreadSummaryDto(50L, 7L, "Tax", LocalDateTime.now(), 2, 1, "ADMIN", "preview");
+        when(service.listAdminThreads(7L)).thenReturn(List.of(dto));
+        mvc.perform(get("/api/clients/7/threads").with(authentication(adminAuth())))
+           .andExpect(status().isOk())
+           .andExpect(jsonPath("$[0].clientUnreadCount").value(1))
+           .andExpect(jsonPath("$[0].lastSenderType").value("ADMIN"));
     }
 
     @Test
