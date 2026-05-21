@@ -1,26 +1,21 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { MyDocumentsService } from '../../../core/services/my-documents.service';
+import { PortalMessagesService } from '../../../core/services/portal-messages.service';
 import { MyDocumentsResponse } from '../../../core/models/my-documents';
+import { MessageThreadSummaryDto } from '../../../core/models/message.model';
 import { MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatAnchor } from '@angular/material/button';
 import { MatDivider } from '@angular/material/divider';
 
-interface PortalMessage {
-  id: number;
-  title: string;
-  sender: string;
-  date: string;
-  read: boolean;
-}
-
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    RouterLink,
+    RouterLink, DatePipe,
     MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent,
     MatIcon, MatButton, MatAnchor, MatDivider,
   ],
@@ -30,8 +25,10 @@ interface PortalMessage {
 export class DashboardComponent implements OnInit {
   protected authService = inject(AuthService);
   private myDocs = inject(MyDocumentsService);
+  private portalMessages = inject(PortalMessagesService);
 
   response = signal<MyDocumentsResponse | null>(null);
+  threads = signal<MessageThreadSummaryDto[]>([]);
 
   documentCount = computed(() => this.response()?.documents.length ?? null);
 
@@ -41,22 +38,26 @@ export class DashboardComponent implements OnInit {
     return r.documents.reduce((max, d) => Math.max(max, d.year), 0);
   });
 
+  unreadCount = computed(() => this.threads().reduce((sum, t) => sum + t.unreadCount, 0));
+
   ngOnInit(): void {
     this.myDocs.getAll().subscribe({
       next: (res) => this.response.set(res),
       error: () => this.response.set(null),
     });
+    this.portalMessages.listThreads().subscribe({
+      next: (list) => this.threads.set(list.slice(0, 3)),
+      error: () => this.threads.set([]),
+    });
   }
 
-  get unreadCount(): number {
-    return this.messages.filter(m => !m.read).length;
+  senderLabel(t: MessageThreadSummaryDto): string {
+    return t.lastSenderType === 'ADMIN' ? 'Your accountant' : 'You';
   }
 
-  readonly messages: PortalMessage[] = [
-    { id: 1, title: 'Your 2024 tax return is ready for review', sender: 'GWH Accounting', date: 'May 6', read: false },
-    { id: 2, title: 'Document received: T4 Statement 2024', sender: 'GWH Accounting', date: 'Apr 28', read: true },
-    { id: 3, title: 'Action required: Missing T5 slip', sender: 'GWH Accounting', date: 'Apr 15', read: true },
-  ];
+  titleFor(t: MessageThreadSummaryDto): string {
+    return t.subject || t.lastMessagePreview;
+  }
 
   get greeting(): string {
     const h = new Date().getHours();

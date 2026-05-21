@@ -337,6 +337,25 @@
 }
 
 
+/* anchor reset — .msg-row rows are now <a> elements */
+a.msg-row {
+  text-decoration: none;
+  color: inherit;
+}
+
+.view-all-link {
+  display: block;
+  text-align: right;
+  font-size: 13px;
+  color: var(--mat-primary, #1976d2);
+  text-decoration: none;
+  padding: 8px 0 0;
+}
+
+.view-all-link:hover {
+  text-decoration: underline;
+}
+
 /* ── Responsive ── */
 @media (max-width: 767px) {
   .portal-hero {
