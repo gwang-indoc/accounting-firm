@@ -1,0 +1,198 @@
+{
+  "main": {
+    "id": "a6e571a8935ebb68",
+    "type": "split",
+    "children": [
+      {
+        "id": "18a3ba238addea4a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "a04538f42c0b9d86",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "wiki/frontend/auth-pages.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "auth-pages"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "2216dcc903693d0e",
+    "type": "split",
+    "children": [
+      {
+        "id": "835b4005f44c49c2",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "715624cd3b0cfa52",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "751c838f5080a840",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "849177ec6d4019a1",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "f7f82911b55dbe28",
+    "type": "split",
+    "children": [
+      {
+        "id": "c031b7e10ca15784",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "dd370ec52a67d496",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "wiki/frontend/auth-pages.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for auth-pages"
+            }
+          },
+          {
+            "id": "630abbfedc108810",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "wiki/frontend/auth-pages.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from auth-pages"
+            }
+          },
+          {
+            "id": "3ece1262123e2480",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "c8df50a4efb76323",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "6a6ac4271c485625",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "wiki/frontend/auth-pages.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of auth-pages"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "a04538f42c0b9d86",
+  "lastOpenFiles": [
+    "wiki/frontend/navbar-and-layout.md",
+    "wiki/frontend/client-portal-dashboard.md",
+    "wiki/frontend/auth-pages.md",
+    "wiki/frontend/angular-material-theme.md",
+    "wiki/authentication/google-oauth2.md",
+    "wiki/authentication/email-password-auth.md",
+    "raw/authentication/openspec-google-oauth2-auth.md",
+    "wiki/index.md",
+    "wiki/api/contact-form.md"
+  ]
+}
