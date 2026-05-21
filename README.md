@@ -1,34 +1,202 @@
-# accounting-firm
+# GWH Accounting — Secure Tax & Accounting Portal
 
-Web application for an accounting firm. Monorepo containing a Spring Boot backend and Angular frontend.
+> A full-stack web application for an accounting firm: premium public marketing site, encrypted client document portal, secure messaging, and an admin management panel — all in one monorepo.
 
-**Tech Stack:**
-- Backend: Java 21, Spring Boot 3.5, PostgreSQL
-- Frontend: Angular 21
-- Authentication: Google OAuth2
+![Home](docs/screenshots/01-home-hero.png)
+
+---
+
+## What This Project Is
+
+GWH Accounting is a production-ready web application built for a real accounting firm. It combines two distinct experiences in a single codebase:
+
+1. **Public marketing site** — A professional dark-navy website where prospective clients learn about services, review security practices, book consultations, and get in touch.
+2. **Secure client portal** — An authenticated area where existing clients upload and download tax documents, exchange messages with their accountant, and track their dashboard year-over-year.
+3. **Admin panel** — A role-gated back-office used by GWH staff to manage clients, upload documents on their behalf, and conduct threaded message conversations.
+
+Authentication is handled entirely through **Google OAuth2** — clients never create a password on this site. After sign-in, a short-lived `httpOnly` JWT cookie keeps the session secure.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Frontend** | Angular 21, standalone components, zoneless change detection |
+| **UI Library** | Angular Material (dark theme) |
+| **Backend** | Java 21, Spring Boot 3.5 |
+| **Auth** | Google OAuth2 + Spring Security + `httpOnly` JWT cookie |
+| **Database** | PostgreSQL 16 with Flyway migrations |
+| **Testing** | Vitest + Angular TestBed (frontend) · JUnit 5 + Spring Boot Test (backend) · Playwright (E2E) |
+| **Containerisation** | Docker + Docker Compose (dev & prod variants) |
+
+---
+
+## Application Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Browser (Angular 21)                  │
+│                                                          │
+│  Public site          Client portal       Admin panel    │
+│  / /services          /portal/dashboard   /admin/clients │
+│  /security /contact   /portal/documents   /admin/...     │
+│  /book-consultation   /portal/messages                   │
+└────────────────────────┬────────────────────────────────┘
+                         │  HTTP + JWT cookie (httpOnly)
+                         │  (dev: proxied via Angular dev server)
+┌────────────────────────▼────────────────────────────────┐
+│               Spring Boot 3.5  (port 8080)               │
+│                                                          │
+│  Spring Security ── Google OAuth2 ── JWT issuance        │
+│  REST controllers ── Services ── Spring Data JPA         │
+│  Flyway migrations  File upload/download  Email (SMTP)   │
+└────────────────────────┬────────────────────────────────┘
+                         │
+              ┌──────────▼──────────┐
+              │   PostgreSQL 16     │
+              │   accounting_firm   │
+              └─────────────────────┘
+```
+
+### Auth flow
+
+```
+User clicks "Continue with Google"
+  → GET /oauth2/authorization/google          (Spring Security redirect)
+  → Google consent screen
+  → GET /login/oauth2/code/google             (OAuth2 callback)
+  → Spring issues httpOnly JWT cookie
+  → Redirect to /portal/dashboard  (USER role)
+               /admin/clients      (ADMIN role)
+```
+
+### Role model
+
+| Role | Access |
+|---|---|
+| **Unauthenticated** | Public marketing pages only |
+| **USER** | `/portal/dashboard`, `/portal/documents`, `/portal/messages` |
+| **ADMIN** | `/admin/clients` and all per-client sub-pages |
+
+---
+
+## Pages & Screenshots
+
+### 🏠 Home
+
+The marketing homepage — hero section with animated kanji, stats strip, services preview, client portal teaser, security badges, and a consultation CTA.
+
+![Home hero](docs/screenshots/01-home-hero.png)
+
+---
+
+### 🔐 Client Login
+
+Split-screen login: dark brand panel on the left, clean sign-in form on the right. Supports Google OAuth2 (primary), email/password, and new-account registration.
+
+![Login](docs/screenshots/02-login.png)
+
+---
+
+### 💼 Services
+
+Six service cards — Tax Preparation, Bookkeeping, Financial Consulting, Business Advisory, Payroll Services, and Estate Planning — with animated entrance effects.
+
+![Services](docs/screenshots/03-services.png)
+
+---
+
+### 🛡️ Security
+
+Four security pillars (AES-256 encryption, OAuth2 identity, isolated document storage, RBAC) plus a grid of security practices.
+
+![Security](docs/screenshots/04-security.png)
+
+---
+
+### ✉️ Contact & Book Consultation
+
+Contact page with office details and an embedded map. Book Consultation page with a full inquiry form delivered by email to the firm.
+
+<table>
+<tr>
+<td><img src="docs/screenshots/05-contact.png" alt="Contact" /></td>
+<td><img src="docs/screenshots/06-book-consultation.png" alt="Book Consultation" /></td>
+</tr>
+</table>
+
+---
+
+### 📂 Client Portal *(requires login)*
+
+After signing in, clients land on a **Dashboard** showing recent documents and unread messages. From there they can:
+
+| Page | Path | What it does |
+|---|---|---|
+| Dashboard | `/portal/dashboard` | Recent documents, unread message count, quick-links |
+| Documents | `/portal/documents` | Upload files, browse year-grouped document history, download |
+| Messages | `/portal/messages` | Inbox of message threads with the accountant |
+| Thread view | `/portal/messages/:id` | Full conversation thread, reply composer |
+
+---
+
+### 🗂️ Admin Panel *(requires ADMIN role)*
+
+Staff access a dedicated back-office to manage all clients:
+
+| Page | Path | What it does |
+|---|---|---|
+| Client list | `/admin/clients` | Paginated, filterable client roster |
+| Client documents | `/admin/clients/:id/documents` | Upload/manage documents for any client, select tax year |
+| Client messages | `/admin/clients/:id/messages` | View all thread threads for a client with read/awaiting/unread chip indicators |
+| Thread view | `/admin/clients/:id/messages/:id` | Full thread view with reply composer |
+
+---
+
+## User Journeys
+
+### New client
+```
+Home → Book Consultation (inquiry form → email to firm)
+     → Register (/register) → Google OAuth2 → Portal Dashboard
+```
+
+### Returning client
+```
+Home → Client Login → Google OAuth2 → Portal Dashboard
+                    → Documents (download tax return / upload W2)
+                    → Messages  (read reply from accountant)
+```
+
+### Admin staff
+```
+Login → /admin/clients (client list)
+      → Client row → Documents tab (upload signed return)
+      → Client row → Messages tab → Thread (reply to client query)
+```
+
+---
 
 ## Development Setup
 
+### Prerequisites
+
+- Java 21
+- Node.js 20+
+- PostgreSQL 16 (or Docker)
+
 ### 1. PostgreSQL
 
-**Option A — Homebrew (native macOS):**
-
+**Option A — Homebrew:**
 ```bash
-# Install
 brew install postgresql@16
-
-# Start the service
 brew services start postgresql@16
-
-# Create the database
 createdb accounting_firm
 ```
 
 **Option B — Docker:**
-
 ```bash
-# Install Docker Desktop from https://www.docker.com/products/docker-desktop/
-# Then run:
 docker run -d --name accounting-pg \
   -e POSTGRES_DB=accounting_firm \
   -e POSTGRES_USER=postgres \
@@ -39,17 +207,15 @@ docker run -d --name accounting-pg \
 
 ### 2. Environment variables
 
-Create a `.env` file at the project root (already gitignored):
+Create `.env` at the project root (already gitignored):
 
 ```bash
-# Google OAuth2 — from console.cloud.google.com
-# Create a project → APIs & Services → Credentials → OAuth 2.0 Client ID
-# Application type: Web application
+# Google OAuth2 — console.cloud.google.com
 # Authorized redirect URI: http://localhost:8080/login/oauth2/code/google
 GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=your-client-secret
 
-# JWT signing key — any random string, at least 32 characters
+# JWT signing key — at least 32 characters
 JWT_SECRET=change-me-to-a-random-32-char-string
 
 # PostgreSQL
@@ -63,262 +229,113 @@ UPLOAD_MAX_FILE_SIZE_MB=10
 UPLOAD_MAX_FILENAME_LENGTH=100
 BLOCKED_EXTENSIONS=exe,js
 
-# Contact form — email address where contact submissions are delivered
+# Contact form destination
 CONTACT_NOTIFICATION_EMAIL=you@example.com
 ```
 
 ### 3. Start the backend
-
 ```bash
 ./start.sh
 ```
-
-`start.sh` loads `.env` automatically, defaults to the `dev` Spring profile, and starts the backend on `localhost:8080`.
+Loads `.env` automatically, activates the `dev` Spring profile, starts on `localhost:8080`.
 
 ### 4. Start the frontend
-
 ```bash
 cd frontend && npm start
 ```
+Angular dev server on `localhost:4200`. The proxy forwards `/api/**`, `/oauth2/**`, and `/login/oauth2/**` to the backend.
 
-The Angular dev server proxies `/api/**`, `/oauth2/**`, and `/login/oauth2/**` to the Spring Boot server at `localhost:8080`.
+---
 
-## Run with Docker Compose (local testing only)
+## Docker Compose (local, all-in-one)
 
-Alternative to the manual setup above — boots Postgres, backend, and frontend in one command on your laptop. **This setup is for local development/testing only; it is not hardened for production** (no HTTPS, default DB credentials, images built locally rather than pulled from a registry). See [Production Deployment](#production-deployment) for the prod path.
-
-**Prerequisites:** Docker Desktop, and a populated `.env` file at the repo root (see [Environment variables](#2-environment-variables)). The `SPRING_DATASOURCE_*` values in `.env` are ignored under Compose — the backend container is wired to the `db` service automatically.
-
-### 1. Build and start everything
+Boots Postgres, Spring Boot, and Angular in one command — no local Java or Node required.
 
 ```bash
-docker compose up --build
+docker compose up --build        # build and start
+docker compose up --build -d     # background mode
+docker compose down              # stop (keeps DB data)
+docker compose down -v           # stop + wipe DB and uploads
 ```
 
-- Frontend: `http://localhost:4200`
-- Backend: `http://localhost:8080`
-- Postgres: `localhost:5432` (user `postgres`, password `postgres`, db `accounting_firm`)
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:4200 |
+| Backend | http://localhost:8080 |
+| Postgres | localhost:5432 |
 
-Add `-d` to run in the background:
+> **Note:** The OAuth2 callback URL stays `http://localhost:8080/login/oauth2/code/google` — register this in Google Cloud Console.
 
-```bash
-docker compose up --build -d
-```
-
-### 2. Common commands
-
-```bash
-# Tail logs
-docker compose logs -f backend
-docker compose logs -f frontend
-
-# Rebuild a single service after a code change
-docker compose up --build backend
-
-# Stop everything (keeps DB data and uploads)
-docker compose down
-
-# Stop everything AND wipe DB + uploads
-docker compose down -v
-
-# Open a psql shell against the running DB
-docker compose exec db psql -U postgres -d accounting_firm
-```
-
-### 3. Notes
-
-- The OAuth2 callback URL is unchanged: `http://localhost:8080/login/oauth2/code/google` (backend port 8080 is published to the host).
-- Database data persists in the `db_data` named volume; uploaded files persist in `backend_uploads`. Both survive `docker compose down` and are wiped by `down -v`.
-- Flyway migrations run automatically on backend startup.
+---
 
 ## Production Deployment
 
 ### 1. Create `.env.prod`
 
-Copy `.env` to `.env.prod` (gitignored) and fill in production values. Add the SMTP block for outbound email:
+Copy `.env` and fill production values. Add SMTP for outbound email:
 
 ```bash
-# ... same keys as .env, with production values ...
-
-# SMTP — Gmail example (requires an App Password, not your regular password)
-# Enable 2-Step Verification at myaccount.google.com first, then generate
-# an App Password at myaccount.google.com/apppasswords
 SPRING_MAIL_HOST=smtp.gmail.com
 SPRING_MAIL_PORT=587
 SPRING_MAIL_USERNAME=you@gmail.com
-SPRING_MAIL_PASSWORD=your-app-password
-```
+SPRING_MAIL_PASSWORD=your-app-password   # Google App Password (not your login password)
 
-### 2. Start the production backend
-
-```bash
-./start_prod.sh
-```
-
-`start_prod.sh` requires `.env.prod` to exist (exits with an error if missing), sources it, forces `SPRING_PROFILES_ACTIVE=prod`, and starts the backend.
-
-## Production Docker Deployment
-
-Deploy the prebuilt images from Docker Hub to a production server using `docker-compose.prod.yml`.
-
-**Prerequisites:**
-- A Linux server with Docker and the Docker Compose plugin installed
-- A Docker Hub account that has pushed `accounting-firm-backend` and `accounting-firm-frontend` images (see [Publishing images](#publishing-images-to-docker-hub) below)
-- Google OAuth2 production callback URL registered in Google Cloud Console: `https://your-domain/login/oauth2/code/google`
-
-### 1. Publish images to Docker Hub
-
-Releases are gated by git tags. Pushing a `v*` tag triggers the `.github/workflows/release.yml` workflow, which builds and pushes both images to Docker Hub:
-
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-Required GitHub repository secrets (Settings → Secrets and variables → Actions):
-
-| Secret | Value |
-|---|---|
-| `DOCKERHUB_USERNAME` | Your Docker Hub username |
-| `DOCKERHUB_TOKEN` | An access token with Read/Write/Delete permissions |
-
-The workflow tags each image with both the version (`1.0.0`) and `latest`.
-
-### 2. Configure the production server
-
-Clone the repo on the server (you only need `docker-compose.prod.yml`, but cloning keeps things consistent):
-
-```bash
-git clone git@github.com:gwang-indoc/accounting-firm.git
-cd accounting-firm
-```
-
-Create `.env.prod` at the repo root (gitignored). In addition to the keys from the local `.env`, this file must define `DOCKERHUB_USERNAME` and `POSTGRES_PASSWORD`. `IMAGE_TAG` is optional — it defaults to `latest`; set it explicitly to pin a specific version (e.g. for rollback):
-
-```bash
-# Image source
-DOCKERHUB_USERNAME=your-dockerhub-username
-# IMAGE_TAG=1.0.0   # uncomment to pin; otherwise defaults to "latest"
-
-# Google OAuth2 — production credentials
-GOOGLE_CLIENT_ID=...
-GOOGLE_CLIENT_SECRET=...
-
-# JWT signing key (at least 32 characters)
-JWT_SECRET=...
-
-# Database (db service uses this; the URL is wired automatically in compose)
-POSTGRES_PASSWORD=...
-
-# OAuth2 redirect — must use the production HTTPS URL
 OAUTH2_REDIRECT_URI=https://your-domain/portal/dashboard
 CORS_ALLOWED_ORIGINS=https://your-domain
-
-# Contact form
-CONTACT_NOTIFICATION_EMAIL=ops@your-domain
-
-# SMTP — Gmail example (App Password required)
-SPRING_MAIL_HOST=smtp.gmail.com
-SPRING_MAIL_PORT=587
-SPRING_MAIL_USERNAME=you@gmail.com
-SPRING_MAIL_PASSWORD=your-app-password
-
-# File uploads
-UPLOAD_MAX_FILE_SIZE_MB=10
-UPLOAD_MAX_FILENAME_LENGTH=100
-BLOCKED_EXTENSIONS=exe,js
+POSTGRES_PASSWORD=strong-random-password
 ```
 
-### 3. Pull and start
+### 2. Publish Docker images
+
+Push a `v*` git tag to trigger the GitHub Actions release workflow:
 
 ```bash
-# Log in once so Docker can pull from private Docker Hub repos
-docker login -u "$DOCKERHUB_USERNAME"
-
-# Pull the tagged images and start everything in the background
-docker compose -f docker-compose.prod.yml pull
-docker compose -f docker-compose.prod.yml up -d
-
-# Verify
-docker compose -f docker-compose.prod.yml ps
-docker compose -f docker-compose.prod.yml logs -f backend
+git tag v1.0.0 && git push origin v1.0.0
 ```
 
-### 4. Deploy a new release
+Required GitHub secrets: `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`.
 
-If you're tracking `latest` (the default), just pull and restart:
+### 3. Deploy on server
 
 ```bash
+git clone git@github.com:gwang-indoc/accounting-firm.git && cd accounting-firm
+# place .env.prod here
 docker compose -f docker-compose.prod.yml pull
 docker compose -f docker-compose.prod.yml up -d
 ```
 
-To pin or roll back to a specific version, set `IMAGE_TAG` in `.env.prod` (e.g. `IMAGE_TAG=1.0.1`) and run the same two commands.
+### 4. Before going live checklist
 
-Docker recreates only the containers whose image changed. Flyway runs any new DB migrations automatically on backend startup.
+- [ ] HTTPS terminated (Caddy / Traefik / nginx + Let's Encrypt)
+- [ ] `app.cookie.secure=true` in `application-prod.yml` (JWT cookie requires HTTPS)
+- [ ] Production OAuth2 callback URL registered in Google Cloud Console
+- [ ] Docker Hub repositories set to **Private**
+- [ ] Scheduled `pg_dump` backups configured
 
-### 5. Things to wire up before going live
+---
 
-- **HTTPS** — put Caddy, Traefik, or nginx (with Let's Encrypt) in front of port 80, or terminate TLS at a managed load balancer (AWS ALB, Cloudflare Tunnel). The Spring `app.cookie.secure` flag must be `true` once HTTPS is live, or the JWT cookie won't be sent.
-- **Update Google OAuth callback** — register the production URL `https://your-domain/login/oauth2/code/google` in the Google Cloud Console.
-- **Database backups** — `db_data` is a Docker named volume. Back it up with `pg_dump` on a schedule (`docker compose exec db pg_dump -U postgres accounting_firm > backup.sql`), not by copying the volume directory.
-- **Make Docker Hub repos private** — `<username>/accounting-firm-backend` and `-frontend` → Settings → Visibility: Private. Otherwise anyone can pull your image.
+## Commands Reference
 
-## Backend Commands
-
+### Backend
 ```bash
-# Run the application (loads .env automatically)
-./start.sh
-
-# Build (skip tests)
+./start.sh                                    # run (loads .env, dev profile)
+cd backend && ./mvnw test                     # all tests
+cd backend && ./mvnw test -Dtest=ClassName    # single class
 cd backend && ./mvnw clean package -DskipTests
-
-# Run all tests
-cd backend && ./mvnw test
-
-# Run a single test class
-cd backend && ./mvnw test -Dtest=MyServiceTest
-
-# Run a single test method
-cd backend && ./mvnw test -Dtest=MyServiceTest#methodName
 ```
 
-## Frontend Commands
-
+### Frontend
 ```bash
-# Install dependencies
-cd frontend && npm install
-
-# Start dev server (http://localhost:4200)
-cd frontend && npm start
-
-# Build for production
-cd frontend && npm run build
-
-# Run tests
-cd frontend && npm test
-
-# Run a single test file
-cd frontend && npx ng test --include='**/my.component.spec.ts'
-
-# Lint
-cd frontend && npm run lint
+cd frontend && npm start                      # dev server → localhost:4200
+cd frontend && npx ng test --no-watch         # all tests
+cd frontend && npx ng test --include='**/foo.spec.ts'
+cd frontend && npm run build                  # production build
 ```
 
-## E2E Tests (Playwright)
-
-E2E tests live under `e2e/`. Both the backend and frontend must be running before executing them.
-
+### E2E (Playwright)
 ```bash
-# Install dependencies (first time only)
-cd e2e && npm install
-
-# Run all E2E tests
-cd e2e && npx playwright test
-
-# Run a specific test file
-cd e2e && npx playwright test contact.spec.ts
-
-# Run tests matching a keyword
-cd e2e && npx playwright test --grep "login"
+# Backend and frontend must be running first
+cd e2e && npx playwright test                 # all tests
+cd e2e && npx playwright test --grep "login"  # filter by keyword
+cd e2e && npx playwright test contact.spec.ts # single file
 ```
