@@ -130,27 +130,48 @@ Contact page with office details and an embedded map. Book Consultation page wit
 
 ### 📂 Client Portal *(requires login)*
 
-After signing in, clients land on a **Dashboard** showing recent documents and unread messages. From there they can:
+After signing in with Google OAuth2, clients land on a personalised **Dashboard** showing document counts, the latest tax year on file, and their most recent message threads — with unread badges in both the nav and the message list.
 
-| Page | Path | What it does |
-|---|---|---|
-| Dashboard | `/portal/dashboard` | Recent documents, unread message count, quick-links |
-| Documents | `/portal/documents` | Upload files, browse year-grouped document history, download |
-| Messages | `/portal/messages` | Inbox of message threads with the accountant |
-| Thread view | `/portal/messages/:id` | Full conversation thread, reply composer |
+#### Dashboard
+The welcome screen shows live stats (total documents, latest year), quick navigation, and the top 3 message threads with unread indicators.
+
+![Portal Dashboard](docs/screenshots/07-portal-dashboard.png)
+
+#### Document Management
+Clients can upload their own files (W2s, 1099s) and download firm-prepared documents (tax returns, financial reports). Documents are grouped and filterable by **tax year** via a year selector.
+
+![Portal Documents](docs/screenshots/08-portal-documents.png)
+
+#### Secure Messaging — Inbox
+A threaded message inbox for private, encrypted communication with the accounting team. Each thread shows a preview and timestamp; unread threads are highlighted with a badge.
+
+![Portal Messages](docs/screenshots/09-portal-messages.png)
+
+#### Secure Messaging — Thread View
+Full conversation view with alternating client/accountant message bubbles, timestamps, and a reply composer. The client can start new threads from the inbox.
+
+![Portal Thread](docs/screenshots/10-portal-thread.png)
 
 ---
 
 ### 🗂️ Admin Panel *(requires ADMIN role)*
 
-Staff access a dedicated back-office to manage all clients:
+Staff log in through the same Google OAuth2 flow and are redirected to the back-office client roster. Admins see the client's name in the navbar instead of portal links.
 
-| Page | Path | What it does |
-|---|---|---|
-| Client list | `/admin/clients` | Paginated, filterable client roster |
-| Client documents | `/admin/clients/:id/documents` | Upload/manage documents for any client, select tax year |
-| Client messages | `/admin/clients/:id/messages` | View all thread threads for a client with read/awaiting/unread chip indicators |
-| Thread view | `/admin/clients/:id/messages/:id` | Full thread view with reply composer |
+#### Client Management
+A searchable, paginated roster of all clients. Each row shows portal-link status (Linked / Not linked), plus one-click access to Documents and Messages for that client. Staff can create, edit, and delete client records inline.
+
+![Admin Clients](docs/screenshots/11-admin-clients.png)
+
+#### Per-Client Document Management
+Upload, download, and delete documents on behalf of any client. A tax-year selector (10-year range) lets staff manage documents across multiple filing years.
+
+![Admin Client Documents](docs/screenshots/12-admin-client-documents.png)
+
+#### Per-Client Messaging
+A full thread list for the selected client with three-state **chip indicators**: sky-blue unread badge (client replied), amber "Awaiting client" (admin sent, not yet opened), and grey "Client read" (acknowledged). Staff can open any thread or start a new one.
+
+![Admin Client Messages](docs/screenshots/13-admin-client-messages.png)
 
 ---
 
