@@ -1,2 +1,2 @@
 # No property overrides needed for dev.
-# Dev-specific behaviour (e.g. LoggingMailSender) is handled via @Profile("dev") beans.
+# Mail uses defaults from application.yml (override via SPRING_MAIL_* env vars).
