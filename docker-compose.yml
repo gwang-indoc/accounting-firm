@@ -35,7 +35,7 @@ services:
       CORS_ALLOWED_ORIGINS: http://localhost:4200
       OAUTH2_REDIRECT_URI_ADMIN: http://localhost:4200/admin/clients
       OAUTH2_REDIRECT_URI_USER: http://localhost:4200/portal/dashboard
-      UPLOAD_DIR: /app/uploads
+      UPLOAD_DIR: ./backend/uploads
     ports:
       - "8080:8080"
     volumes:
