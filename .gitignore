@@ -17,6 +17,9 @@ out/
 .env.local
 .env.*.local
 
+# Production compose (contains server IPs and prod-specific config)
+docker-compose.prod.yml
+
 # Logs
 logs/
 *.log
