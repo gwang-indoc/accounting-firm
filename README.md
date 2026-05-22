@@ -311,7 +311,7 @@ POSTGRES_PASSWORD=strong-random-password
 
 ### 2. Publish Docker images
 
-Push a `v*` git tag to trigger the GitHub Actions release workflow:
+**Option A — GitHub Actions (recommended):** push a `v*` tag to trigger the release workflow:
 
 ```bash
 git tag v1.0.0 && git push origin v1.0.0
@@ -319,14 +319,28 @@ git tag v1.0.0 && git push origin v1.0.0
 
 Required GitHub secrets: `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`.
 
+**Option B — manual build from a Mac (Apple Silicon):** the production server runs `linux/amd64`, so you must cross-compile explicitly:
+
+```bash
+docker buildx build --platform linux/amd64 \
+  -t garywang118/accounting-firm-backend:latest --push ./backend
+
+docker buildx build --platform linux/amd64 \
+  -t garywang118/accounting-firm-frontend:latest --push ./frontend
+```
+
+> **Why `--platform linux/amd64`?** A Mac with Apple Silicon builds `linux/arm64` images by default. Pushing those to DockerHub and pulling them on an AMD64 server produces `no matching manifest for linux/amd64` — the server can't run the image.
+
 ### 3. Deploy on server
 
 ```bash
 git clone git@github.com:gwang-indoc/accounting-firm.git && cd accounting-firm
 # place .env.prod here
-docker compose -f docker-compose.prod.yml pull
-docker compose -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml --env-file .env.prod pull
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
 ```
+
+> **Why `--env-file .env.prod`?** Docker Compose only loads `.env` automatically. Without this flag, `DOCKERHUB_USERNAME` and `POSTGRES_PASSWORD` stay blank, image names become invalid, and the stack fails to start.
 
 ### 4. Before going live checklist
 

@@ -13,6 +13,8 @@ services:
   db:
     image: postgres:16-alpine
     restart: unless-stopped
+    env_file:
+      - .env.prod
     environment:
       POSTGRES_DB: accounting_firm
       POSTGRES_USER: postgres
@@ -52,6 +54,8 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
+    env_file:
+      - .env.prod
     ports:
       - "80:80"
     # Put a reverse proxy (Caddy/Traefik) or load balancer in front of
