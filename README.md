@@ -277,7 +277,10 @@ docker compose up --build        # build and start
 docker compose up --build -d     # background mode
 docker compose down              # stop (keeps DB data)
 docker compose down -v           # stop + wipe DB and uploads
+docker compose build --no-cache  # force full rebuild (bypasses layer cache)
 ```
+
+> **Tip:** If `--build` isn't picking up your latest code changes, run `docker compose build --no-cache` first. Docker BuildKit caches layers aggressively — `--no-cache` forces every `COPY` and `RUN` step to re-execute from scratch.
 
 | Service | URL |
 |---|---|
