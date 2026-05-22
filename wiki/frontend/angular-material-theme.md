@@ -44,3 +44,4 @@ mat-toolbar[color="primary"] {
 
 - [Navbar and Layout](navbar-and-layout.md)
 - [Auth Pages](auth-pages.md)
+- [Client Portal Dashboard](client-portal-dashboard.md)

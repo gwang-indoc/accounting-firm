@@ -57,3 +57,4 @@ Fields: Full Name, Email, Password, Confirm Password. Submit: `mat-flat-button c
 - [Angular Material Theme](angular-material-theme.md)
 - [Email/Password Authentication](../authentication/email-password-auth.md)
 - [Navbar and Layout](navbar-and-layout.md)
+- [Client Portal Dashboard](client-portal-dashboard.md)

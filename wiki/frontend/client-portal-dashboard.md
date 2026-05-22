@@ -65,3 +65,4 @@ Omitting `/oauth2` breaks the login flow — the browser stays on `localhost:420
 - [Google OAuth2 Authentication](../authentication/google-oauth2.md)
 - [Navbar and Layout](navbar-and-layout.md)
 - [Angular Material Theme](angular-material-theme.md)
+- [Auth Pages](auth-pages.md)
