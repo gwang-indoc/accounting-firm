@@ -39,10 +39,13 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/accounting_firm
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      CORS_ALLOWED_ORIGINS: http://localhost:4200
+      OAUTH2_REDIRECT_URI_ADMIN: http://localhost:4200/admin/clients
+      OAUTH2_REDIRECT_URI_USER: http://localhost:4200/portal/dashboard
       UPLOAD_DIR: /app/uploads
     # No `ports:` block — backend is reached via the frontend nginx proxy.
     volumes:
-      - backend_uploads:/app/uploads
+      - ./uploads:/app/uploads
 
   frontend:
     image: ${DOCKERHUB_USERNAME}/accounting-firm-frontend:${IMAGE_TAG:-latest}
