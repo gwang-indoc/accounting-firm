@@ -153,7 +153,7 @@ That's it! You now see all clients and their data.
 1. Find a client and click their row
 2. Click the **"Messages"** tab
 3. You see all message threads for this client
-4. Notice the **status chips** — blue means unread, amber means awaiting client reply, grey means client read
+4. Notice the **status chips** — sky-blue means unread, amber means awaiting client reply, grey means client read
 5. Click a thread to open the full conversation
 6. Type your reply in the composer at the bottom
 7. Click **"Send"**
