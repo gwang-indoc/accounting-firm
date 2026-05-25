@@ -216,3 +216,138 @@ Use these to prioritize your message queue.
 - Reach out to your manager with feature requests or bugs
 
 ---
+
+# Part 2: Public Site Features
+
+## Home & Navigation
+
+The home page is your first impression of GWH Accounting. It introduces the firm, highlights key services, and invites you to sign in or book a consultation.
+
+![Home page hero section showing the GWH Accounting brand and animated kanji design](docs/screenshots/01-home-hero.png)
+*Figure 1: Home page hero section with brand introduction and calls-to-action*
+
+### What You See
+
+- **Hero section** — The animated GWH logo and introduction: "Secure Tax & Accounting Portal"
+- **Stats strip** — Key numbers about the firm (years in business, clients served, documents secured)
+- **Services preview** — Clickable cards for the six main services
+- **Client portal teaser** — A preview of what clients can do after signing in
+- **Security badges** — Visual indicators that the platform is secure and trusted
+- **"Book Consultation" button** — Large CTA to schedule an initial meeting
+
+### How to Navigate
+
+From the home page, you can:
+- Click **"Services"** to learn about the six offerings in detail
+- Click **"Security"** to understand how your data is protected
+- Click **"Contact"** for office information, phone, and directions
+- Click **"Book Consultation"** to schedule a meeting
+- Click **"Client Login"** if you already have an account
+
+---
+
+## Services Overview
+
+The services page showcases the six core offerings: Tax Preparation, Bookkeeping, Financial Consulting, Business Advisory, Payroll Services, and Estate Planning. Each service card explains what it covers and invites you to book a consultation.
+
+![Six service cards displayed in a grid with icons and descriptions](docs/screenshots/03-services.png)
+*Figure 2: Services overview showing tax preparation, bookkeeping, consulting, advisory, payroll, and estate planning*
+
+### What It Is
+
+Each service card displays:
+- **Service name** — Tax Preparation, Bookkeeping, etc.
+- **Description** — What the service covers and who it's for
+- **Key benefits** — What you gain from this service
+- **Call-to-action** — A link to book this specific service or learn more
+
+### How to Use It
+
+1. Browse the services to find which one matches your needs
+2. Click a card to expand details (if applicable)
+3. Click **"Book Consultation"** to schedule a call with someone who can discuss this service
+4. We'll contact you within 24 hours to confirm your preferred time
+
+---
+
+## Security & Trust
+
+GWH Accounting takes data security seriously. This section explains the technical and operational measures that protect your information.
+
+![Security features page showing four pillars: AES-256 encryption, OAuth2 identity, isolated storage, and role-based access control](docs/screenshots/04-security.png)
+*Figure 3: Security features highlighting encryption, identity verification, data isolation, and access control*
+
+### What It Is
+
+The security section covers:
+- **Data encryption** — All documents encrypted with AES-256 at rest, TLS in transit
+- **Authentication** — Google OAuth2 prevents password breaches; you never create a password on this site
+- **Isolated storage** — Your data is stored separately from other clients; no cross-access
+- **Role-based access** — Only your accountant (and you) can see your documents
+
+### How to Use It
+
+- **To understand our practices:** Read each security pillar
+- **To report a vulnerability:** Contact security@gwh-accounting.com
+- **To ask questions:** Reach out to your accountant or the firm directly
+
+### Why It Matters
+
+You're trusting us with sensitive financial data. Our security practices ensure:
+- Your documents stay private
+- Your communications are encrypted
+- Even if a hacker breaches our servers, they can't read your data without the encryption keys
+- Your accountant has access; no one else does
+
+---
+
+## Contact & Book Consultation
+
+Two pages help you get in touch and schedule your first meeting.
+
+### Contact Page
+
+![Contact page showing firm address, phone, email, and embedded map](docs/screenshots/05-contact.png)
+*Figure 4: Contact information page with office location, phone number, email, and interactive map*
+
+**What You See:**
+- Office address and directions
+- Phone number for voice calls
+- Email address for inquiries
+- Embedded map showing our location
+- Office hours
+
+**How to Use It:**
+- Call or email with general questions
+- Use the map to plan your visit (yes, we offer in-person meetings)
+- Send a message if you prefer email communication
+
+### Book Consultation Page
+
+![Book consultation form with fields for name, email, phone, preferred service, and message](docs/screenshots/06-book-consultation.png)
+*Figure 5: Book consultation form for scheduling an initial meeting*
+
+**What You See:**
+- **Name** — Your full name
+- **Email** — Your contact email
+- **Phone** — Your phone number (optional but helpful)
+- **Preferred Service** — Dropdown to select which service you're interested in
+- **Message** — Space to explain your situation or ask questions
+- **Submit button** — Send your inquiry
+
+**How to Use It:**
+1. Fill in your name and email
+2. Select the service you're interested in (e.g., Tax Preparation)
+3. Optionally add your phone number
+4. Type a brief message (e.g., "I'm a freelancer looking for bookkeeping help")
+5. Click **"Submit"**
+6. Your inquiry is delivered to the firm by email
+7. Someone will contact you within 24 hours to schedule
+
+**What Happens Next:**
+- We review your inquiry
+- We call or email to discuss your needs
+- We schedule a time that works for you
+- In your first call, we learn about your situation and explain how we can help
+
+---
