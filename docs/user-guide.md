@@ -764,3 +764,206 @@ These chips show at a glance what action is needed:
 - **Be conversational** — Messages are about building trust; be friendly and clear
 
 ---
+
+# Part 5: Reference
+
+## Frequently Asked Questions
+
+### For Clients
+
+**Q: Can I use the platform on my phone?**
+A: Yes! The platform is responsive and works on phones, tablets, and desktops. All features are available on mobile.
+
+**Q: What happens if I forget my password?**
+A: You don't have a password! You sign in with Google. If you forget your Google password, reset it at myaccount.google.com.
+
+**Q: What file formats can I upload?**
+A: You can upload PDF, DOCX, XLSX, XLS, JPG, and PNG files. Maximum file size is 10 MB per document. If you have a larger file, compress it or contact your accountant.
+
+**Q: How long do you keep my documents?**
+A: We keep all documents indefinitely. They're securely stored and encrypted. You can download them anytime.
+
+**Q: Can I export all my documents at once?**
+A: Not yet, but it's on our roadmap. For now, download them individually or ask your accountant for a batch export.
+
+**Q: How secure are my messages?**
+A: Your messages are encrypted in transit (TLS) and at rest (AES-256). Only you and your accountant can see them. No one else has access.
+
+**Q: What if I need to upload a scanned receipt?**
+A: Use your phone's camera app to photograph the receipt, then upload the image (JPG or PNG). Make sure the text is legible. Keep the original for your records.
+
+**Q: Can I share my portal with a business partner or family member?**
+A: Not directly. Your login is personal. If you want to share access, reach out to your accountant — they can create a separate login for the other person.
+
+### For Admin Staff
+
+**Q: Can I delete a client's document permanently?**
+A: Yes, click the delete button on the document. Once deleted, it's gone from both the client's view and our system. Use caution!
+
+**Q: What if a client uploads a file with a virus?**
+A: Our system scans uploads for malware. If something is detected, you'll see a warning. You can quarantine or delete suspicious files.
+
+**Q: Can I upload on behalf of multiple clients at once?**
+A: Not in bulk. You upload to one client at a time through their Documents tab. If you need a batch operation, contact your manager about tools.
+
+**Q: What does "Linked" mean in the client roster?**
+A: "Linked" means the client has a Google account that matches their email on file. They can sign in and use the portal. "Not linked" means they're on the roster but haven't signed in yet.
+
+**Q: Can I see all clients' messages in one view?**
+A: No. You view one client's messages at a time. This keeps conversations private and prevents mixing up client data.
+
+**Q: How do I know if a client has read my message?**
+A: Check the status chip on the thread. Grey "Client read" means they've opened it. The timestamp tells you when.
+
+**Q: Can I schedule messages to send later?**
+A: No, messages send immediately. Draft important messages in a text editor first, then paste them.
+
+---
+
+## Troubleshooting
+
+### Login Issues
+
+**Problem: "I can't sign in with Google"**
+
+1. Check that you're clicking **"Continue with Google"** (not email/password)
+2. Ensure your Google account email matches the email on file with the firm
+3. Clear your browser cookies: Settings → Privacy → Clear browsing data
+4. Try signing in in an incognito/private window
+5. If still stuck, ask your accountant for help
+
+**Problem: "I'm redirected to the wrong place after sign-in"**
+
+1. Logout completely (click profile → Logout)
+2. Clear browser cache (Ctrl+Shift+Delete or Cmd+Shift+Delete)
+3. Sign in again
+4. Expected: Clients go to Dashboard; staff go to Client Management
+
+**Problem: "The sign-in button doesn't work"**
+
+1. Check your internet connection
+2. Disable browser extensions (ad blockers, password managers) temporarily
+3. Try a different browser
+4. Check that the site is https://gwh-accounting.com (secure connection required)
+
+### Document Upload Issues
+
+**Problem: "My file won't upload"**
+
+1. Check file size — max is 10 MB
+2. Verify the file format is supported (PDF, DOCX, XLSX, XLS, JPG, PNG)
+3. Confirm you selected a tax year from the dropdown
+4. Check your internet connection (uploads can fail on slow networks)
+5. Try a smaller file first to test
+
+**Problem: "Upload was successful, but I can't see the file"**
+
+1. Refresh the page (Cmd+R or Ctrl+R)
+2. Check the year selector — you may be viewing the wrong tax year
+3. Wait 5 seconds and refresh again (sometimes there's a slight delay)
+4. Ask your accountant if the file appeared on their end
+
+**Problem: "I'm trying to upload a large file and it keeps failing"**
+
+1. Compress the file (if PDF, use Preview on macOS or Adobe Reader on Windows)
+2. Split large documents into multiple files (e.g., "2025 Receipts - Part 1.pdf", "Part 2.pdf")
+3. Upload one part at a time
+4. Check with your accountant if they need the file in a specific format
+
+### Messaging Issues
+
+**Problem: "My message isn't showing up"**
+
+1. Refresh the page
+2. Check that you clicked **"Send"** (not just typed)
+3. Wait 5 seconds and refresh again
+4. If the message was very long, try breaking it into two shorter messages
+
+**Problem: "I'm not seeing the client's reply"**
+
+1. Refresh the page
+2. Check that you're in the correct thread (click back and re-open it)
+3. Scroll down in the thread to see all messages
+4. Check the unread badge — blue means there's a new message
+
+**Problem: "The message composer isn't responding"**
+
+1. Try refreshing the page
+2. Clear your browser cache
+3. Try a different browser
+4. Check your internet connection
+
+---
+
+## Security & Privacy
+
+### Data Encryption
+
+**What's encrypted?**
+- All documents uploaded to the platform
+- All messages between you and your accountant
+- Your personal information (name, email, phone)
+- Everything in transit (when data moves between your computer and our servers)
+
+**How?**
+- **At rest:** AES-256 encryption (military-grade)
+- **In transit:** TLS (Transport Layer Security) — same technology banks use
+- **Keys:** Managed securely; only authorized staff can decrypt data
+
+**In plain English:** Even if someone hacked our servers or intercepted your internet traffic, they couldn't read your documents or messages without the encryption keys.
+
+### Authentication & Access Control
+
+**Google OAuth2:**
+- You sign in with your Google account, not a password created on this site
+- This prevents password theft and credential breaches on our platform
+- Google handles password security; they're very good at it
+
+**JWT Tokens:**
+- After you sign in, we issue a secure token (JWT) stored in an httpOnly cookie
+- httpOnly means browser scripts can't access it (prevents XSS attacks)
+- SameSite=Strict means the token only works on our site (prevents CSRF attacks)
+
+**Role-Based Access Control (RBAC):**
+- Clients can only see their own documents and messages
+- Admin staff can see and manage all clients (by role)
+- No accidental cross-access; the system enforces role boundaries
+
+### Compliance & Best Practices
+
+**Data Retention:**
+- We keep all documents and messages indefinitely (you own your data)
+- You can request a data export anytime
+- If you leave the firm, your data is securely archived or deleted per your request
+
+**Backups:**
+- Documents are backed up regularly to a secure, offsite location
+- If we have a data loss incident, we can recover from backups
+- Backups are encrypted with the same keys as live data
+
+**Audit Logging:**
+- We log all logins, document uploads, and messages
+- Staff audits are reviewed quarterly for security and compliance
+- If there's a security incident, audit logs help us understand what happened
+
+**Report Security Issues:**
+- If you discover a vulnerability, please report it to security@gwh-accounting.com
+- We take all reports seriously and respond within 24 hours
+- Never publicly disclose a vulnerability — let us know privately first so we can fix it
+
+### What You Can Do
+
+**To protect your account:**
+- Use a strong, unique Google password
+- Enable two-factor authentication (2FA) on your Google account (Settings → Security → 2-Step Verification)
+- Don't share your login with anyone
+- Logout on shared computers
+- Use HTTPS (the lock icon in your browser address bar) — never use HTTP
+
+**To protect your data:**
+- Don't email sensitive files — use the portal instead
+- Don't share your Google password with your accountant
+- Tell your accountant if you suspect unauthorized access
+- Keep your contact email current so the firm can reach you
+
+---
