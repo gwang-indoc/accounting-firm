@@ -31,7 +31,7 @@ pandoc user-guide.md \
   --standalone \
   --toc \
   --toc-depth=2 \
-  --css=/dev/null \
+  --css=user-guide.css \
   --metadata title="GWH Accounting User Guide"
 
 # Convert HTML to PDF using weasyprint

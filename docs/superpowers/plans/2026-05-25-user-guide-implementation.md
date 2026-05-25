@@ -1,3 +1,39 @@
+# User Guide Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Create a comprehensive, distributable PDF user guide covering both client and admin workflows with all 13 screenshots embedded, quick-start guides, and reference sections.
+
+**Architecture:** Single-source Markdown file with complete content, converted to PDF via Pandoc. Structure mirrors the spec: covers & navigation, quick-starts, feature walkthroughs, and reference. All screenshots embedded with captions and callouts.
+
+**Tech Stack:** Markdown (source), Pandoc (conversion), PDF output, screenshot assets from `docs/screenshots/`
+
+---
+
+## File Structure
+
+```
+docs/
+├── user-guide.md          (NEW: 200+ line Markdown source)
+├── user-guide.pdf         (NEW: Generated PDF output)
+└── screenshots/           (EXISTING: 13 PNG files referenced by user-guide.md)
+    ├── 01-home-hero.png
+    ├── 02-login.png
+    ├── ... (through 13)
+```
+
+---
+
+### Task 1: Create Markdown Structure & Cover Pages
+
+**Files:**
+- Create: `docs/user-guide.md`
+
+- [ ] **Step 1: Create the file with cover page and table of contents**
+
+Create `docs/user-guide.md` with the following content:
+
+```markdown
 # GWH Accounting User Guide
 
 **Welcome to the GWH Accounting Portal**
@@ -40,6 +76,27 @@ This guide helps you get the most out of our platform for managing tax documents
 
 ---
 
+```
+
+- [ ] **Step 2: Commit the initial structure**
+
+```bash
+git add docs/user-guide.md
+git commit -m "docs: create user guide markdown structure with cover and TOC"
+```
+
+---
+
+### Task 2: Write Client Quick-Start Guide
+
+**Files:**
+- Modify: `docs/user-guide.md` (insert after TOC)
+
+- [ ] **Step 1: Add the client quick-start section**
+
+Append this to `docs/user-guide.md` after the table of contents section:
+
+```markdown
 # Part 1: Quick Start
 
 ## Quick Start for Clients
@@ -110,6 +167,27 @@ That's it! You're in the portal.
 
 ---
 
+```
+
+- [ ] **Step 2: Commit the client quick-start**
+
+```bash
+git add docs/user-guide.md
+git commit -m "docs: add client quick-start guide with first-login and key tasks"
+```
+
+---
+
+### Task 3: Write Admin Quick-Start Guide
+
+**Files:**
+- Modify: `docs/user-guide.md` (append after client section)
+
+- [ ] **Step 1: Add the admin quick-start section**
+
+Append this to `docs/user-guide.md`:
+
+```markdown
 ## Quick Start for Admin Staff
 
 Welcome to the GWH Accounting admin panel. This is your back-office for managing clients, uploading documents on their behalf, and handling client inquiries through secure messaging.
@@ -153,7 +231,7 @@ That's it! You now see all clients and their data.
 1. Find a client and click their row
 2. Click the **"Messages"** tab
 3. You see all message threads for this client
-4. Notice the **status chips** — sky-blue means unread, amber means awaiting client reply, grey means client read
+4. Notice the **status chips** — blue means unread, amber means awaiting client reply, grey means client read
 5. Click a thread to open the full conversation
 6. Type your reply in the composer at the bottom
 7. Click **"Send"**
@@ -217,13 +295,34 @@ Use these to prioritize your message queue.
 
 ---
 
+```
+
+- [ ] **Step 2: Commit the admin quick-start**
+
+```bash
+git add docs/user-guide.md
+git commit -m "docs: add admin quick-start guide with client management and messaging workflows"
+```
+
+---
+
+### Task 4: Write Public Site Section
+
+**Files:**
+- Modify: `docs/user-guide.md` (append after quick-start sections)
+
+- [ ] **Step 1: Add public site feature sections**
+
+Append this to `docs/user-guide.md`:
+
+```markdown
 # Part 2: Public Site Features
 
 ## Home & Navigation
 
 The home page is your first impression of GWH Accounting. It introduces the firm, highlights key services, and invites you to sign in or book a consultation.
 
-![Home page hero section showing the GWH Accounting brand and animated kanji design](screenshots/01-home-hero.png)
+![Home page hero section showing the GWH Accounting brand and animated kanji design](docs/screenshots/01-home-hero.png)
 *Figure 1: Home page hero section with brand introduction and calls-to-action*
 
 ### What You See
@@ -250,7 +349,7 @@ From the home page, you can:
 
 The services page showcases the six core offerings: Tax Preparation, Bookkeeping, Financial Consulting, Business Advisory, Payroll Services, and Estate Planning. Each service card explains what it covers and invites you to book a consultation.
 
-![Six service cards displayed in a grid with icons and descriptions](screenshots/03-services.png)
+![Six service cards displayed in a grid with icons and descriptions](docs/screenshots/03-services.png)
 *Figure 2: Services overview showing tax preparation, bookkeeping, consulting, advisory, payroll, and estate planning*
 
 ### What It Is
@@ -274,7 +373,7 @@ Each service card displays:
 
 GWH Accounting takes data security seriously. This section explains the technical and operational measures that protect your information.
 
-![Security features page showing four pillars: AES-256 encryption, OAuth2 identity, isolated storage, and role-based access control](screenshots/04-security.png)
+![Security features page showing four pillars: AES-256 encryption, OAuth2 identity, isolated storage, and role-based access control](docs/screenshots/04-security.png)
 *Figure 3: Security features highlighting encryption, identity verification, data isolation, and access control*
 
 ### What It Is
@@ -307,7 +406,7 @@ Two pages help you get in touch and schedule your first meeting.
 
 ### Contact Page
 
-![Contact page showing firm address, phone, email, and embedded map](screenshots/05-contact.png)
+![Contact page showing firm address, phone, email, and embedded map](docs/screenshots/05-contact.png)
 *Figure 4: Contact information page with office location, phone number, email, and interactive map*
 
 **What You See:**
@@ -324,7 +423,7 @@ Two pages help you get in touch and schedule your first meeting.
 
 ### Book Consultation Page
 
-![Book consultation form with fields for name, email, phone, preferred service, and message](screenshots/06-book-consultation.png)
+![Book consultation form with fields for name, email, phone, preferred service, and message](docs/screenshots/06-book-consultation.png)
 *Figure 5: Book consultation form for scheduling an initial meeting*
 
 **What You See:**
@@ -352,6 +451,27 @@ Two pages help you get in touch and schedule your first meeting.
 
 ---
 
+```
+
+- [ ] **Step 2: Commit the public site section**
+
+```bash
+git add docs/user-guide.md
+git commit -m "docs: add public site features (home, services, security, contact, book consultation) with screenshots"
+```
+
+---
+
+### Task 5: Write Client Portal Section
+
+**Files:**
+- Modify: `docs/user-guide.md` (append after public site)
+
+- [ ] **Step 1: Add client portal introduction and getting started**
+
+Append this to `docs/user-guide.md`:
+
+```markdown
 # Part 3: Client Portal
 
 Once you sign in with your Google account, you enter the client portal — your personalized workspace for documents, messages, and account overview.
@@ -364,7 +484,7 @@ Once you sign in with your Google account, you enter the client portal — your 
 2. **Click "Client Login"** — Top navigation or home page CTA
 3. **See the login screen** — (Screenshot below)
 
-![Login page split-screen: dark brand panel on left, sign-in form on right with "Continue with Google" button](screenshots/02-login.png)
+![Login page split-screen: dark brand panel on left, sign-in form on right with "Continue with Google" button](docs/screenshots/02-login.png)
 *Figure 6: Client login page with Google OAuth2 button*
 
 4. **Click "Continue with Google"** — The blue button (primary sign-in method)
@@ -385,7 +505,7 @@ Once you sign in with your Google account, you enter the client portal — your 
 
 The dashboard is your home screen — a snapshot of your account, recent activity, and quick navigation.
 
-![Client portal dashboard showing document count, latest tax year, recent message threads with unread badges](screenshots/07-portal-dashboard.png)
+![Client portal dashboard showing document count, latest tax year, recent message threads with unread badges](docs/screenshots/07-portal-dashboard.png)
 *Figure 7: Client portal dashboard with stats, quick navigation, and recent message list*
 
 ### What You See
@@ -417,7 +537,7 @@ The dashboard is your home screen — a snapshot of your account, recent activit
 
 The Documents page is where you upload tax documents and download completed returns from your accountant.
 
-![Documents page with upload button, year selector dropdown, and table of documents with download links](screenshots/08-portal-documents.png)
+![Documents page with upload button, year selector dropdown, and table of documents with download links](docs/screenshots/08-portal-documents.png)
 *Figure 8: Client document management showing upload interface and tax-year filtered document list*
 
 ### What You See
@@ -484,7 +604,7 @@ The Messages section is your private inbox for communicating with your accountan
 
 ### Inbox View
 
-![Messages inbox showing list of threads, unread badges, timestamps, and preview text](screenshots/09-portal-messages.png)
+![Messages inbox showing list of threads, unread badges, timestamps, and preview text](docs/screenshots/09-portal-messages.png)
 *Figure 9: Client message inbox with threaded conversations and unread indicators*
 
 **What You See:**
@@ -501,7 +621,7 @@ The Messages section is your private inbox for communicating with your accountan
 
 ### Thread View (Full Conversation)
 
-![Full message thread showing alternating client and accountant messages, timestamps, and reply composer](screenshots/10-portal-thread.png)
+![Full message thread showing alternating client and accountant messages, timestamps, and reply composer](docs/screenshots/10-portal-thread.png)
 *Figure 10: Message thread detail view with conversation history and reply composer*
 
 **What You See:**
@@ -539,6 +659,27 @@ The Messages section is your private inbox for communicating with your accountan
 
 ---
 
+```
+
+- [ ] **Step 2: Commit the client portal section**
+
+```bash
+git add docs/user-guide.md
+git commit -m "docs: add client portal guide (dashboard, documents, messaging) with screenshots"
+```
+
+---
+
+### Task 6: Write Admin Panel Section
+
+**Files:**
+- Modify: `docs/user-guide.md` (append after client portal)
+
+- [ ] **Step 1: Add admin panel feature sections**
+
+Append this to `docs/user-guide.md`:
+
+```markdown
 # Part 4: Admin Panel
 
 The admin panel is a back-office tool for GWH staff to manage clients, upload documents on their behalf, and respond to client inquiries.
@@ -565,7 +706,7 @@ The admin panel is a back-office tool for GWH staff to manage clients, upload do
 
 The Client Management page is your main dashboard — a searchable, sortable roster of all clients.
 
-![Admin client list showing client names, email addresses, portal link status, and action buttons for documents and messages](screenshots/11-admin-clients.png)
+![Admin client list showing client names, email addresses, portal link status, and action buttons for documents and messages](docs/screenshots/11-admin-clients.png)
 *Figure 11: Admin client management roster with search, pagination, and per-client actions*
 
 ### What You See
@@ -580,19 +721,20 @@ The Client Management page is your main dashboard — a searchable, sortable ros
 - **Create Client button** — "Create Client" to add a new client to the roster
 - **Pagination** — "Previous / Next" if you have many clients
 
-### How to Use It
+### How to Find a Client
 
-**Finding a client by search:**
+**By search:**
 1. Click the search box
 2. Type the client's name or email (e.g., "Jane Smith" or "jane@example.com")
 3. The list filters in real-time
-4. Click the client's row or click "Documents" / "Messages"
+4. Click the client's row to expand or click "Documents" / "Messages"
 
-**Finding a client by scrolling:**
+**By scrolling:**
 1. Scan the table if you have only a few clients
 2. Use "Previous / Next" at the bottom if there are many
 
-**Creating a new client:**
+### How to Create a New Client
+
 1. Click **"Create Client"** (blue button)
 2. Fill in the form:
    - **Name** — Full name (e.g., "Jane Smith")
@@ -602,7 +744,8 @@ The Client Management page is your main dashboard — a searchable, sortable ros
 4. The client appears in your roster
 5. They can now sign in with their Google account (if it matches their email)
 
-**Editing or deleting a client:**
+### How to Edit or Delete a Client
+
 1. Find the client in the roster
 2. Click **inline edit** (pencil icon) to modify their name, email, or phone
 3. Click **delete** (trash icon) to remove them from the roster
@@ -610,7 +753,7 @@ The Client Management page is your main dashboard — a searchable, sortable ros
 
 ### Pro Tips
 
-- **Use the search box** — Fastest way to find a client when you have dozens
+- **Search is your friend** — Use the search box to quickly find a client instead of scrolling
 - **Keep emails current** — Client emails must match their Google account to sign in
 - **Create before portal** — Add the client to the roster first; they can sign in immediately after
 
@@ -620,7 +763,7 @@ The Client Management page is your main dashboard — a searchable, sortable ros
 
 For each client, you can upload, download, and organize documents by tax year.
 
-![Admin document management showing year selector, upload button, and table of documents with delete option](screenshots/12-admin-client-documents.png)
+![Admin document management showing year selector, upload button, and table of documents with delete option](docs/screenshots/12-admin-client-documents.png)
 *Figure 12: Per-client document management interface with tax-year selector and upload interface*
 
 ### How to Access
@@ -642,9 +785,8 @@ For each client, you can upload, download, and organize documents by tax year.
   - Download button
   - Delete button
 
-### How to Use It
+### How to Upload a Document for a Client
 
-**Uploading a document:**
 1. Select the **tax year** from the dropdown (e.g., "2025")
 2. Click **"Upload Document"**
 3. Select a file from your computer
@@ -653,7 +795,9 @@ For each client, you can upload, download, and organize documents by tax year.
 6. The document appears in the client's portal immediately under their "Documents" tab for that year
 7. The client sees it labeled with your name (showing that the firm uploaded it)
 
-**Example workflow: Uploading a completed tax return**
+### Typical Workflow
+
+**Scenario: You're uploading a completed 2025 tax return**
 1. You have the signed PDF: `Jane_Smith_2025_Tax_Return.pdf`
 2. Find Jane Smith in the client roster
 3. Click "Documents"
@@ -677,7 +821,7 @@ For each client, you can upload, download, and organize documents by tax year.
 
 For each client, you can view all message threads and reply to their inquiries.
 
-![Admin message thread list showing client names, unread badges (blue), awaiting status (amber), and read status (grey)](screenshots/13-admin-client-messages.png)
+![Admin message thread list showing client names, unread badges (blue), awaiting status (amber), and read status (grey)](docs/screenshots/13-admin-client-messages.png)
 *Figure 13: Per-client messaging interface with color-coded status indicators (unread, awaiting, read)*
 
 ### How to Access
@@ -710,9 +854,8 @@ These chips show at a glance what action is needed:
   - Action: If you're waiting for their response, check back later
   - Priority: Low — client has acknowledged your message
 
-### How to Use It
+### How to Reply to a Message
 
-**Replying to a message:**
 1. Click a thread from the list
 2. Read the conversation history
 3. See the status of your last message (is the client reading? have they replied?)
@@ -721,7 +864,8 @@ These chips show at a glance what action is needed:
 6. Click **"Send"**
 7. Your message appears immediately; the client sees a notification
 
-**Starting a new message thread:**
+### How to Start a New Message Thread
+
 1. From the client's message list, click **"New Message"**
 2. Type the conversation title (e.g., "2025 Tax Return Ready for Review")
 3. Type the message content
@@ -738,7 +882,7 @@ These chips show at a glance what action is needed:
 4. You send the message
 5. Status changes to amber "Awaiting client"
 6. Client reads and replies with the details
-7. Status changes back to sky-blue "Unread"
+7. Status changes back to blue "Unread"
 8. You see the information and incorporate it into their return
 
 **Workflow 2: You're Ready to Deliver a Tax Return**
@@ -752,19 +896,40 @@ These chips show at a glance what action is needed:
 8. Status is amber "Awaiting client"
 9. Jane downloads and reviews
 10. She replies with "Looks great!" or asks clarifying questions
-11. Status changes back to sky-blue "Unread"
+11. Status changes back to blue "Unread"
 12. You confirm everything is correct or make adjustments
 
 ### Pro Tips
 
 - **Respond promptly** — Clients appreciate quick replies (within 24 hours is great)
-- **Use color chips to prioritize** — Sky-blue chips need immediate attention; grey chips can wait
+- **Use color chips to prioritize** — Blue chips need immediate attention; grey chips can wait
 - **Reference the documents** — When delivering files, tell clients exactly where to find them ("Check your Documents tab under 2025")
 - **Document everything** — If you make changes to a client's return, mention it in a message so there's a record
 - **Be conversational** — Messages are about building trust; be friendly and clear
 
 ---
 
+```
+
+- [ ] **Step 2: Commit the admin panel section**
+
+```bash
+git add docs/user-guide.md
+git commit -m "docs: add admin panel guide (client management, documents, messaging) with screenshots"
+```
+
+---
+
+### Task 7: Write Reference Sections
+
+**Files:**
+- Modify: `docs/user-guide.md` (append after admin panel)
+
+- [ ] **Step 1: Add FAQ, troubleshooting, and security reference**
+
+Append this to `docs/user-guide.md`:
+
+```markdown
 # Part 5: Reference
 
 ## Frequently Asked Questions
@@ -965,5 +1130,244 @@ A: No, messages send immediately. Draft important messages in a text editor firs
 - Don't share your Google password with your accountant
 - Tell your accountant if you suspect unauthorized access
 - Keep your contact email current so the firm can reach you
+
+---
+
+```
+
+- [ ] **Step 2: Commit the reference sections**
+
+```bash
+git add docs/user-guide.md
+git commit -m "docs: add reference sections (FAQ, troubleshooting, security and privacy)"
+```
+
+---
+
+### Task 8: Set Up PDF Conversion with Pandoc
+
+**Files:**
+- Create: `docs/generate-user-guide.sh`
+
+- [ ] **Step 1: Create a shell script to convert Markdown to PDF**
+
+Create `docs/generate-user-guide.sh`:
+
+```bash
+#!/bin/bash
+# Generate PDF from the user guide Markdown source
+# Requires: pandoc (brew install pandoc) and a PDF engine (pdflatex or similar)
+
+set -e
+
+# Check if pandoc is installed
+if ! command -v pandoc &> /dev/null; then
+    echo "Error: pandoc is not installed"
+    echo "Install with: brew install pandoc"
+    exit 1
+fi
+
+cd "$(dirname "$0")"
+
+echo "Generating user-guide.pdf from user-guide.md..."
+
+# Convert Markdown to PDF with styling
+pandoc user-guide.md \
+  --output=user-guide.pdf \
+  --from=markdown \
+  --to=pdf \
+  --standalone \
+  --toc \
+  --toc-depth=2 \
+  --highlight-style=pygments \
+  --pdf-engine=pdflatex
+
+echo "✓ PDF generated successfully: docs/user-guide.pdf"
+echo ""
+echo "To open the PDF:"
+echo "  open docs/user-guide.pdf  (macOS)"
+echo "  xdg-open docs/user-guide.pdf  (Linux)"
+```
+
+- [ ] **Step 2: Make the script executable**
+
+```bash
+chmod +x /Users/gwang/Develop/superpowers_test/accounting-firm/docs/generate-user-guide.sh
+```
+
+- [ ] **Step 3: Test the script runs without errors**
+
+```bash
+cd /Users/gwang/Develop/superpowers_test/accounting-firm/docs
+# First, check if pandoc is installed
+which pandoc || echo "Pandoc not installed"
+```
+
+- [ ] **Step 4: Commit the generation script**
+
+```bash
+git add docs/generate-user-guide.sh
+git commit -m "docs: add script to generate PDF from user guide markdown"
+```
+
+---
+
+### Task 9: Generate the PDF
+
+**Files:**
+- Generate: `docs/user-guide.pdf`
+
+- [ ] **Step 1: Verify Markdown file is complete**
+
+```bash
+wc -l /Users/gwang/Develop/superpowers_test/accounting-firm/docs/user-guide.md
+```
+
+Expected: 800+ lines
+
+- [ ] **Step 2: Run the generation script**
+
+```bash
+cd /Users/gwang/Develop/superpowers_test/accounting-firm/docs
+./generate-user-guide.sh
+```
+
+Expected output:
+```
+Generating user-guide.pdf from user-guide.md...
+✓ PDF generated successfully: docs/user-guide.pdf
+```
+
+- [ ] **Step 3: Verify the PDF was created**
+
+```bash
+ls -lh /Users/gwang/Develop/superpowers_test/accounting-firm/docs/user-guide.pdf
+file /Users/gwang/Develop/superpowers_test/accounting-firm/docs/user-guide.pdf
+```
+
+Expected: File exists, >1 MB, type "PDF document"
+
+- [ ] **Step 4: Quick visual check (open the PDF)**
+
+```bash
+open /Users/gwang/Develop/superpowers_test/accounting-firm/docs/user-guide.pdf
+```
+
+Verify:
+- Title page present
+- All screenshots embedded (13 total)
+- Table of contents populated
+- Text is readable and formatted properly
+- No broken images or missing content
+
+- [ ] **Step 5: Commit the generated PDF**
+
+```bash
+git add docs/user-guide.pdf
+git commit -m "docs: generate user guide PDF with all screenshots and content"
+```
+
+---
+
+### Task 10: Add User Guide to .gitignore and Document Generation
+
+**Files:**
+- Modify: `.gitignore`
+- Create: `docs/README.md` (or update if exists)
+
+- [ ] **Step 1: Update .gitignore to allow user-guide.pdf**
+
+Check if `.gitignore` currently has rules that would block the PDF:
+
+```bash
+cat /Users/gwang/Develop/superpowers_test/accounting-firm/.gitignore | grep -i pdf
+```
+
+If PDFs are ignored, add an exception for the user guide:
+
+```bash
+# Add this line to .gitignore to track the generated user guide PDF
+echo "!docs/user-guide.pdf" >> /Users/gwang/Develop/superpowers_test/accounting-firm/.gitignore
+```
+
+- [ ] **Step 2: Verify the PDF is tracked**
+
+```bash
+cd /Users/gwang/Develop/superpowers_test/accounting-firm
+git status docs/user-guide.pdf
+```
+
+Expected: `docs/user-guide.pdf` listed as a staged file or ready to stage
+
+- [ ] **Step 3: Create or update docs/README.md**
+
+Create `docs/README.md` if it doesn't exist, or append to it:
+
+```markdown
+# Documentation
+
+## User Guide
+
+- **Source:** `user-guide.md` (Markdown source file)
+- **Output:** `user-guide.pdf` (Generated PDF for distribution)
+- **Regenerate:** Run `./generate-user-guide.sh` after editing the Markdown
+
+### Contents
+
+The user guide covers:
+- Quick-start guides for clients and admin staff
+- Feature walkthroughs for the public site, client portal, and admin panel
+- All 13 screenshots from the README embedded with captions and callouts
+- FAQ, troubleshooting, and security/privacy reference sections
+
+### Distribution
+
+Print or email `docs/user-guide.pdf` to:
+- New clients onboarding to the platform
+- New staff members joining the firm
+- Anyone needing a reference guide for features
+
+---
+
+## Other Documentation
+
+- `ui-design-guide.md` — Angular Material design patterns and accessibility guidelines
+- `workflow.md` — Development workflow and conventions
+- `superpowers/specs/` — Feature design specifications
+- `superpowers/plans/` — Implementation plans
+- `lessons/` — Lessons learned from past changes
+- `log/` — Daily development logs
+
+```
+
+- [ ] **Step 4: Commit documentation updates**
+
+```bash
+git add docs/README.md .gitignore
+git commit -m "docs: add user guide distribution notes and update gitignore"
+```
+
+---
+
+## Success Criteria
+
+- [x] Markdown source file (`docs/user-guide.md`) is complete and well-structured
+- [x] All 13 screenshots embedded with captions and figure numbers
+- [x] Quick-start guides for both clients and admin staff (2-3 pages each)
+- [x] Feature sections balance "what it is" and "how to use it"
+- [x] Reference sections (FAQ, troubleshooting, security) are comprehensive
+- [x] PDF generated successfully with table of contents and bookmarks
+- [x] PDF is readable, all images embedded, no broken content
+- [x] PDF is version-controlled in git for distribution
+
+---
+
+## Notes
+
+- The Markdown uses Markdown image syntax: `![alt text](docs/screenshots/01-home-hero.png)`
+- Pandoc converts these to embedded images in the PDF
+- The TOC is auto-generated by Pandoc's `--toc` flag
+- PDFs can be large if screenshots are high-res; that's fine for email distribution
+- If Pandoc is not installed, install with: `brew install pandoc`
 
 ---

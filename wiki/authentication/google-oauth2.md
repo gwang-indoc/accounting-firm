@@ -23,10 +23,10 @@ Attributes: `HttpOnly`, `SameSite=Strict`, `Path=/`. JavaScript cannot read the 
 
 ## Auth Endpoints
 
-| Endpoint | Method | Auth | Purpose |
-|---|---|---|---|
-| `/api/auth/me` | GET | Required | Returns `{ id, email, name, role }` or 401 |
-| `/api/auth/logout` | POST | Required | Sets cookie `Max-Age=0`, returns 200 |
+| Endpoint           | Method | Auth     | Purpose                                    |
+| ------------------ | ------ | -------- | ------------------------------------------ |
+| `/api/auth/me`     | GET    | Required | Returns `{ id, email, name, role }` or 401 |
+| `/api/auth/logout` | POST   | Required | Sets cookie `Max-Age=0`, returns 200       |
 
 ## See Also
 
