@@ -351,3 +351,190 @@ Two pages help you get in touch and schedule your first meeting.
 - In your first call, we learn about your situation and explain how we can help
 
 ---
+
+# Part 3: Client Portal
+
+Once you sign in with your Google account, you enter the client portal — your personalized workspace for documents, messages, and account overview.
+
+## Getting Started
+
+### Your Login Flow
+
+1. **Visit the site** — Go to https://gwh-accounting.com
+2. **Click "Client Login"** — Top navigation or home page CTA
+3. **See the login screen** — (Screenshot below)
+
+![Login page split-screen: dark brand panel on left, sign-in form on right with "Continue with Google" button](docs/screenshots/02-login.png)
+*Figure 6: Client login page with Google OAuth2 button*
+
+4. **Click "Continue with Google"** — The blue button (primary sign-in method)
+5. **Authenticate** — Google prompts you to sign in if you're not already; you may see a "Grant Access" screen
+6. **Redirected to dashboard** — You're now logged in and see your personalized dashboard
+7. **Look for unread badges** — Messages tab may show a blue badge if your accountant sent you something
+
+### Account Security
+
+- **No password to create** — Google OAuth2 handles authentication; much more secure
+- **httpOnly JWT cookie** — Your session is managed by a secure token that can't be stolen by browser scripts
+- **Logout anytime** — Click your profile in the top-right → "Logout"; you're immediately signed out
+- **Forgotten password?** — No password to forget! Just click "Continue with Google" again
+
+---
+
+## Dashboard Overview
+
+The dashboard is your home screen — a snapshot of your account, recent activity, and quick navigation.
+
+![Client portal dashboard showing document count, latest tax year, recent message threads with unread badges](docs/screenshots/07-portal-dashboard.png)
+*Figure 7: Client portal dashboard with stats, quick navigation, and recent message list*
+
+### What You See
+
+- **Welcome header** — "Welcome, [Your Name]"
+- **Document stats** — Total documents uploaded, count by year
+- **Latest tax year** — The most recent year on file
+- **Quick navigation** — Buttons to jump to Documents or Messages
+- **Recent message threads** — The 3 most recent threads with previews
+- **Unread badges** — Blue badges on threads if your accountant has replied
+
+### How to Use It
+
+- **Check stats** — See at a glance how many documents you've uploaded
+- **Jump to Documents** — Click the Documents button to upload a new file
+- **Check for replies** — Scan the message list for unread badges (blue)
+- **Click a thread** — Jump directly to a recent conversation
+- **Refresh** — Reload the page to see new activity
+
+### Pro Tips
+
+- **Set a weekly reminder** — Check your dashboard every Sunday to catch any messages from your accountant
+- **Don't wait until tax season** — Upload documents as they arrive (W2, 1099, receipts) rather than batching them in March
+- **Look for blue badges** — Unread messages need attention; respond quickly to keep things moving
+
+---
+
+## Document Management
+
+The Documents page is where you upload tax documents and download completed returns from your accountant.
+
+![Documents page with upload button, year selector dropdown, and table of documents with download links](docs/screenshots/08-portal-documents.png)
+*Figure 8: Client document management showing upload interface and tax-year filtered document list*
+
+### What You See
+
+- **Upload button** — "Upload Document" (blue button)
+- **Year selector** — Dropdown to filter documents by tax year (2026, 2025, 2024, etc.)
+- **Document table** — List of uploaded files with:
+  - Filename
+  - Upload date
+  - File size
+  - Download link
+
+### How to Upload a Document
+
+1. Click **"Upload Document"** (blue button at top)
+2. Click **"Select File"** or drag a file into the upload area
+3. Choose a file from your computer (W2, 1099, receipt, tax return, etc.)
+4. Choose the **tax year** from the dropdown (e.g., "2025")
+5. Click **"Upload"**
+6. Wait for confirmation: "Document uploaded successfully"
+7. The file appears in your document list immediately
+
+### Supported File Types
+
+- **PDF** (.pdf)
+- **Microsoft Office** (.docx, .xlsx, .xls)
+- **Images** (.jpg, .png) — useful for scanned receipts or photos
+- **Max size:** 10 MB per file
+
+### How to Download a Document
+
+1. Find the document in the table (use the year selector to filter if needed)
+2. Click **"Download"** on the right side of the row
+3. The file saves to your computer's Downloads folder
+4. Open it with your default app (Adobe Reader for PDFs, Excel for spreadsheets, etc.)
+
+### Common Documents You'll See
+
+**Documents you upload:**
+- W2 forms (from your employer)
+- 1099 forms (from clients if you're self-employed)
+- Receipts and invoices
+- Bank statements
+- Mortgage/loan statements
+
+**Documents your accountant uploads:**
+- Tax returns (signed and ready to file)
+- Financial reports or balance sheets
+- IRS correspondence
+- Amended returns or extensions
+
+### Pro Tips
+
+- **Organize early** — Don't wait until tax season to upload; send documents as they arrive
+- **Use the year selector** — Manage multiple years if you work with the firm for several years
+- **Keep scans readable** — If photographing receipts, make sure the text is legible
+- **Ask questions** — If you're unsure what to upload, message your accountant first
+
+---
+
+## Secure Messaging
+
+The Messages section is your private inbox for communicating with your accountant. All messages are encrypted.
+
+### Inbox View
+
+![Messages inbox showing list of threads, unread badges, timestamps, and preview text](docs/screenshots/09-portal-messages.png)
+*Figure 9: Client message inbox with threaded conversations and unread indicators*
+
+**What You See:**
+- **New Message button** — "New Message" button to start a conversation
+- **Thread list** — All your conversations with your accountant
+- **Thread preview** — First few words of the latest message in each thread
+- **Unread badge** — Blue badge if your accountant has replied and you haven't read it yet
+- **Timestamp** — When the most recent message was sent
+
+**How to Use the Inbox:**
+1. Scan the list for **blue unread badges** — these need your attention
+2. Click a thread to open and read the full conversation
+3. Click **"New Message"** to start a brand-new conversation (not a reply)
+
+### Thread View (Full Conversation)
+
+![Full message thread showing alternating client and accountant messages, timestamps, and reply composer](docs/screenshots/10-portal-thread.png)
+*Figure 10: Message thread detail view with conversation history and reply composer*
+
+**What You See:**
+- **Message bubbles** — Alternating colors for you (client) and your accountant
+- **Timestamps** — When each message was sent
+- **Message content** — The full text of each message
+- **Reply composer** — Text field at the bottom to type your reply
+- **Send button** — Button to send your reply
+
+**How to Reply:**
+1. Read the conversation history
+2. Click in the **text field** at the bottom
+3. Type your response (e.g., "Thanks for the update. Here's what I found in my receipts...")
+4. Click **"Send"**
+5. Your message appears immediately; your accountant gets a notification
+
+**How to Start a New Thread:**
+1. From the inbox, click **"New Message"**
+2. Or from the dashboard, click a recent thread and scroll down to see the old conversation, then reply
+3. A new thread keeps conversations organized by topic
+
+### Security & Privacy
+
+- **Encrypted in transit** — Messages are protected by TLS (like a bank)
+- **Encrypted at rest** — Even if someone hacked our servers, they couldn't read your messages
+- **Only you and your accountant** — No one else can see this thread
+- **Permanent record** — All messages are stored indefinitely for your records
+
+### Pro Tips
+
+- **Be specific** — Instead of "What about the car?" write "Can I deduct vehicle mileage for business travel?"
+- **Attach files** — If you need to share something, upload it to Documents and mention it in your message
+- **Ask follow-up questions** — Don't hesitate to clarify if an answer isn't clear
+- **Check weekly** — Messages may be time-sensitive; check at least once a week for replies
+
+---
