@@ -5,6 +5,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslateModule } from '@ngx-translate/core';
 import { ContactService } from '../../core/services/contact.service';
 import { finalize } from 'rxjs';
 
@@ -17,6 +18,7 @@ import { finalize } from 'rxjs';
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+    TranslateModule,
   ],
   templateUrl: './book-consultation.component.html',
   styleUrl: './book-consultation.component.css',
