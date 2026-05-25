@@ -538,3 +538,229 @@ The Messages section is your private inbox for communicating with your accountan
 - **Check weekly** — Messages may be time-sensitive; check at least once a week for replies
 
 ---
+
+# Part 4: Admin Panel
+
+The admin panel is a back-office tool for GWH staff to manage clients, upload documents on their behalf, and respond to client inquiries.
+
+## Getting Started
+
+### Your Login Flow (Same as Clients)
+
+1. **Visit the site** — Go to https://gwh-accounting.com
+2. **Click "Client Login"** — Top navigation or home page CTA
+3. **Sign in with your GWH Google account** — Same OAuth2 flow as clients
+4. **Redirected to admin dashboard** — If your account has ADMIN role, you see the client roster instead of the client portal
+5. **See the client list** — All clients and their management options
+
+### Role-Based Access
+
+- **USER role** — Clients see the client portal (documents, messages, dashboard)
+- **ADMIN role** — Staff see the admin panel (client list, bulk operations)
+- **How you got ADMIN** — Your accountant or manager set this up when you were hired
+
+---
+
+## Client Management
+
+The Client Management page is your main dashboard — a searchable, sortable roster of all clients.
+
+![Admin client list showing client names, email addresses, portal link status, and action buttons for documents and messages](docs/screenshots/11-admin-clients.png)
+*Figure 11: Admin client management roster with search, pagination, and per-client actions*
+
+### What You See
+
+- **Search box** — "Search by name or email"
+- **Client table** — Rows of clients with:
+  - Client name
+  - Email address
+  - Portal link status ("Linked" = they can log in, "Not linked" = they're on the roster but have no account yet)
+  - **Documents** action button
+  - **Messages** action button
+- **Create Client button** — "Create Client" to add a new client to the roster
+- **Pagination** — "Previous / Next" if you have many clients
+
+### How to Use It
+
+**Finding a client by search:**
+1. Click the search box
+2. Type the client's name or email (e.g., "Jane Smith" or "jane@example.com")
+3. The list filters in real-time
+4. Click the client's row or click "Documents" / "Messages"
+
+**Finding a client by scrolling:**
+1. Scan the table if you have only a few clients
+2. Use "Previous / Next" at the bottom if there are many
+
+**Creating a new client:**
+1. Click **"Create Client"** (blue button)
+2. Fill in the form:
+   - **Name** — Full name (e.g., "Jane Smith")
+   - **Email** — Their email (e.g., "jane@example.com")
+   - **Phone** (optional) — Their phone number
+3. Click **"Save"**
+4. The client appears in your roster
+5. They can now sign in with their Google account (if it matches their email)
+
+**Editing or deleting a client:**
+1. Find the client in the roster
+2. Click **inline edit** (pencil icon) to modify their name, email, or phone
+3. Click **delete** (trash icon) to remove them from the roster
+4. Confirm the action
+
+### Pro Tips
+
+- **Use the search box** — Fastest way to find a client when you have dozens
+- **Keep emails current** — Client emails must match their Google account to sign in
+- **Create before portal** — Add the client to the roster first; they can sign in immediately after
+
+---
+
+## Per-Client Document Management
+
+For each client, you can upload, download, and organize documents by tax year.
+
+![Admin document management showing year selector, upload button, and table of documents with delete option](docs/screenshots/12-admin-client-documents.png)
+*Figure 12: Per-client document management interface with tax-year selector and upload interface*
+
+### How to Access
+
+1. From the client roster, find the client
+2. Click the **"Documents"** action button on their row
+3. You see their document page (similar to what the client sees, but you can upload on their behalf)
+
+### What You See
+
+- **Client name header** — Shows which client's documents you're managing
+- **Year selector** — Dropdown to filter documents (2026, 2025, 2024, etc.)
+- **Upload button** — "Upload Document"
+- **Document table** — List of documents for the selected year with:
+  - Filename
+  - Upload date
+  - Uploader (you or the client)
+  - File size
+  - Download button
+  - Delete button
+
+### How to Use It
+
+**Uploading a document:**
+1. Select the **tax year** from the dropdown (e.g., "2025")
+2. Click **"Upload Document"**
+3. Select a file from your computer
+4. Click **"Upload"**
+5. Confirmation: "Document uploaded successfully"
+6. The document appears in the client's portal immediately under their "Documents" tab for that year
+7. The client sees it labeled with your name (showing that the firm uploaded it)
+
+**Example workflow: Uploading a completed tax return**
+1. You have the signed PDF: `Jane_Smith_2025_Tax_Return.pdf`
+2. Find Jane Smith in the client roster
+3. Click "Documents"
+4. Use year selector to choose "2025"
+5. Click "Upload Document"
+6. Select the PDF
+7. Click "Upload"
+8. Jane sees the file in her Documents tab immediately
+9. She can download it and file it with the IRS
+
+### Pro Tips
+
+- **Check the year selector** — Easy to upload to the wrong year if you're not careful
+- **Name files clearly** — Use names like `2025_Tax_Return.pdf` not `FINAL_FINAL_v2.pdf`
+- **Organize by year** — Keep 2024 docs in 2024, 2025 docs in 2025, etc.
+- **Download before sending** — Test that you can download the file before telling the client it's ready
+
+---
+
+## Per-Client Messaging & Support
+
+For each client, you can view all message threads and reply to their inquiries.
+
+![Admin message thread list showing client names, unread badges (blue), awaiting status (amber), and read status (grey)](docs/screenshots/13-admin-client-messages.png)
+*Figure 13: Per-client messaging interface with color-coded status indicators (unread, awaiting, read)*
+
+### How to Access
+
+1. From the client roster, find the client
+2. Click the **"Messages"** action button on their row
+3. You see their message thread list
+
+### What You See
+
+- **Client name header** — Shows which client's messages you're managing
+- **New Message button** — "New Message" to start a conversation
+- **Thread list** — All conversations with this client with:
+  - Thread title / preview
+  - Latest message timestamp
+  - Status chip (color-coded indicator)
+  - Unread badge (if applicable)
+
+### Status Indicators (Color-Coded)
+
+These chips show at a glance what action is needed:
+
+- **Sky-blue badge "Unread"** — Client has replied; you haven't read it yet
+  - Action: Click the thread and read the message
+  - Priority: High — client is waiting for you
+- **Amber chip "Awaiting client"** — You sent a message; client hasn't opened it yet
+  - Action: You can reply with another message or wait for their response
+  - Priority: Medium — client has the info but may not have seen it
+- **Grey chip "Client read"** — Client has read your message
+  - Action: If you're waiting for their response, check back later
+  - Priority: Low — client has acknowledged your message
+
+### How to Use It
+
+**Replying to a message:**
+1. Click a thread from the list
+2. Read the conversation history
+3. See the status of your last message (is the client reading? have they replied?)
+4. Click in the **reply composer** at the bottom
+5. Type your response (e.g., "Great! I found those receipts. I'll update the return and have it ready for you by Friday.")
+6. Click **"Send"**
+7. Your message appears immediately; the client sees a notification
+
+**Starting a new message thread:**
+1. From the client's message list, click **"New Message"**
+2. Type the conversation title (e.g., "2025 Tax Return Ready for Review")
+3. Type the message content
+4. Click **"Send"**
+5. A new thread appears in the conversation list
+6. The client sees the notification and can reply
+
+### Typical Workflows
+
+**Workflow 1: Client Asks a Question**
+1. You see a sky-blue unread badge on their thread
+2. You click and read: "Can I deduct home office expenses?"
+3. You reply: "Yes, you can deduct a percentage of your home expenses proportional to your office square footage. I'll calculate it for you — send me the details of your home (square footage, office area, mortgage/rent, utilities)."
+4. You send the message
+5. Status changes to amber "Awaiting client"
+6. Client reads and replies with the details
+7. Status changes back to sky-blue "Unread"
+8. You see the information and incorporate it into their return
+
+**Workflow 2: You're Ready to Deliver a Tax Return**
+1. You've completed Jane's 2025 return
+2. You upload it to her Documents tab (see "Per-Client Document Management")
+3. You go to Messages
+4. You click "New Message"
+5. Title: "2025 Tax Return Ready for Review"
+6. Message: "Hi Jane, your 2025 tax return is ready. Please review it in your Documents tab under 2025. Let me know if you have any questions or if I need to make any changes."
+7. You send
+8. Status is amber "Awaiting client"
+9. Jane downloads and reviews
+10. She replies with "Looks great!" or asks clarifying questions
+11. Status changes back to sky-blue "Unread"
+12. You confirm everything is correct or make adjustments
+
+### Pro Tips
+
+- **Respond promptly** — Clients appreciate quick replies (within 24 hours is great)
+- **Use color chips to prioritize** — Sky-blue chips need immediate attention; grey chips can wait
+- **Reference the documents** — When delivering files, tell clients exactly where to find them ("Check your Documents tab under 2025")
+- **Document everything** — If you make changes to a client's return, mention it in a message so there's a record
+- **Be conversational** — Messages are about building trust; be friendly and clear
+
+---
