@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { take } from 'rxjs/operators';
 import { AdminClientsService } from '../../../core/services/admin-clients.service';
 import { AdminClientMessagesService } from '../../../core/services/admin-client-messages.service';
@@ -15,7 +16,7 @@ import { AdminConfirmDialogComponent } from './admin-confirm-dialog.component';
 @Component({
   selector: 'app-admin-clients',
   standalone: true,
-  imports: [MatButtonModule, RouterLink],
+  imports: [MatButtonModule, RouterLink, TranslateModule],
   templateUrl: './admin-clients.component.html',
   styleUrl: './admin-clients.component.css',
 })

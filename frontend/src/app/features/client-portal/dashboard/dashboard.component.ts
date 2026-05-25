@@ -1,6 +1,7 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { MyDocumentsService } from '../../../core/services/my-documents.service';
 import { PortalMessagesService } from '../../../core/services/portal-messages.service';
@@ -15,7 +16,7 @@ import { MatDivider } from '@angular/material/divider';
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    RouterLink, DatePipe,
+    RouterLink, DatePipe, TranslateModule,
     MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent,
     MatIcon, MatButton, MatAnchor, MatDivider,
   ],
