@@ -17,7 +17,7 @@ export class TranslationService {
 
     // Load default English translations
     const enTranslations = await firstValueFrom(
-      this.http.get('./assets/i18n/en.json')
+      this.http.get('./i18n/en.json')
     );
     this.translate.setTranslation('en', enTranslations as any);
 
@@ -39,7 +39,7 @@ export class TranslationService {
 
   private async loadLanguage(lang: 'en' | 'zh'): Promise<void> {
     const translations = await firstValueFrom(
-      this.http.get(`./assets/i18n/${lang}.json`)
+      this.http.get(`./i18n/${lang}.json`)
     );
     this.translate.setTranslation(lang, translations as any);
     this.translate.use(lang);
