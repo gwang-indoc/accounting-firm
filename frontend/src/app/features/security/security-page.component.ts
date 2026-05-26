@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-security-page',
@@ -11,35 +11,61 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrl: './security-page.component.css',
 })
 export class SecurityPageComponent {
-  readonly pillars = [
+  private translate = inject(TranslateService);
+  private langChangeSignal = signal<string>(this.translate.currentLang);
+
+  readonly pillarKeys = [
     {
       icon: 'lock',
-      title: 'End-to-End Encryption',
-      description: 'All data in transit is protected with TLS 1.3. Documents at rest are encrypted using AES-256 — the same standard used by financial institutions and governments worldwide.',
+      titleKey: 'security.pillar.encryption.title',
+      descKey: 'security.pillar.encryption.desc',
     },
     {
       icon: 'verified_user',
-      title: 'OAuth2 Identity Verification',
-      description: "We delegate authentication to Google's OAuth2 infrastructure. Your credentials are never stored on our servers — only a securely signed JWT session token is held.",
+      titleKey: 'security.pillar.oauth.title',
+      descKey: 'security.pillar.oauth.desc',
     },
     {
       icon: 'folder_special',
-      title: 'Isolated Document Storage',
-      description: "Every client's documents live in a dedicated storage partition. Our access-control layer ensures that no one — not even other GWH staff — can access files outside their scope.",
+      titleKey: 'security.pillar.isolation.title',
+      descKey: 'security.pillar.isolation.desc',
     },
     {
       icon: 'manage_accounts',
-      title: 'Role-Based Access Control',
-      description: "A strict ADMIN / CLIENT permission model governs every API endpoint. Our security layer rejects requests that don't carry a valid role token — no exceptions.",
+      titleKey: 'security.pillar.rbac.title',
+      descKey: 'security.pillar.rbac.desc',
     },
   ];
 
-  readonly practices = [
-    { icon: 'security_update_good', label: 'Regular security audits' },
-    { icon: 'bug_report', label: 'Vulnerability disclosure program' },
-    { icon: 'backup', label: 'Daily encrypted backups' },
-    { icon: 'history', label: 'Full audit logging' },
-    { icon: 'https', label: 'HTTPS-only enforcement' },
-    { icon: 'policy', label: 'GDPR & CCPA aligned' },
+  readonly practiceKeys = [
+    { icon: 'security_update_good', labelKey: 'security.practice.audits' },
+    { icon: 'bug_report', labelKey: 'security.practice.vulnerability' },
+    { icon: 'backup', labelKey: 'security.practice.backups' },
+    { icon: 'history', labelKey: 'security.practice.auditLog' },
+    { icon: 'https', labelKey: 'security.practice.https' },
+    { icon: 'policy', labelKey: 'security.practice.compliance' },
   ];
+
+  pillars = computed(() => {
+    this.langChangeSignal();
+    return this.pillarKeys.map(pk => ({
+      icon: pk.icon,
+      title: this.translate.instant(pk.titleKey),
+      description: this.translate.instant(pk.descKey),
+    }));
+  });
+
+  practices = computed(() => {
+    this.langChangeSignal();
+    return this.practiceKeys.map(pk => ({
+      icon: pk.icon,
+      label: this.translate.instant(pk.labelKey),
+    }));
+  });
+
+  constructor() {
+    this.translate.onLangChange.subscribe(() => {
+      this.langChangeSignal.set(this.translate.currentLang);
+    });
+  }
 }

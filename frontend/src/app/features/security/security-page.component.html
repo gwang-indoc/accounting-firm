@@ -33,7 +33,7 @@
       <div class="practices-section">
         <p class="practices-label">{{ 'security.practice.label' | translate }}</p>
         <div class="practices-list">
-          @for (p of practices; track p.label; let i = $index) {
+          @for (p of practices(); track p.label; let i = $index) {
             <div class="practice-item" [style.animation-delay]="(0.1 + i * 0.06) + 's'">
               <mat-icon>{{ p.icon }}</mat-icon>
               <span>{{ p.label }}</span>
@@ -47,7 +47,7 @@
   <!-- RIGHT: Security pillars -->
   <main class="content-panel">
     <div class="pillars-list">
-      @for (pillar of pillars; track pillar.title; let i = $index) {
+      @for (pillar of pillars(); track pillar.title; let i = $index) {
         <div class="pillar-card" [style.animation-delay]="(i * 0.1) + 's'">
           <div class="pillar-num">0{{ i + 1 }}</div>
           <div class="pillar-body">
