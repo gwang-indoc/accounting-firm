@@ -10,9 +10,9 @@
 
     <div class="info-content">
       <div class="info-top">
-        <span class="info-eyebrow">GWH Accounting</span>
-        <h1 class="info-heading">Let's<br>Talk.</h1>
-        <p class="info-sub">Ready to take control of your finances? Tell us about your needs and we'll reply within one business day.</p>
+        <span class="info-eyebrow">{{ 'brand.name' | translate }}</span>
+        <h1 class="info-heading">{{ 'bookConsultation.title' | translate }}</h1>
+        <p class="info-sub">{{ 'bookConsultation.intro' | translate }}</p>
       </div>
     </div>
   </aside>
@@ -21,35 +21,35 @@
   <main class="form-panel">
     <div class="form-content">
       <div class="form-header">
-        <h2 class="form-heading">Book a Consultation</h2>
-        <p class="form-sub">All fields are required.</p>
+        <h2 class="form-heading">{{ 'bookConsultation.formTitle' | translate }}</h2>
+        <p class="form-sub">{{ 'bookConsultation.formSub' | translate }}</p>
       </div>
 
       <form [formGroup]="form" (ngSubmit)="submit()" (input)="onFormInput()" class="contact-form" novalidate>
 
         <div class="field-row">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Your Name</mat-label>
+            <mat-label>{{ 'bookConsultation.name' | translate }}</mat-label>
             <input matInput formControlName="name" autocomplete="name" />
-            <mat-error>Name is required</mat-error>
+            <mat-error>{{ 'bookConsultation.nameRequired' | translate }}</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Email Address</mat-label>
+            <mat-label>{{ 'bookConsultation.email' | translate }}</mat-label>
             <input matInput type="email" formControlName="email" autocomplete="email" />
-            <mat-error>Enter a valid email address</mat-error>
+            <mat-error>{{ 'bookConsultation.emailInvalid' | translate }}</mat-error>
           </mat-form-field>
         </div>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Subject</mat-label>
+          <mat-label>{{ 'bookConsultation.subject' | translate }}</mat-label>
           <input matInput formControlName="subject" />
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width message-field">
-          <mat-label>Your Message</mat-label>
+          <mat-label>{{ 'bookConsultation.message' | translate }}</mat-label>
           <textarea matInput formControlName="message" rows="5"></textarea>
-          <mat-error>Message is too long (5000 character limit)</mat-error>
+          <mat-error>{{ 'bookConsultation.messageTooLong' | translate }}</mat-error>
         </mat-form-field>
 
         <!-- Honeypot: off-screen, invisible to keyboard and screen readers -->
@@ -71,9 +71,9 @@
           <span class="btn-label">
             @if (submitting()) {
               <mat-icon class="spin-icon">autorenew</mat-icon>
-              Sending…
+              {{ 'bookConsultation.sending' | translate }}
             } @else {
-              Send Message
+              {{ 'bookConsultation.submit' | translate }}
               <mat-icon>arrow_forward</mat-icon>
             }
           </span>
@@ -82,7 +82,7 @@
         @if (showConfirmation()) {
           <div class="confirmation-block" role="status" aria-live="polite">
             <mat-icon>check_circle</mat-icon>
-            <span>Thanks — we'll reply soon.</span>
+            <span>{{ 'bookConsultation.success' | translate }}</span>
           </div>
         }
 

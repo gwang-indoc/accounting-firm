@@ -10,28 +10,28 @@
 
     <div class="info-content">
       <div class="info-top">
-        <span class="info-eyebrow">GWH Accounting</span>
-        <h1 class="info-heading">Your Data,<br>Protected.</h1>
-        <p class="info-sub">Financial data is among the most sensitive information you hold. We treat it that way — with bank-grade security measures at every layer.</p>
+        <span class="info-eyebrow">{{ 'brand.name' | translate }}</span>
+        <h1 class="info-heading">{{ 'security.title' | translate }}</h1>
+        <p class="info-sub">{{ 'security.subtitle' | translate }}</p>
       </div>
 
       <div class="trust-badges">
         <div class="trust-badge">
           <mat-icon>shield</mat-icon>
-          <span>Bank-grade security</span>
+          <span>{{ 'security.badge.bankGrade' | translate }}</span>
         </div>
         <div class="trust-badge">
           <mat-icon>visibility_off</mat-icon>
-          <span>Zero third-party sharing</span>
+          <span>{{ 'security.badge.noSharing' | translate }}</span>
         </div>
         <div class="trust-badge">
           <mat-icon>support_agent</mat-icon>
-          <span>24/7 incident response</span>
+          <span>{{ 'security.badge.incident' | translate }}</span>
         </div>
       </div>
 
       <div class="practices-section">
-        <p class="practices-label">Security practices</p>
+        <p class="practices-label">{{ 'security.practice.label' | translate }}</p>
         <div class="practices-list">
           @for (p of practices; track p.label; let i = $index) {
             <div class="practice-item" [style.animation-delay]="(0.1 + i * 0.06) + 's'">
@@ -64,9 +64,9 @@
     </div>
 
     <div class="bottom-cta">
-      <p class="cta-text">Questions about our security practices?</p>
+      <p class="cta-text">{{ 'security.cta' | translate }}</p>
       <a class="cta-link" routerLink="/contact">
-        Talk to our team
+        {{ 'security.ctaLink' | translate }}
         <mat-icon>arrow_forward</mat-icon>
       </a>
     </div>

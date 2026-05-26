@@ -1,5 +1,5 @@
 <div class="thread-view">
-  <button class="back-link" data-testid="back-link" (click)="goBack()">← Back to Messages</button>
+  <button class="back-link" data-testid="back-link" (click)="goBack()">← {{ 'messages.backToMessages' | translate }}</button>
 
   <div class="page-header">
     <h1 class="page-title">{{ thread()?.subject }}</h1>
@@ -20,7 +20,7 @@
       class="reply-textarea"
       data-testid="reply-textarea"
       rows="3"
-      placeholder="Write a reply…"
+      [attr.placeholder]="'messages.reply' | translate"
       aria-label="Reply message"
       [value]="replyBody()"
       (input)="onReplyInput($event)"
@@ -30,6 +30,6 @@
       data-testid="send-btn"
       [disabled]="!canSend"
       (click)="send()"
-    >Send</button>
+    >{{ 'messages.send' | translate }}</button>
   </div>
 </div>

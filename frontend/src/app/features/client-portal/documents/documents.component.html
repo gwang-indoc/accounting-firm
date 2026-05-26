@@ -1,28 +1,28 @@
 <div class="documents-page">
   <a mat-button class="back-link" routerLink="/portal/dashboard" data-testid="back-to-dashboard-link">
     <mat-icon>arrow_back</mat-icon>
-    Back to Dashboard
+    {{ 'documents.backToDashboard' | translate }}
   </a>
 
   <header class="page-header">
-    <h1>My Documents</h1>
-    <p class="subtitle">Documents shared with you by GWH Accounting</p>
+    <h1>{{ 'documents.title' | translate }}</h1>
+    <p class="subtitle">{{ 'documents.subtitle' | translate }}</p>
   </header>
 
   @if (response() === null) {
-    <p class="loading">Loading…</p>
+    <p class="loading">{{ 'documents.loading' | translate }}</p>
   } @else if (!response()!.linked) {
     <div class="empty-state">
       <mat-icon>info_outline</mat-icon>
-      <p>Your portal isn't set up yet. Please contact GWH Accounting to get started.</p>
+      <p>{{ 'documents.portalNotSetUp' | translate }}</p>
     </div>
   } @else if (response()!.documents.length === 0) {
     <div class="empty-state">
       <mat-icon>folder_open</mat-icon>
-      <p>No documents yet — upload your first one below.</p>
+      <p>{{ 'documents.empty' | translate }}</p>
       <div class="empty-controls">
         <label class="year-label">
-          Tax Year:
+          {{ 'documents.selectYear' | translate }}
           <select class="empty-year-select" (change)="onEmptyYearChange($any($event.target).value)">
             @for (y of emptyStateYearOptions; track y) {
               <option [value]="y" [selected]="y === emptyStateYear()">{{ y }}</option>
@@ -34,21 +34,21 @@
                 [disabled]="uploading()"
                 (click)="onUploadClick()">
           <mat-icon>upload</mat-icon>
-          {{ uploading() ? 'Uploading…' : 'Upload a document' }}
+          {{ uploading() ? ('documents.uploading' | translate) : ('documents.upload' | translate) }}
         </button>
       </div>
     </div>
   } @else {
     <div class="controls">
       <label class="year-label">
-        Tax Year:
+        {{ 'documents.selectYear' | translate }}
         <select class="year-select" (change)="onYearChange($any($event.target).value)">
           @for (y of years(); track y) {
             <option [value]="y" [selected]="y === selectedYear()">{{ y }}</option>
           }
         </select>
       </label>
-      <span class="doc-count">· {{ filteredDocs().length }} document{{ filteredDocs().length === 1 ? '' : 's' }}</span>
+      <span class="doc-count">· {{ filteredDocs().length }} {{ filteredDocs().length === 1 ? 'document' : 'documents' }}</span>
 
       <div class="spacer"></div>
 
@@ -57,7 +57,7 @@
               [disabled]="uploading()"
               (click)="onUploadClick()">
         <mat-icon>upload</mat-icon>
-        {{ uploading() ? 'Uploading…' : 'Upload' }}
+        {{ uploading() ? ('documents.uploading' | translate) : ('documents.upload' | translate) }}
       </button>
 
       <button mat-flat-button color="primary"
@@ -65,14 +65,14 @@
               [disabled]="filteredDocs().length === 0"
               (click)="downloadYearZip()">
         <mat-icon>download</mat-icon>
-        Download All for {{ selectedYear() }}
+        {{ 'documents.downloadAll' | translate }} {{ selectedYear() }}
       </button>
     </div>
 
     @if (filteredDocs().length === 0) {
       <div class="empty-state">
         <mat-icon>folder_open</mat-icon>
-        <p>No documents for {{ selectedYear() }}. Try a different year above.</p>
+        <p>{{ 'documents.noDocumentsForYear' | translate: {year: selectedYear()} }}</p>
       </div>
     } @else {
       <div class="doc-list">
@@ -85,11 +85,11 @@
                 {{ doc.mimeType || 'file' }} · {{ formatBytes(doc.sizeBytes) }} · uploaded {{ formatUploadedAt(doc.uploadedAt) }}
               </div>
               @if (doc.uploadedByMe) {
-                <mat-chip class="badge-you" disableRipple>Uploaded by you</mat-chip>
+                <mat-chip class="badge-you" disableRipple>{{ 'documents.uploadedByYou' | translate }}</mat-chip>
               }
             </div>
             <a mat-stroked-button class="download-link" [attr.href]="downloadHref(doc.id)" download>
-              Download
+              {{ 'documents.download' | translate }}
             </a>
           </div>
         }

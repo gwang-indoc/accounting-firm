@@ -1,8 +1,8 @@
 <div class="portal-inbox">
-  <a routerLink="/portal/dashboard" class="back-link">← Back to Dashboard</a>
+  <a routerLink="/portal/dashboard" class="back-link">← {{ 'messages.backToDashboard' | translate }}</a>
   <div class="page-header">
-    <h1 class="page-title">Messages</h1>
-    <button mat-flat-button class="new-btn" data-testid="new-message-btn" (click)="openNewThread()">+ New Message</button>
+    <h1 class="page-title">{{ 'messages.title' | translate }}</h1>
+    <button mat-flat-button class="new-btn" data-testid="new-message-btn" (click)="openNewThread()">{{ 'messages.newMessage' | translate }}</button>
   </div>
 
   <div class="threads-list">
@@ -20,7 +20,7 @@
         </div>
       </div>
     } @empty {
-      <div class="empty-state" data-testid="empty-state">You have no messages yet.</div>
+      <div class="empty-state" data-testid="empty-state">{{ 'messages.empty' | translate }}</div>
     }
   </div>
 </div>

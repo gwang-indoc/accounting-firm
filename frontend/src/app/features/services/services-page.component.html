@@ -10,28 +10,28 @@
 
     <div class="info-content">
       <div class="info-top">
-        <span class="info-eyebrow">GWH Accounting</span>
-        <h1 class="info-heading">What We<br>Do Best.</h1>
-        <p class="info-sub">From sole proprietors to mid-size enterprises, we bring institutional-grade accounting to every client we serve.</p>
+        <span class="info-eyebrow">{{ 'brand.name' | translate }}</span>
+        <h1 class="info-heading">{{ 'services.title' | translate }}</h1>
+        <p class="info-sub">{{ 'services.intro' | translate }}</p>
       </div>
 
       <div class="info-stats">
         <div class="stat-item">
           <span class="stat-number">200+</span>
-          <span class="stat-label">Clients served</span>
+          <span class="stat-label">{{ 'services.stat.clients' | translate }}</span>
         </div>
         <div class="stat-item">
           <span class="stat-number">15+</span>
-          <span class="stat-label">Years in practice</span>
+          <span class="stat-label">{{ 'services.stat.years' | translate }}</span>
         </div>
         <div class="stat-item">
           <span class="stat-number">$0</span>
-          <span class="stat-label">Hidden fees</span>
+          <span class="stat-label">{{ 'services.stat.fees' | translate }}</span>
         </div>
       </div>
 
       <a class="cta-link" routerLink="/book-consultation">
-        Book a free consultation
+        {{ 'services.cta' | translate }}
         <mat-icon>arrow_forward</mat-icon>
       </a>
     </div>

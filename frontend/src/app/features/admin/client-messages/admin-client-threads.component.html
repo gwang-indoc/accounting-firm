@@ -1,13 +1,13 @@
 <div class="admin-threads">
-  <a routerLink="/admin/clients" class="back-link">← Back to Clients</a>
+  <a routerLink="/admin/clients" class="back-link">← {{ 'messages.backToClients' | translate }}</a>
   <div class="page-header">
     <div>
-      <h1 class="page-title">Messages</h1>
+      <h1 class="page-title">{{ 'messages.title' | translate }}</h1>
       @if (client()) {
         <p class="page-subtitle">with {{ client()!.name }}</p>
       }
     </div>
-    <button mat-flat-button class="new-btn" data-testid="new-thread-btn" (click)="openNewThread()">+ New Thread</button>
+    <button mat-flat-button class="new-btn" data-testid="new-thread-btn" (click)="openNewThread()">+ {{ 'messages.newThread' | translate }}</button>
   </div>
 
   <div class="threads-list">
@@ -24,16 +24,16 @@
               <span class="thread-chip chip-unread" data-testid="thread-chip-unread">·{{ t.unreadCount }}</span>
             }
             @case ('awaiting') {
-              <span class="thread-chip chip-awaiting" data-testid="thread-chip-awaiting">Awaiting client</span>
+              <span class="thread-chip chip-awaiting" data-testid="thread-chip-awaiting">{{ 'messages.awaitingClient' | translate }}</span>
             }
             @case ('read') {
-              <span class="thread-chip chip-read" data-testid="thread-chip-read">Client read</span>
+              <span class="thread-chip chip-read" data-testid="thread-chip-read">{{ 'messages.clientRead' | translate }}</span>
             }
           }
         </div>
       </div>
     } @empty {
-      <div class="empty-state">No conversations yet. Click + New Thread to start one.</div>
+      <div class="empty-state">{{ 'messages.empty' | translate }}</div>
     }
   </div>
 </div>
