@@ -130,5 +130,6 @@
   "login.email": "Sign in with email",
   "login.register": "New client?",
   "login.registerLink": "Create an account",
-  "login.security": "256-bit encrypted · Zero credential storage · Session-only JWT"
+  "login.security": "256-bit encrypted · Zero credential storage · Session-only JWT",
+  "navbar.home": "Client portal"
 }
