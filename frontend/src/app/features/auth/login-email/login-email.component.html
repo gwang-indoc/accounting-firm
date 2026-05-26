@@ -6,26 +6,26 @@
     <div class="card-brand">
       <div class="card-icon">税</div>
       <div class="card-brand-text">
-        <span class="card-brand-name">GWH Accounting</span>
-        <span class="card-brand-tagline">Secure Tax & Accounting Portal</span>
+        <span class="card-brand-name">{{ 'brand.name' | translate }}</span>
+        <span class="card-brand-tagline">{{ 'loginEmail.tagline' | translate }}</span>
       </div>
     </div>
 
     <div class="form-header">
-      <span class="form-eyebrow">Email Sign In</span>
-      <h1 class="form-heading">Welcome back</h1>
-      <p class="form-sub">Use your email and password</p>
+      <span class="form-eyebrow">{{ 'loginEmail.eyebrow' | translate }}</span>
+      <h1 class="form-heading">{{ 'loginEmail.heading' | translate }}</h1>
+      <p class="form-sub">{{ 'loginEmail.subtitle' | translate }}</p>
     </div>
 
     <form [formGroup]="form" (ngSubmit)="submit()" class="login-email-form">
 
       <mat-form-field appearance="outline" class="field">
-        <mat-label>Email</mat-label>
+        <mat-label>{{ 'loginEmail.emailLabel' | translate }}</mat-label>
         <input matInput type="email" formControlName="email" />
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="field">
-        <mat-label>Password</mat-label>
+        <mat-label>{{ 'loginEmail.passwordLabel' | translate }}</mat-label>
         <input matInput type="password" formControlName="password" />
       </mat-form-field>
 
@@ -34,15 +34,15 @@
           <svg class="error-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
           </svg>
-          Invalid email or password
+          {{ 'loginEmail.invalidError' | translate }}
         </div>
       }
 
       <button mat-flat-button color="primary" type="submit" class="submit-btn">
-        Sign In
+        {{ 'loginEmail.submit' | translate }}
       </button>
 
-      <a mat-button routerLink="/login" class="back-link">← Back to Login</a>
+      <a mat-button routerLink="/login" class="back-link">{{ 'loginEmail.backLink' | translate }}</a>
 
     </form>
 

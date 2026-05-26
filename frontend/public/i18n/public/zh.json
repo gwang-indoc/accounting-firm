@@ -145,5 +145,14 @@
   "login.register": "新客户？",
   "login.registerLink": "创建账户",
   "login.security": "256 位加密 · 零凭据存储 · 仅限会话的 JWT",
+  "loginEmail.tagline": "安全的税务和会计门户",
+  "loginEmail.eyebrow": "电子邮件登录",
+  "loginEmail.heading": "欢迎回来",
+  "loginEmail.subtitle": "使用您的电子邮件和密码",
+  "loginEmail.emailLabel": "电子邮件",
+  "loginEmail.passwordLabel": "密码",
+  "loginEmail.invalidError": "电子邮件或密码无效",
+  "loginEmail.submit": "登录",
+  "loginEmail.backLink": "← 返回登录",
   "navbar.home": "客户门户"
 }

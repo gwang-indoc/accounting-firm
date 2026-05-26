@@ -145,5 +145,14 @@
   "login.register": "New client?",
   "login.registerLink": "Create an account",
   "login.security": "256-bit encrypted · Zero credential storage · Session-only JWT",
+  "loginEmail.tagline": "Secure Tax & Accounting Portal",
+  "loginEmail.eyebrow": "Email Sign In",
+  "loginEmail.heading": "Welcome back",
+  "loginEmail.subtitle": "Use your email and password",
+  "loginEmail.emailLabel": "Email",
+  "loginEmail.passwordLabel": "Password",
+  "loginEmail.invalidError": "Invalid email or password",
+  "loginEmail.submit": "Sign In",
+  "loginEmail.backLink": "← Back to Login",
   "navbar.home": "Client portal"
 }
