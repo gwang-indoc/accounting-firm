@@ -1,13 +1,14 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { PortalMessagesService } from '../../../core/services/portal-messages.service';
 import { MessageDto, MessageThreadDto } from '../../../core/models/message.model';
 
 @Component({
   selector: 'app-portal-thread-view',
   standalone: true,
-  imports: [DatePipe],
+  imports: [DatePipe, TranslateModule],
   templateUrl: './portal-thread-view.component.html',
   styleUrl: './portal-thread-view.component.css',
 })

@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { take } from 'rxjs/operators';
+import { TranslateModule } from '@ngx-translate/core';
 import { AdminClientDocumentsService } from '../../../core/services/admin-client-documents.service';
 import { AdminClientsService } from '../../../core/services/admin-clients.service';
 import { AdminDocumentDto } from '../../../core/models/admin-document.model';
@@ -11,7 +12,7 @@ import { AdminConfirmDialogComponent } from '../clients/admin-confirm-dialog.com
 @Component({
   selector: 'app-admin-client-documents',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, TranslateModule],
   templateUrl: './admin-client-documents.component.html',
   styleUrl: './admin-client-documents.component.css',
 })

@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { DatePipe } from '@angular/common';
 import { take } from 'rxjs/operators';
+import { TranslateModule } from '@ngx-translate/core';
 import { PortalMessagesService } from '../../../core/services/portal-messages.service';
 import { MessageThreadSummaryDto } from '../../../core/models/message.model';
 import { NewPortalThreadDialogComponent } from './new-portal-thread-dialog.component';
@@ -11,7 +12,7 @@ import { NewPortalThreadDialogComponent } from './new-portal-thread-dialog.compo
 @Component({
   selector: 'app-portal-inbox',
   standalone: true,
-  imports: [MatButtonModule, RouterLink, DatePipe],
+  imports: [MatButtonModule, RouterLink, DatePipe, TranslateModule],
   templateUrl: './portal-inbox.component.html',
   styleUrl: './portal-inbox.component.css',
 })

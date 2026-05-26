@@ -6,13 +6,14 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpErrorResponse } from '@angular/common/http';
 import { finalize } from 'rxjs';
+import { TranslateModule } from '@ngx-translate/core';
 import { MyDocumentsService } from '../../../core/services/my-documents.service';
 import { MyDocumentItem, MyDocumentsResponse } from '../../../core/models/my-documents';
 
 @Component({
   selector: 'app-documents',
   standalone: true,
-  imports: [RouterLink, MatIconModule, MatButtonModule, MatChipsModule],
+  imports: [RouterLink, MatIconModule, MatButtonModule, MatChipsModule, TranslateModule],
   templateUrl: './documents.component.html',
   styleUrl: './documents.component.css',
 })

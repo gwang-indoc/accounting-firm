@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { AdminClientMessagesService } from '../../../core/services/admin-client-messages.service';
 import { AdminClientsService } from '../../../core/services/admin-clients.service';
 import { MessageDto, MessageThreadDto } from '../../../core/models/message.model';
@@ -9,7 +10,7 @@ import { ClientDto } from '../../../core/models/client.model';
 @Component({
   selector: 'app-admin-client-thread-view',
   standalone: true,
-  imports: [DatePipe],
+  imports: [DatePipe, TranslateModule],
   templateUrl: './admin-client-thread-view.component.html',
   styleUrl: './admin-client-thread-view.component.css',
 })

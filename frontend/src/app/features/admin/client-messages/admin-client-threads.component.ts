@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { take } from 'rxjs/operators';
 import { DatePipe } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { AdminClientMessagesService } from '../../../core/services/admin-client-messages.service';
 import { AdminClientsService } from '../../../core/services/admin-clients.service';
 import { MessageThreadSummaryDto } from '../../../core/models/message.model';
@@ -13,7 +14,7 @@ import { NewThreadDialogComponent } from './new-thread-dialog.component';
 @Component({
   selector: 'app-admin-client-threads',
   standalone: true,
-  imports: [MatButtonModule, RouterLink, DatePipe],
+  imports: [MatButtonModule, RouterLink, DatePipe, TranslateModule],
   templateUrl: './admin-client-threads.component.html',
   styleUrl: './admin-client-threads.component.css',
 })
