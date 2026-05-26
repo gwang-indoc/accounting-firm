@@ -7,7 +7,7 @@
     <div class="hero-inner">
       <div class="hero-badge">
         <span class="badge-dot"></span>
-        Trusted financial guidance · Est. 2009
+        {{ 'home.badge' | translate }}
       </div>
       <h1 class="hero-heading">
         {{ 'home.hero.title' | translate }}
@@ -22,11 +22,11 @@
             <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd"/>
           </svg>
         </a>
-        <a routerLink="/login" class="btn-ghost">Client Portal</a>
+        <a routerLink="/login" class="btn-ghost">{{ 'home.clientPortal' | translate }}</a>
       </div>
     </div>
     <div class="hero-scroll" aria-hidden="true">
-      <span>Scroll</span>
+      <span>{{ 'home.scroll' | translate }}</span>
       <div class="scroll-line"></div>
     </div>
   </section>
@@ -36,60 +36,60 @@
     <div class="stats-inner">
       <div class="stat-item">
         <div class="stat-number">15<span>+</span></div>
-        <div class="stat-label">Years of expertise</div>
+        <div class="stat-label">{{ 'home.stats.expertise' | translate }}</div>
       </div>
       <div class="stat-divider"></div>
       <div class="stat-item">
         <div class="stat-number">500<span>+</span></div>
-        <div class="stat-label">Clients served</div>
+        <div class="stat-label">{{ 'home.stats.clientsServed' | translate }}</div>
       </div>
       <div class="stat-divider"></div>
       <div class="stat-item">
         <div class="stat-number">$12M<span>+</span></div>
-        <div class="stat-label">In tax savings</div>
+        <div class="stat-label">{{ 'home.stats.taxSavings' | translate }}</div>
       </div>
       <div class="stat-divider"></div>
       <div class="stat-item">
         <div class="stat-number">98<span>%</span></div>
-        <div class="stat-label">Client retention rate</div>
+        <div class="stat-label">{{ 'home.stats.retention' | translate }}</div>
       </div>
     </div>
   </section>
 
   <!-- ─────────── SERVICES PREVIEW ─────────── -->
   <section class="services-section">
-    <div class="section-eyebrow">What We Do</div>
+    <div class="section-eyebrow">{{ 'home.services.what' | translate }}</div>
     <div class="services-header">
-      <h2 class="services-heading">Comprehensive services<br>for every financial need.</h2>
-      <a routerLink="/services" class="view-all-link">View all services →</a>
+      <h2 class="services-heading">{{ 'home.services.intro' | translate }}</h2>
+      <a routerLink="/services" class="view-all-link">{{ 'home.services.viewAll' | translate }} →</a>
     </div>
     <div class="services-grid">
       <div class="service-card" style="--delay: 0.05s">
         <div class="service-icon-wrap">
           <mat-icon>receipt_long</mat-icon>
         </div>
-        <div class="service-tag">Year-round support</div>
-        <h3>Tax Preparation</h3>
-        <p>Comprehensive individual and business tax filing. We navigate complex tax codes so you pay only what you owe — nothing more.</p>
-        <a routerLink="/services" class="service-cta">Learn more →</a>
+        <div class="service-tag">{{ 'home.services.taxTag' | translate }}</div>
+        <h3>{{ 'home.services.taxPrep.title' | translate }}</h3>
+        <p>{{ 'home.services.taxPrep.desc' | translate }}</p>
+        <a routerLink="/services" class="service-cta">{{ 'home.services.learn' | translate }} →</a>
       </div>
       <div class="service-card" style="--delay: 0.15s">
         <div class="service-icon-wrap">
           <mat-icon>menu_book</mat-icon>
         </div>
-        <div class="service-tag">Monthly &amp; quarterly</div>
-        <h3>Bookkeeping</h3>
-        <p>Accurate monthly records, bank reconciliations, and financial statements that give you a clear picture of your business health.</p>
-        <a routerLink="/services" class="service-cta">Learn more →</a>
+        <div class="service-tag">{{ 'home.services.bookkeepingTag' | translate }}</div>
+        <h3>{{ 'home.services.bookkeeping.title' | translate }}</h3>
+        <p>{{ 'home.services.bookkeeping.desc' | translate }}</p>
+        <a routerLink="/services" class="service-cta">{{ 'home.services.learn' | translate }} →</a>
       </div>
       <div class="service-card" style="--delay: 0.25s">
         <div class="service-icon-wrap">
           <mat-icon>trending_up</mat-icon>
         </div>
-        <div class="service-tag">Strategy sessions</div>
-        <h3>Financial Consulting</h3>
-        <p>Strategic guidance on cash flow, growth planning, and investment decisions tailored to your goals and risk profile.</p>
-        <a routerLink="/services" class="service-cta">Learn more →</a>
+        <div class="service-tag">{{ 'home.services.consultingTag' | translate }}</div>
+        <h3>{{ 'home.services.consulting.title' | translate }}</h3>
+        <p>{{ 'home.services.consulting.desc' | translate }}</p>
+        <a routerLink="/services" class="service-cta">{{ 'home.services.learn' | translate }} →</a>
       </div>
     </div>
   </section>
@@ -97,12 +97,12 @@
   <!-- ─────────── CLIENT PORTAL ─────────── -->
   <section class="portal-section">
     <div class="portal-text">
-      <div class="section-eyebrow accent">Client Portal</div>
-      <h2 class="portal-heading">Your documents,<br>always at hand.</h2>
-      <p class="portal-desc">Access all your tax documents, financial reports, and secure messages with your accountant — encrypted and available from anywhere, anytime.</p>
+      <div class="section-eyebrow accent">{{ 'home.portal.section' | translate }}</div>
+      <h2 class="portal-heading">{{ 'home.portal.title' | translate }}</h2>
+      <p class="portal-desc">{{ 'home.portal.desc' | translate }}</p>
       <div class="portal-actions">
-        <a routerLink="/login" class="btn-dark">Sign in to portal</a>
-        <a routerLink="/register" class="portal-register-link">New client? Register →</a>
+        <a routerLink="/login" class="btn-dark">{{ 'home.portal.signIn' | translate }}</a>
+        <a routerLink="/register" class="portal-register-link">{{ 'home.portal.register' | translate }} →</a>
       </div>
     </div>
 
@@ -113,14 +113,14 @@
           <div class="mock-dot red"></div>
           <div class="mock-dot yellow"></div>
           <div class="mock-dot green"></div>
-          <span class="mock-title">Client Dashboard</span>
+          <span class="mock-title">{{ 'home.portal.dashboard' | translate }}</span>
         </div>
         <div class="mock-body">
-          <div class="mock-section-title">Recent Documents</div>
+          <div class="mock-section-title">{{ 'home.portal.recentDocuments' | translate }}</div>
           <div class="mock-row">
             <div class="mock-file-icon"></div>
             <span>2024_Tax_Return.pdf</span>
-            <span class="mock-badge">New</span>
+            <span class="mock-badge">{{ 'home.portal.new' | translate }}</span>
           </div>
           <div class="mock-row">
             <div class="mock-file-icon"></div>
@@ -130,12 +130,12 @@
             <div class="mock-file-icon"></div>
             <span>W2_2024.pdf</span>
           </div>
-          <div class="mock-section-title top-gap">Messages</div>
+          <div class="mock-section-title top-gap">{{ 'home.portal.messages' | translate }}</div>
           <div class="mock-msg">
             <div class="mock-avatar">GW</div>
             <div class="mock-msg-content">
-              <div class="mock-msg-from">GWH Accounting</div>
-              <div class="mock-msg-text">Your Q4 tax documents are ready for review...</div>
+              <div class="mock-msg-from">{{ 'home.portal.sender' | translate }}</div>
+              <div class="mock-msg-text">{{ 'home.portal.messagePreview' | translate }}</div>
             </div>
           </div>
         </div>
@@ -145,23 +145,23 @@
 
   <!-- ─────────── SECURITY ─────────── -->
   <section class="security-section">
-    <div class="section-eyebrow">Security First</div>
-    <h2 class="security-heading">Your data is always protected.</h2>
+    <div class="section-eyebrow">{{ 'home.security.section' | translate }}</div>
+    <h2 class="security-heading">{{ 'home.security.title' | translate }}</h2>
     <div class="security-badges">
       <div class="security-badge">
-        <mat-icon>lock</mat-icon><span>AES-256 Encryption</span>
+        <mat-icon>lock</mat-icon><span>{{ 'home.security.encryption' | translate }}</span>
       </div>
       <div class="security-badge">
-        <mat-icon>verified_user</mat-icon><span>Google OAuth2</span>
+        <mat-icon>verified_user</mat-icon><span>{{ 'home.security.oauth' | translate }}</span>
       </div>
       <div class="security-badge">
-        <mat-icon>folder_special</mat-icon><span>Isolated Storage</span>
+        <mat-icon>folder_special</mat-icon><span>{{ 'home.security.isolation' | translate }}</span>
       </div>
       <div class="security-badge">
-        <mat-icon>policy</mat-icon><span>GDPR &amp; CCPA</span>
+        <mat-icon>policy</mat-icon><span>{{ 'home.security.compliance' | translate }}</span>
       </div>
     </div>
-    <a routerLink="/security" class="security-link">Learn about our security practices →</a>
+    <a routerLink="/security" class="security-link">{{ 'home.security.learn' | translate }} →</a>
   </section>
 
   <!-- ─────────── FINAL CTA ─────────── -->
@@ -169,16 +169,16 @@
     <div class="cta-kanji" aria-hidden="true">税</div>
     <div class="cta-inner">
       <h2 class="cta-heading">
-        Ready to take control<br>of your <em>finances?</em>
+        {{ 'home.cta.ready' | translate }}<br>of your <em>finances?</em>
       </h2>
-      <p class="cta-sub">Schedule a free 30-minute consultation. No obligation, no pressure.</p>
+      <p class="cta-sub">{{ 'home.cta.schedule' | translate }}</p>
       <a routerLink="/book-consultation" class="btn-primary btn-large">
-        Book your free consultation
+        {{ 'home.cta.consultation' | translate }}
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
           <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd"/>
         </svg>
       </a>
-      <a routerLink="/contact" class="cta-contact-link">Or reach out with a question →</a>
+      <a routerLink="/contact" class="cta-contact-link">{{ 'home.cta.question' | translate }} →</a>
     </div>
   </section>
 
