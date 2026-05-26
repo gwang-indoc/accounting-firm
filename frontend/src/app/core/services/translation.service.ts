@@ -15,11 +15,9 @@ export class TranslationService {
   async init(): Promise<void> {
     this.translate.setDefaultLang('en');
 
-    // Load default English translations
-    const enTranslations = await firstValueFrom(
-      this.http.get('./i18n/en.json')
-    );
-    this.translate.setTranslation('en', enTranslations as any);
+    // Load default English translations (merge all files)
+    const enTranslations = await this.loadAndMergeLanguage('en');
+    this.translate.setTranslation('en', enTranslations);
 
     // Check for saved language preference
     const saved = localStorage.getItem('language') as 'en' | 'zh' | null;
@@ -38,11 +36,19 @@ export class TranslationService {
   }
 
   private async loadLanguage(lang: 'en' | 'zh'): Promise<void> {
-    const translations = await firstValueFrom(
-      this.http.get(`./i18n/${lang}.json`)
-    );
-    this.translate.setTranslation(lang, translations as any);
+    const translations = await this.loadAndMergeLanguage(lang);
+    this.translate.setTranslation(lang, translations);
     this.translate.use(lang);
+  }
+
+  private async loadAndMergeLanguage(lang: 'en' | 'zh'): Promise<Record<string, any>> {
+    const [root, publicTrans, portal, admin] = await Promise.all([
+      firstValueFrom(this.http.get(`./i18n/${lang}.json`)).catch(() => ({})),
+      firstValueFrom(this.http.get(`./i18n/public/${lang}.json`)).catch(() => ({})),
+      firstValueFrom(this.http.get(`./i18n/portal/${lang}.json`)).catch(() => ({})),
+      firstValueFrom(this.http.get(`./i18n/admin/${lang}.json`)).catch(() => ({})),
+    ]);
+    return { ...root, ...publicTrans, ...portal, ...admin } as Record<string, any>;
   }
 
   getLanguage(): 'en' | 'zh' {
