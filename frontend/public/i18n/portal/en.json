@@ -46,5 +46,22 @@
   "messages.compose": "Write a Message",
   "messages.sentAt": "Sent at",
   "messages.sender": "From",
-  "messages.messageBody": "Message"
+  "messages.messageBody": "Message",
+  "dashboard.greetingMorning": "Good morning",
+  "dashboard.greetingAfternoon": "Good afternoon",
+  "dashboard.greetingEvening": "Good evening",
+  "dashboard.messagesEmptyHint": "Messages from your advisor will appear here",
+  "dashboard.senderTypeClient": "You",
+  "dashboard.senderTypeAdmin": "Your accountant",
+  "documents.loadError": "Could not load your documents. Please try again.",
+  "documents.uploadedMessage": "Uploaded {{filename}}.",
+  "documents.documentSingular": "document",
+  "documents.documentPlural": "documents",
+  "documents.errorDefault": "That file could not be uploaded.",
+  "documents.errorNotSetUp": "Your portal isn't set up yet. Please contact GWH Accounting.",
+  "documents.errorDuplicate": "A file named \"{{filename}}\" already exists for {{year}}. Please rename and try again.",
+  "documents.errorTooLarge": "File is too large. Maximum size is 10 MB.",
+  "documents.errorFailed": "Upload failed. Please try again.",
+  "messages.senderTypeClient": "You",
+  "messages.senderTypeAdmin": "Your accountant"
 }

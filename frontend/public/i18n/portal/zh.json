@@ -46,5 +46,22 @@
   "messages.compose": "撰写消息",
   "messages.sentAt": "发送于",
   "messages.sender": "来自",
-  "messages.messageBody": "消息"
+  "messages.messageBody": "消息",
+  "dashboard.greetingMorning": "早上好",
+  "dashboard.greetingAfternoon": "下午好",
+  "dashboard.greetingEvening": "晚上好",
+  "dashboard.messagesEmptyHint": "您的顾问的消息将显示在此处",
+  "dashboard.senderTypeClient": "您",
+  "dashboard.senderTypeAdmin": "您的会计师",
+  "documents.loadError": "无法加载您的文档。请重试。",
+  "documents.uploadedMessage": "已上传 {{filename}}。",
+  "documents.documentSingular": "文档",
+  "documents.documentPlural": "文档",
+  "documents.errorDefault": "该文件无法上传。",
+  "documents.errorNotSetUp": "您的门户尚未设置。请联系 GWH Accounting。",
+  "documents.errorDuplicate": "名为 \"{{filename}}\" 的文件已存在于 {{year}}。请重命名后重试。",
+  "documents.errorTooLarge": "文件过大。最大大小为 10 MB。",
+  "documents.errorFailed": "上传失败。请重试。",
+  "messages.senderTypeClient": "您",
+  "messages.senderTypeAdmin": "您的会计师"
 }

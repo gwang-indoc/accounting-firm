@@ -6,7 +6,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpErrorResponse } from '@angular/common/http';
 import { finalize } from 'rxjs';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MyDocumentsService } from '../../../core/services/my-documents.service';
 import { MyDocumentItem, MyDocumentsResponse } from '../../../core/models/my-documents';
 
@@ -20,6 +20,8 @@ import { MyDocumentItem, MyDocumentsResponse } from '../../../core/models/my-doc
 export class DocumentsComponent implements OnInit {
   private myDocs = inject(MyDocumentsService);
   private snackBar = inject(MatSnackBar);
+  private translate = inject(TranslateService);
+  private langChangeSignal = signal<string>(this.translate.currentLang);
 
   response = signal<MyDocumentsResponse | null>(null);
   selectedYear = signal<number | null>(null);
@@ -61,7 +63,10 @@ export class DocumentsComponent implements OnInit {
         const dy = this.docYears();
         if (dy.length > 0) this.selectedYear.set(dy[0]);
       },
-      error: () => this.snackBar.open('Could not load your documents. Please try again.', 'OK'),
+      error: () => this.snackBar.open(this.translate.instant('documents.loadError'), 'OK'),
+    });
+    this.translate.onLangChange.subscribe(() => {
+      this.langChangeSignal.set(this.translate.currentLang);
     });
   }
 
@@ -95,7 +100,8 @@ export class DocumentsComponent implements OnInit {
           const current = this.response() ?? { linked: true, clientName: null, documents: [] };
           this.response.set({ ...current, documents: [...current.documents, item] });
           if (this.selectedYear() == null) this.selectedYear.set(item.year);
-          this.snackBar.open(`Uploaded ${item.filename}.`, 'OK', { duration: 3000 });
+          const msg = this.translate.instant('documents.uploadedMessage', { filename: item.filename });
+          this.snackBar.open(msg, 'OK', { duration: 3000 });
         },
         error: (err: HttpErrorResponse) => {
           this.snackBar.open(this.errorMessageFor(err, file.name, year), 'OK');
@@ -106,11 +112,11 @@ export class DocumentsComponent implements OnInit {
   private errorMessageFor(err: HttpErrorResponse, filename: string, year: number): string {
     const serverMessage = err?.error?.message;
     switch (err.status) {
-      case 400: return serverMessage ?? 'That file could not be uploaded.';
-      case 403: return serverMessage ?? "Your portal isn't set up yet. Please contact GWH Accounting.";
-      case 409: return serverMessage ?? `A file named "${filename}" already exists for ${year}. Please rename and try again.`;
-      case 413: return 'File is too large. Maximum size is 10 MB.';
-      default:  return 'Upload failed. Please try again.';
+      case 400: return serverMessage ?? this.translate.instant('documents.errorDefault');
+      case 403: return serverMessage ?? this.translate.instant('documents.errorNotSetUp');
+      case 409: return serverMessage ?? this.translate.instant('documents.errorDuplicate', { filename, year });
+      case 413: return this.translate.instant('documents.errorTooLarge');
+      default:  return this.translate.instant('documents.errorFailed');
     }
   }
 

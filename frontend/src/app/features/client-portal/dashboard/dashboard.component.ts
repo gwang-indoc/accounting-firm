@@ -1,7 +1,7 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { MyDocumentsService } from '../../../core/services/my-documents.service';
 import { PortalMessagesService } from '../../../core/services/portal-messages.service';
@@ -27,6 +27,8 @@ export class DashboardComponent implements OnInit {
   protected authService = inject(AuthService);
   private myDocs = inject(MyDocumentsService);
   private portalMessages = inject(PortalMessagesService);
+  private translate = inject(TranslateService);
+  private langChangeSignal = signal<string>(this.translate.currentLang);
 
   response = signal<MyDocumentsResponse | null>(null);
   threads = signal<MessageThreadSummaryDto[]>([]);
@@ -50,10 +52,16 @@ export class DashboardComponent implements OnInit {
       next: (list) => this.threads.set(list.slice(0, 3)),
       error: () => this.threads.set([]),
     });
+    this.translate.onLangChange.subscribe(() => {
+      this.langChangeSignal.set(this.translate.currentLang);
+    });
   }
 
   senderLabel(t: MessageThreadSummaryDto): string {
-    return t.lastSenderType === 'ADMIN' ? 'Your accountant' : 'You';
+    this.langChangeSignal();
+    return t.lastSenderType === 'ADMIN'
+      ? this.translate.instant('dashboard.senderTypeAdmin')
+      : this.translate.instant('dashboard.senderTypeClient');
   }
 
   titleFor(t: MessageThreadSummaryDto): string {
@@ -61,10 +69,11 @@ export class DashboardComponent implements OnInit {
   }
 
   get greeting(): string {
+    this.langChangeSignal();
     const h = new Date().getHours();
-    if (h < 12) return 'Good morning';
-    if (h < 17) return 'Good afternoon';
-    return 'Good evening';
+    if (h < 12) return this.translate.instant('dashboard.greetingMorning');
+    if (h < 17) return this.translate.instant('dashboard.greetingAfternoon');
+    return this.translate.instant('dashboard.greetingEvening');
   }
 
   get today(): string {

@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { PortalMessagesService } from '../../../core/services/portal-messages.service';
 import { MessageDto, MessageThreadDto } from '../../../core/models/message.model';
 
@@ -16,6 +16,8 @@ export class PortalThreadViewComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private msgService = inject(PortalMessagesService);
+  private translate = inject(TranslateService);
+  private langChangeSignal = signal<string>(this.translate.currentLang);
 
   threadId = signal<number>(0);
   thread = signal<MessageThreadDto | null>(null);
@@ -25,6 +27,9 @@ export class PortalThreadViewComponent implements OnInit {
     const tid = Number(this.route.snapshot.paramMap.get('threadId'));
     this.threadId.set(tid);
     this.msgService.getThread(tid).subscribe(t => this.thread.set(t));
+    this.translate.onLangChange.subscribe(() => {
+      this.langChangeSignal.set(this.translate.currentLang);
+    });
   }
 
   get messages(): MessageDto[] {
@@ -32,7 +37,10 @@ export class PortalThreadViewComponent implements OnInit {
   }
 
   senderLabel(msg: MessageDto): string {
-    return msg.senderType === 'CLIENT' ? 'You' : 'Your accountant';
+    this.langChangeSignal();
+    return msg.senderType === 'CLIENT'
+      ? this.translate.instant('messages.senderTypeClient')
+      : this.translate.instant('messages.senderTypeAdmin');
   }
 
   onReplyInput(event: Event): void {

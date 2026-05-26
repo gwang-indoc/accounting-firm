@@ -27,12 +27,12 @@
         <div class="overview-stats">
           <div class="stat-cell">
             <span class="stat-value">{{ documentCount() ?? '—' }}</span>
-            <span class="stat-label">Documents</span>
+            <span class="stat-label">{{ 'dashboard.documents' | translate }}</span>
           </div>
           <mat-divider [vertical]="true" class="stat-divider"></mat-divider>
           <div class="stat-cell">
             <span class="stat-value">{{ mostRecentYear() ?? '—' }}</span>
-            <span class="stat-label">Latest Year</span>
+            <span class="stat-label">{{ 'dashboard.latestYearLabel' | translate }}</span>
           </div>
         </div>
       </mat-card-content>
@@ -41,11 +41,11 @@
     <!-- Quick Actions -->
     <mat-card class="card card-actions">
       <mat-card-header>
-        <mat-card-title>Quick Actions</mat-card-title>
+        <mat-card-title>{{ 'dashboard.quickActions' | translate }}</mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <div class="action-single">
-          <a mat-button class="action-tile" routerLink="/portal/documents" data-testid="view-documents-link">View Documents</a>
+          <a mat-button class="action-tile" routerLink="/portal/documents" data-testid="view-documents-link">{{ 'dashboard.viewDocuments' | translate }}</a>
         </div>
       </mat-card-content>
     </mat-card>
@@ -54,7 +54,7 @@
     <mat-card class="card card-messages">
       <mat-card-header>
         <mat-card-title class="messages-heading">
-          Messages
+          {{ 'dashboard.messages' | translate }}
           @if (unreadCount() > 0) {
             <span class="unread-badge">{{ unreadCount() }}</span>
           }
@@ -81,15 +81,15 @@
         } @empty {
           <div class="empty-state">
             <mat-icon class="empty-icon">inbox</mat-icon>
-            <p class="empty-title">No messages</p>
-            <p class="empty-hint">Messages from your advisor will appear here</p>
+            <p class="empty-title">{{ 'dashboard.noMessages' | translate }}</p>
+            <p class="empty-hint">{{ 'dashboard.messagesEmptyHint' | translate }}</p>
           </div>
         }
         @if (threads().length > 0) {
           <a class="view-all-link"
              routerLink="/portal/messages"
              data-testid="view-all-messages-link">
-            View all messages →
+            {{ 'dashboard.viewAllMessages' | translate }}
           </a>
         }
       </mat-card-content>
