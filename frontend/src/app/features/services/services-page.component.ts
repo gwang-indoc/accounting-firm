@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, signal, effect } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -12,6 +12,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 })
 export class ServicesPageComponent {
   private translate = inject(TranslateService);
+  private langChangeSignal = signal<string>(this.translate.currentLang);
 
   readonly serviceKeys = [
     {
@@ -53,7 +54,7 @@ export class ServicesPageComponent {
   ];
 
   services = computed(() => {
-    const lang = this.translate.currentLanguage;
+    this.langChangeSignal();
     return this.serviceKeys.map(sk => ({
       icon: sk.icon,
       title: this.translate.instant(sk.titleKey),
@@ -61,4 +62,10 @@ export class ServicesPageComponent {
       tag: this.translate.instant(sk.tagKey),
     }));
   });
+
+  constructor() {
+    this.translate.onLangChange.subscribe(() => {
+      this.langChangeSignal.set(this.translate.currentLang);
+    });
+  }
 }

@@ -40,7 +40,7 @@
   <!-- RIGHT: Services grid -->
   <main class="content-panel">
     <div class="services-grid">
-      @for (svc of services; track svc.title; let i = $index) {
+      @for (svc of services(); track svc.title; let i = $index) {
         <div class="service-card" [style.animation-delay]="(i * 0.07) + 's'">
           <div class="card-icon-wrap">
             <mat-icon>{{ svc.icon }}</mat-icon>
