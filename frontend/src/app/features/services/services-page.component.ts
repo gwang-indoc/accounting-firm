@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-services-page',
@@ -11,42 +11,54 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrl: './services-page.component.css',
 })
 export class ServicesPageComponent {
-  readonly services = [
+  private translate = inject(TranslateService);
+
+  readonly serviceKeys = [
     {
       icon: 'receipt_long',
-      title: 'Tax Preparation',
-      description: 'Comprehensive individual and business tax filing. We navigate complex tax codes so you pay only what you owe — nothing more.',
-      tag: 'Year-round support',
+      titleKey: 'services.taxPrep.title',
+      descKey: 'services.taxPrep.desc',
+      tagKey: 'services.taxPrep.tag',
     },
     {
       icon: 'menu_book',
-      title: 'Bookkeeping',
-      description: 'Accurate monthly records, bank reconciliations, and financial statements that give you a clear picture of your business health.',
-      tag: 'Monthly & quarterly',
+      titleKey: 'services.bookkeeping.title',
+      descKey: 'services.bookkeeping.desc',
+      tagKey: 'services.bookkeeping.tag',
     },
     {
       icon: 'trending_up',
-      title: 'Financial Consulting',
-      description: 'Strategic guidance on cash flow, growth planning, and investment decisions tailored to your goals and risk profile.',
-      tag: 'Strategy sessions',
+      titleKey: 'services.consulting.title',
+      descKey: 'services.consulting.desc',
+      tagKey: 'services.consulting.tag',
     },
     {
       icon: 'corporate_fare',
-      title: 'Business Advisory',
-      description: 'Entity structuring, acquisition due diligence, and exit planning for founders who want a trusted financial partner.',
-      tag: 'For founders',
+      titleKey: 'services.advisory.title',
+      descKey: 'services.advisory.desc',
+      tagKey: 'services.advisory.tag',
     },
     {
       icon: 'people',
-      title: 'Payroll Services',
-      description: 'Full-service payroll processing, compliance filings, and employee tax management for teams of any size.',
-      tag: 'Automated & accurate',
+      titleKey: 'services.payroll.title',
+      descKey: 'services.payroll.desc',
+      tagKey: 'services.payroll.tag',
     },
     {
       icon: 'account_balance',
-      title: 'Estate Planning',
-      description: "Trust structuring, wealth transfer strategies, and tax-efficient succession planning for your family's future.",
-      tag: 'Generational wealth',
+      titleKey: 'services.estate.title',
+      descKey: 'services.estate.desc',
+      tagKey: 'services.estate.tag',
     },
   ];
+
+  services = computed(() => {
+    const lang = this.translate.currentLanguage;
+    return this.serviceKeys.map(sk => ({
+      icon: sk.icon,
+      title: this.translate.instant(sk.titleKey),
+      description: this.translate.instant(sk.descKey),
+      tag: this.translate.instant(sk.tagKey),
+    }));
+  });
 }
