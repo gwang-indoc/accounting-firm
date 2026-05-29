@@ -322,10 +322,10 @@ Required GitHub secrets: `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`.
 **Option B — manual build from a Mac (Apple Silicon):** the production server runs `linux/amd64`, so you must cross-compile explicitly:
 
 ```bash
-docker buildx build --platform linux/amd64 \
+docker buildx build --no-cache --platform linux/amd64 \
   -t garywang118/accounting-firm-backend:latest --push ./backend
 
-docker buildx build --platform linux/amd64 \
+docker buildx build --no-cache --platform linux/amd64 \
   -t garywang118/accounting-firm-frontend:latest --push ./frontend
 ```
 
