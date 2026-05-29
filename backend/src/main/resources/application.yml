@@ -1,3 +1,6 @@
+server:
+  forward-headers-strategy: framework
+
 spring:
   mail:
     host: ${SPRING_MAIL_HOST:localhost}
@@ -34,7 +37,7 @@ contact:
   notification-email: ${CONTACT_NOTIFICATION_EMAIL}
 
 app:
-  publicBaseUrl: "http://localhost:4200"
+  publicBaseUrl: ${APP_PUBLIC_BASE_URL:http://localhost:4200}
   jwt:
     secret: ${JWT_SECRET}
     expiration-ms: 86400000
