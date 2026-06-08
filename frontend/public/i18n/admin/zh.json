@@ -48,6 +48,7 @@
   "messages.reply": "撰写回复…",
   "messages.send": "发送",
   "messages.noMessages": "没有消息",
+  "clients.recordPlural": "/ 共 {{count}} 条",
   "clients.clientSingular": "位客户",
   "clients.clientPlural": "位客户",
   "documents.documentSingular": "份文档",

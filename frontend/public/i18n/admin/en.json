@@ -48,6 +48,7 @@
   "messages.reply": "Write a reply…",
   "messages.send": "Send",
   "messages.noMessages": "No messages",
+  "clients.recordPlural": "of {{count}} clients",
   "clients.clientSingular": "client",
   "clients.clientPlural": "clients",
   "documents.documentSingular": "document",

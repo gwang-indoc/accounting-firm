@@ -26,7 +26,7 @@ artifacts:
 
       Reference any relevant SHALL clauses from openspec/specs/<capability>/spec.md.
 
-      Status flow: DRAFT (after first write) → REVIEWED (after brainstorming
+      Status flow: DRAFT (after first write) → REVIEWED (after can yrming
       review pass catches placeholders, contradictions, scope creep, ambiguity).
       /opsx:propose REJECTS files with Status: DRAFT.
 

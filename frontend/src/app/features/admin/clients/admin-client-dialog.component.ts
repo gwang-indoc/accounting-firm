@@ -37,14 +37,6 @@ export interface AdminClientDialogData {
 
     <mat-dialog-content>
       <form [formGroup]="form" id="clientForm" (ngSubmit)="submit()" class="dlg-form">
-        <mat-form-field appearance="outline" class="dlg-field">
-          <mat-label>Full Name</mat-label>
-          <input matInput formControlName="name" placeholder="e.g. Jane Smith" />
-          @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
-            <mat-error>Name is required</mat-error>
-          }
-        </mat-form-field>
-
         <mat-form-field appearance="outline" class="dlg-field dlg-field-email">
           <mat-label>Email Address</mat-label>
           <input matInput type="email" formControlName="email" placeholder="e.g. jane@example.com" />
@@ -62,6 +54,14 @@ export interface AdminClientDialogData {
           }
           @if (form.get('email')?.hasError('duplicateClient')) {
             <mat-error>Client already exists</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="dlg-field">
+          <mat-label>Full Name</mat-label>
+          <input matInput formControlName="name" placeholder="e.g. Jane Smith" />
+          @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+            <mat-error>Name is required</mat-error>
           }
         </mat-form-field>
 

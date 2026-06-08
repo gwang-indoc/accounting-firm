@@ -78,9 +78,8 @@ test.describe('/admin/clients', () => {
     await expect(page.getByTestId('client-row')).toHaveCount(1);
 
     await page.getByTestId('add-client-btn').click();
-    await page.getByLabel('Full Name').fill('Carol Wu');
-    await page.getByLabel('Email').fill('carol@example.com');
-    // Wait for async email validator (400ms debounce + HTTP) to complete
+    await page.getByLabel('Email Address').fill('carol@example.com');
+    // Wait for async email validator (400ms debounce + HTTP) to complete and auto-fill name
     await page.waitForTimeout(1500);
     await page.getByLabel('Phone').fill('555-9999');
     await page.getByRole('button', { name: 'Add Client' }).click();
