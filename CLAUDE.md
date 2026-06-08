@@ -177,6 +177,17 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
+## Pitfalls
+
+### NOT NULL migration regressions in test helpers
+When a Flyway migration adds a NOT NULL column (e.g. `users.name`, `clients.admin_id`), raw SQL INSERT helpers in `@DataJpaTest` tests break silently at runtime — the compiler won't catch missing columns. After any NOT NULL migration, grep `src/test` for INSERT statements and audit each one for the new column.
+
+### Playwright e2e: async Angular validators need explicit route mocks
+Angular async validators (`switchMap` + HTTP) fire real requests during e2e tests. Without a `page.route()` mock, the request hits Spring Security unauthenticated → redirect → dialog closes → locator times out. Use a **regex** route (e.g. `/\/api\/admin\/users\/lookup/`) not a glob (`**/api/**`) — glob patterns are less reliable against proxied routes.
+
+### Angular Material `getByLabel` uses `mat-label` text only
+`mat-label` is the accessible name. Placeholder text is NOT appended. `getByLabel('Phone (optional)')` fails if the mat-label is just `Phone`; use `getByLabel('Phone')`.
+
 ## Lessons Learned
 
 Lessons from archived changes live in `docs/lessons/` — one file per archive, named `YYYY-MM-DD-<change-name>.md`.
