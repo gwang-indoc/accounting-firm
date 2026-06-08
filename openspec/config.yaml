@@ -2,8 +2,9 @@ schema: superpowers-driven
 
 project:
   test_commands:
-    - ""                         # e.g. "pytest" / "go test ./..." / "npm test"
-  e2e_command: ""                # optional, e.g. "npm run e2e" — leave empty to skip
+    - "cd backend && ./mvnw test"
+    - "cd frontend && npx ng test --no-watch"
+  e2e_command: "cd e2e && npx playwright test"  # requires backend (./start.sh) and frontend (cd frontend && npm start) to be running first
   custom_verification_checks: [] # project-specific grep/lint checks appended to final verification
                                  # e.g. 'grep -rn "hardcoded_secret" src/'
 
