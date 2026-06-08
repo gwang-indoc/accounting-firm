@@ -94,12 +94,22 @@ npx playwright test --grep "login"     # single test
 
 **Requirements before running:** backend must be started (`./start.sh`) and frontend must be started (`cd frontend && npm start`).
 
-**If servers are not running during an apply/verify step:** do NOT silently skip the e2e task. Check with:
+**If servers are not running during an apply/verify step:** start them automatically — do NOT ask the user. Check and start:
 ```bash
+# Check
 curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health
 curl -s -o /dev/null -w "%{http_code}" http://localhost:4200
+
+# If backend down (returns 000): start it
+./start.sh &
+
+# If frontend down (returns 000): start it
+cd frontend && npm start &
+
+# Then wait until both are up before running e2e
+until [ "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/actuator/health)" != "000" ] && \
+      [ "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:4200)" != "000" ]; do sleep 3; done
 ```
-If either returns `000`, stop and tell the user: "E2E needs both servers running. Start backend (`./start.sh`) and frontend (`cd frontend && npm start`), then confirm." Wait for confirmation before running the suite.
 
 **When to add E2E tests:** see schema `tasks.instruction` — the final group of any UI-touching change must include a committed Playwright test in `e2e/` covering the affected flow.
 
