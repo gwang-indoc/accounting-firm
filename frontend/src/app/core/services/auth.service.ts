@@ -3,6 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom, Observable, tap } from 'rxjs';
 import { UserDto } from '../models/user.model';
 
+export interface VerifyEmailCodeResponse {
+  status: 'authenticated' | 'signup_required';
+  signupToken?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   currentUser = signal<UserDto | null>(null);
@@ -19,12 +24,20 @@ export class AuthService {
     }
   }
 
-  register(dto: { fullName: string; email: string; password: string; confirmPassword: string }): Observable<void> {
-    return this.http.post<void>('/api/auth/register', dto);
+  requestEmailCode(email: string): Promise<void> {
+    return firstValueFrom(this.http.post<void>('/api/auth/email/request-code', { email }));
   }
 
-  loginWithEmail(dto: { email: string; password: string }): Observable<void> {
-    return this.http.post<void>('/api/auth/login', dto);
+  verifyEmailCode(email: string, code: string): Promise<VerifyEmailCodeResponse> {
+    return firstValueFrom(
+      this.http.post<VerifyEmailCodeResponse>('/api/auth/email/verify-code', { email, code })
+    );
+  }
+
+  completeEmailSignup(signupToken: string, name: string): Promise<void> {
+    return firstValueFrom(
+      this.http.post<void>('/api/auth/email/complete-signup', { signupToken, name })
+    );
   }
 
   logout(): Observable<void> {

@@ -1,10 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { EventEmitter, provideNgReflectAttributes } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 import { vi } from 'vitest';
 import { NavbarComponent } from './navbar.component';
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth.service';
 import { PortalMessagesService } from '../../core/services/portal-messages.service';
 
@@ -18,7 +19,7 @@ describe('NavbarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NavbarComponent, RouterModule.forRoot([])],
+      imports: [NavbarComponent, RouterModule.forRoot([]), TranslateModule.forRoot()],
       providers: [provideHttpClient()],
     }).compileComponents();
     fixture = TestBed.createComponent(NavbarComponent);
@@ -39,28 +40,6 @@ describe('NavbarComponent', () => {
   it('renders tagline "Secure Tax & Accounting Portal"', () => {
     const nativeEl = fixture.nativeElement as HTMLElement;
     expect(nativeEl.textContent).toContain('Secure Tax & Accounting Portal');
-  });
-
-  it('EN language pill is active by default', () => {
-    expect(component.lang()).toBe('en');
-  });
-
-  it('clicking 中文 sets lang to zh', () => {
-    const zhBtn = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="lang-zh"]') as HTMLElement;
-    zhBtn.click();
-    fixture.detectChanges();
-    expect(component.lang()).toBe('zh');
-  });
-
-  it('clicking EN after 中文 sets lang back to en', () => {
-    const zhBtn = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="lang-zh"]') as HTMLElement;
-    zhBtn.click();
-    fixture.detectChanges();
-
-    const enBtn = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="lang-en"]') as HTMLElement;
-    enBtn.click();
-    fixture.detectChanges();
-    expect(component.lang()).toBe('en');
   });
 
   it('"Services" link has routerLink="/services"', () => {
@@ -179,6 +158,17 @@ describe('NavbarComponent', () => {
     const nativeEl = fixture.nativeElement as HTMLElement;
     expect(nativeEl.querySelector('[data-testid="logout-btn"]')).not.toBeNull();
     expect(nativeEl.querySelector('[data-testid="client-login-btn"]')).toBeNull();
+  });
+
+  it('logout navigates to /login', () => {
+    const authService = TestBed.inject(AuthService);
+    vi.spyOn(authService, 'logout').mockReturnValue(of(undefined));
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    component.logout();
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/login']);
   });
 });
 

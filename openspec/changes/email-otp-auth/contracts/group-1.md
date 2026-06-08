@@ -1,0 +1,6 @@
+### Contract
+
+- **Spec**: The system SHALL create the `email_login_codes` table via a new Flyway migration with columns `id`, `email`, `code_hash`, `expires_at`, `attempts`, `consumed_at`, and `created_at`. // For any syntactically valid email, the system SHALL generate a 6-digit numeric code, store only its BCrypt hash in `email_login_codes` with a 10-minute expiry. // The system SHALL enforce: each code expires 10 minutes after creation; a code is invalidated after 5 failed verify attempts. // Plaintext code is never persisted (store a BCrypt hash, never the plaintext).
+- **Runtime**: `cd backend && ./mvnw test -Dtest=EmailLoginCodeServiceTest,EmailLoginCodeRepositoryTest` → expected: all tests pass; code generated as zero-padded 6 digits, stored hash matches via PasswordEncoder, expiry = created+10min, attempts increment, dead after 5.
+- **Code**: D2 — `SecureRandom` int in [0,999999] zero-padded; `BCrypt(code)` via existing `PasswordEncoder` bean; verify selects latest row where `consumed_at IS NULL AND expires_at > now()` ordered by `created_at DESC`; mismatch increments `attempts`, `attempts >= 5` is dead. D7 — V9 migration + index on `(email, created_at DESC)`. Never persist plaintext.
+- **Threshold**: 80

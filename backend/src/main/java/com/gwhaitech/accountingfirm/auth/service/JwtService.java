@@ -38,6 +38,27 @@ public class JwtService {
                 .compact();
     }
 
+    private static final long SIGNUP_TOKEN_EXPIRY_MS = 10 * 60 * 1000L;
+
+    public String issueSignupToken(String email) {
+        long now = System.currentTimeMillis();
+        return Jwts.builder()
+                .subject(email)
+                .claim("purpose", "signup")
+                .issuedAt(new Date(now))
+                .expiration(new Date(now + SIGNUP_TOKEN_EXPIRY_MS))
+                .signWith(key, Jwts.SIG.HS256)
+                .compact();
+    }
+
+    public String validateSignupToken(String token) {
+        Claims claims = validateToken(token);
+        if (!"signup".equals(claims.get("purpose"))) {
+            throw new JwtException("not a signup token");
+        }
+        return claims.getSubject();
+    }
+
     public int expirationSeconds() {
         return (int) (expirationMs / 1000);
     }

@@ -1,156 +1,149 @@
 ---
 name: "OPSX: Apply"
-description: Implement tasks from an OpenSpec change (Experimental)
+description: Execute tasks.md with TDD + review skills wired into the gates
 category: Workflow
 tags: [workflow, artifacts, experimental]
 ---
 
-Implement tasks from an OpenSpec change.
+Execute the tasks defined in `openspec/changes/<topic>/tasks.md`. Invoke superpowers skills at the gates the planning phase wired in.
 
-**Input**: Optionally specify a change name (e.g., `/opsx:apply add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
+**Input**: Optionally specify a change name (e.g., `/opsx:apply add-auth`). If omitted, infer from conversation context. If ambiguous, run `openspec list --json` and use **AskUserQuestion** to let the user select.
 
-**Authoritative rules**
+---
 
-This command orchestrates how to work through tasks. The actual TDD discipline, code-review checkpoints, checkbox discipline, subagent dispatch, and dev log update rules live in the schema's `apply.instruction` field and are returned automatically by `openspec instructions apply --change "<name>" --json` (see Step 3 below). Read that output before starting — it is the authoritative source for HOW each task is executed.
+**Setup**: Before starting, read `openspec/config.yaml` and note the `project` section:
+- `project.test_commands` — list of test commands (used in verification step)
+- `project.e2e_command` — e2e test command (optional)
+- `project.custom_verification_checks` — appended to verification-before-completion
+
+Also note these new artifact paths for this change:
+- `openspec/changes/<name>/contracts/` — contract files written by N.0 CONTRACT tasks
+- `openspec/changes/<name>/eval-log.md` — evaluator score history (pre-created by propose)
+
+---
 
 **Steps**
 
-1. **Select the change**
+### 1. Select change + read context
 
-   If a name is provided, use it. Otherwise:
-   - Infer from conversation context if the user mentioned a change
-   - Auto-select if only one active change exists
-   - If ambiguous, run `openspec list --json` to get available changes and use the **AskUserQuestion tool** to let the user select
+Announce: "Using change: `<name>`. Override: `/opsx:apply <other>`."
 
-   Always announce: "Using change: <name>" and how to override (e.g., `/opsx:apply <other>`).
-
-2. **Check status to understand the schema**
-   ```bash
-   openspec status --change "<name>" --json
-   ```
-   Parse the JSON to understand:
-   - `schemaName`: The workflow being used (e.g., "spec-driven")
-   - Which artifact contains the tasks (typically "tasks" for spec-driven, check status for others)
-
-3. **Get apply instructions**
-
-   ```bash
-   openspec instructions apply --change "<name>" --json
-   ```
-
-   This returns:
-   - `contextFiles`: artifact ID -> array of concrete file paths (varies by schema)
-   - Progress (total, complete, remaining)
-   - Task list with status
-   - Dynamic instruction based on current state
-
-   **Handle states:**
-   - If `state: "blocked"` (missing artifacts): show message, suggest using `/opsx:continue`
-   - If `state: "all_done"`: congratulate, suggest archive
-   - Otherwise: proceed to implementation
-
-4. **Read context files**
-
-   Read every file path listed under `contextFiles` from the apply instructions output.
-   The files depend on the schema being used:
-   - **spec-driven**: proposal, specs, design, tasks
-   - Other schemas: follow the contextFiles from CLI output
-
-5. **Show current progress**
-
-   Display:
-   - Schema being used
-   - Progress: "N/M tasks complete"
-   - Remaining tasks overview
-   - Dynamic instruction from CLI
-
-6. **Implement tasks (loop until done or blocked)**
-
-   For each pending task:
-   - Show which task is being worked on
-   - Make the code changes required
-   - Keep changes minimal and focused
-   - Mark task complete in the tasks file: `- [ ]` → `- [x]` using the **Edit tool** (never `sed` — `sed` targets by line number and fails silently when lines shift)
-   - Continue to next task
-
-   **Pause if:**
-   - Task is unclear → ask for clarification
-   - Implementation reveals a design issue → suggest updating artifacts
-   - Error or blocker encountered → report and wait for guidance
-   - User interrupts
-
-7. **On completion or pause, show status**
-
-   Display:
-   - Tasks completed this session
-   - Overall progress: "N/M tasks complete"
-   - If all done: suggest archive
-   - If paused: explain why and wait for guidance
-
-**Output During Implementation**
-
-```
-## Implementing: <change-name> (schema: <schema-name>)
-
-Working on task 3/7: <task description>
-[...implementation happening...]
-✓ Task complete
-
-Working on task 4/7: <task description>
-[...implementation happening...]
-✓ Task complete
+```bash
+openspec status --change <name> --json
+openspec instructions apply --change <name> --json
 ```
 
-**Output On Completion**
+Parse `contextFiles` from the apply instructions. READ each one (proposal, specs, design, requirements) so you have full context before touching code.
+
+### 2. Session start: invoke superpowers:test-driven-development
+
+Use the **Skill** tool to invoke `superpowers:test-driven-development`. The skill enforces "no GREEN without a RED predecessor" throughout the session. This is mandatory; do not skip.
+
+### 3. Walk task groups
+
+For each `## N` task group in `tasks.md`:
+
+For each task, dispatch by prefix:
+
+Convention for the task ordinal `N.X`: `N` is the group number; `X` is the position within the group (1, 2, 3, …). The keyword AFTER `N.X` (RED / GREEN / Run …) decides dispatch — NOT the ordinal letter. The schema's tasks template assigns the last-in-group code-review task position `Z` by convention, but you should match on the "Run superpowers:requesting-code-review" prefix, not on `.Z`.
+
+- **`- [ ] N.X RED — ...`** → write the failing test, run it, confirm the failure mode matches the description (often "function not defined" or "expected X got undefined"). Mark the checkbox.
+
+- **`- [ ] N.X GREEN — ...`** → write the minimal code to pass. Run the test. Confirm pass. Mark the checkbox.
+
+- **`- [ ] N.0 CONTRACT — ...`** → read the `### Contract` block above group N in `tasks.md`. Write its content verbatim to `openspec/changes/<name>/contracts/group-N.md`. Confirm all three fields (Spec, Runtime, Code) are non-empty before proceeding. Mark the checkbox.
+
+- **`- [ ] N.E EVAL — ...`** → spawn evaluator subagent (haiku model). See **Evaluator Subagent** and **Retry Loop** sections below. Do NOT mark the checkbox until the evaluator returns PASS. On BLOCK, pause immediately and report to the user. On PASS, mark the checkbox and continue to next group.
+
+- **`- [ ] N.X FIX — ...`** → execute like a GREEN task: write the minimal code change described in the task. Run the relevant test to confirm the fix takes effect. Mark the checkbox. The next task will be another N.E EVAL — the retry loop re-fires automatically.
+
+### Evaluator Subagent
+
+Spawn via the **Agent** tool with `model: haiku`. Pass ONLY these files as context — do not pass the full apply-session conversation:
+
+- `openspec/changes/<name>/contracts/group-N.md`
+- `openspec/changes/<name>/specs/<cap>/spec.md` (all capability specs for this change)
+- `openspec/changes/<name>/design.md`
+- The git diff for files modified in group N: run `git diff HEAD~<n>..HEAD -- <files changed in group N>` and include the output
+
+Before passing the prompt, substitute the current `attempt` count in place of `<attempt_number>` in step 8's YAML block.
+
+Evaluator prompt (pass this verbatim to the subagent):
+
+> You are an external evaluator with a skeptical lens. You have no knowledge of the implementation decisions made during this session.
+>
+> 1. Invoke `superpowers:requesting-code-review` on the provided diff. If you find CRITICAL or HIGH severity issues, return immediately with `STATUS: BLOCK` and the findings. Do not score.
+> 2. Run the Runtime test command from the contract. Execute it as a shell command in the repo root and record pass/fail and output.
+> 3. Compare the diff against each SHALL statement in the contract's Spec section. Score 0–100.
+> 4. Score Runtime 0–100 (100 = all tests pass, 0 = test command fails to run).
+> 5. Score Code 0–100 based on requesting-code-review findings (no CRITICAL/HIGH assumed at this point).
+> 6. Compute total = (Spec × 0.4) + (Runtime × 0.4) + (Code × 0.2).
+> 7. Read the Threshold from the contract.
+> 8. Append to `openspec/changes/<name>/eval-log.md`:
+>    ```yaml
+>    - group: N
+>      attempt: <attempt_number>
+>      scores: {spec: X, runtime: Y, code: Z}
+>      total: T
+>      status: PASS | RETRY
+>      findings:
+>        - "<dimension>: <specific finding>"
+>      fix_tasks:
+>        - "N.F1 FIX — <specific actionable fix>"
+>    ```
+> 9. If total ≥ threshold: return `STATUS: PASS`.
+>    If total < threshold: append the fix_tasks as `- [ ] N.F1 FIX — ...` checkboxes to group N in `tasks.md`, then return `STATUS: RETRY`.
+
+### Retry Loop
+
+The apply agent manages attempt counting per group. Initialize before spawning the first evaluator for each group:
 
 ```
-## Implementation Complete
-
-**Change:** <change-name>
-**Schema:** <schema-name>
-**Progress:** 7/7 tasks complete ✓
-
-### Completed This Session
-- [x] Task 1
-- [x] Task 2
-...
-
-All tasks complete! You can archive this change with `/opsx:archive`.
+attempt = 1
+score_history = []
 ```
 
-**Output On Pause (Issue Encountered)**
+After each evaluator result:
 
+- **BLOCK** → pause immediately: "Group N BLOCKED — CRITICAL/HIGH code issue found. Options: (1) Fix the issue manually and type 'resume' to re-run N.E EVAL (attempt count resets to 1), (2) Skip group N, (3) Abort apply." Do not retry automatically.
+- **PASS** → mark N.E EVAL checkbox `[x]`, advance to next group.
+- **RETRY** →
+  - Append `result.total` to `score_history`
+  - Increment `attempt`
+  - **Escalate if:** `attempt > 3` OR `(len(score_history) >= 2 AND score_history[-1] - score_history[-2] < 5)` — note: a score regression (worsening) also triggers escalation, since the delta will be negative (< 5).
+  - If escalating: pause with score history — "Group N failed after {attempt-1} attempts. Score history: {score_history}. Last findings: {findings}. Options: (1) Fix manually then type 'resume', (2) Skip group N, (3) Abort apply."
+  - Otherwise: FIX tasks were already appended to `tasks.md` by the evaluator. Execute them, then re-spawn the evaluator.
+
+- **Final group's verification task** (`Run superpowers:verification-before-completion`) → invoke `superpowers:verification-before-completion`. Runs pytest / vitest / e2e / `console.log` audit. Fix any failures before marking complete.
+
+Mark each task `- [x]` immediately after completing it (not in a batch at the end).
+
+### 4. On completion or pause: status
+
+Run:
+
+```bash
+openspec status --change <name>
 ```
-## Implementation Paused
 
-**Change:** <change-name>
-**Schema:** <schema-name>
-**Progress:** 4/7 tasks complete
+If all tasks are `- [x]`:
 
-### Issue Encountered
-<description of the issue>
+> "Apply complete. Next: ship (e.g. `git push`, plus any project-specific deploy — see CLAUDE.md), then `/opsx:archive <name>`."
 
-**Options:**
-1. <option 1>
-2. <option 2>
-3. Other approach
+If paused (blocker, error, ambiguity, user interrupt):
 
-What would you like to do?
-```
+> "Paused at task `<N.X>`. Reason: <description>. Options: <1>, <2>, <other approach>. What would you like to do?"
+
+---
 
 **Guardrails**
-- Keep going through tasks until done or blocked
-- Always read context files before starting (from the apply instructions output)
-- If task is ambiguous, pause and ask before implementing
-- If implementation reveals issues, pause and suggest artifact updates
-- Keep code changes minimal and scoped to each task
-- Update task checkbox immediately after completing each task
-- Pause on errors, blockers, or unclear requirements - don't guess
-- Use contextFiles from CLI output, don't assume specific file names
 
-**Fluid Workflow Integration**
-
-This skill supports the "actions on a change" model:
-
-- **Can be invoked anytime**: Before all artifacts are done (if tasks exist), after partial implementation, interleaved with other actions
-- **Allows artifact updates**: If implementation reveals design issues, suggest updating artifacts - not phase-locked, work fluidly
+- DO invoke `superpowers:test-driven-development` at session start. Don't pretend.
+- DO spawn an evaluator subagent at every group's `N.E EVAL` checkpoint. Never fold evaluator logic into the apply agent's context — the fresh context is the point.
+- DO write `contracts/group-N.md` at the `N.0 CONTRACT` step before any RED/GREEN tasks in the group. All three fields (Spec, Runtime, Code) must be non-empty.
+- DO manage the retry loop per-group. Max 3 attempts; plateau < 5pt between attempts triggers escalation.
+- NEVER invoke `superpowers:requesting-code-review` directly during apply — the evaluator subagent invokes it internally.
+- DO mark each task `- [x]` immediately after completing it.
+- DON'T skip RED tasks ("the test is obvious; I'll just GREEN"). The TDD skill catches this.
+- DON'T proceed past a group's checkpoint with unaddressed CRITICAL or HIGH review findings.
+- DO pause if a task reveals a design issue. Suggest updating proposal/design/specs as appropriate; don't paper over it.

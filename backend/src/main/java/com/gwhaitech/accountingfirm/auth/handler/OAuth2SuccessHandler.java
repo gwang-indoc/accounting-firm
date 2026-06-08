@@ -2,9 +2,9 @@ package com.gwhaitech.accountingfirm.auth.handler;
 
 import com.gwhaitech.accountingfirm.auth.domain.User;
 import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
+import com.gwhaitech.accountingfirm.auth.service.JwtCookieHelper;
 import com.gwhaitech.accountingfirm.auth.service.JwtService;
 import com.gwhaitech.accountingfirm.client.service.UserClientLinkService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,27 +21,24 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final JwtCookieHelper jwtCookieHelper;
     private final UserClientLinkService userClientLinkService;
-    private final boolean cookieSecure;
     private final String adminRedirectUri;
     private final String userRedirectUri;
-    private final long expirationMs;
 
     public OAuth2SuccessHandler(
             UserRepository userRepository,
             JwtService jwtService,
+            JwtCookieHelper jwtCookieHelper,
             UserClientLinkService userClientLinkService,
-            @Value("${app.cookie.secure:true}") boolean cookieSecure,
             @Value("${app.oauth2.redirect-uri.admin:http://localhost:4200/admin/clients}") String adminRedirectUri,
-            @Value("${app.oauth2.redirect-uri.user:http://localhost:4200/portal/dashboard}") String userRedirectUri,
-            @Value("${app.jwt.expiration-ms:86400000}") long expirationMs) {
+            @Value("${app.oauth2.redirect-uri.user:http://localhost:4200/portal/dashboard}") String userRedirectUri) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
+        this.jwtCookieHelper = jwtCookieHelper;
         this.userClientLinkService = userClientLinkService;
-        this.cookieSecure = cookieSecure;
         this.adminRedirectUri = adminRedirectUri;
         this.userRedirectUri = userRedirectUri;
-        this.expirationMs = expirationMs;
     }
 
     @Override
@@ -66,14 +63,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         userClientLinkService.linkIfPossible(user);
 
         String token = jwtService.issueToken(user);
-
-        Cookie cookie = new Cookie("jwt", token);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setSecure(cookieSecure);
-        cookie.setMaxAge((int) (expirationMs / 1000));
-        cookie.setAttribute("SameSite", "Strict");
-        response.addCookie(cookie);
+        response.addCookie(jwtCookieHelper.buildJwtCookie(token));
 
         String target = "ADMIN".equals(user.getRole()) ? adminRedirectUri : userRedirectUri;
         response.sendRedirect(target);

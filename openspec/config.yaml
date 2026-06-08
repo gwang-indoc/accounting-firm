@@ -1,45 +1,27 @@
-schema: openspec-superpowers
+schema: superpowers-driven
 
-# Project context — injected into every artifact's instruction prompt.
-context: |
-  Tech stack, repository layout, test-runner commands, and coding
-  conventions are documented in CLAUDE.md at the project root and are
-  loaded automatically into every Claude Code session — do NOT duplicate
-  them here. Read CLAUDE.md when you need that context.
+project:
+  test_commands:
+    - ""                         # e.g. "pytest" / "go test ./..." / "npm test"
+  e2e_command: ""                # optional, e.g. "npm run e2e" — leave empty to skip
+  custom_verification_checks: [] # project-specific grep/lint checks appended to final verification
+                                 # e.g. 'grep -rn "hardcoded_secret" src/'
 
-  OpenSpec + Superpowers workflow:
-    - design.md is produced by /opsx:explore in
-      openspec/changes/_draft/<topic>/ (uncommitted; _draft/ is gitignored).
-    - superpowers:brainstorming is invoked during /opsx:explore as a
-      REVIEWER of the design.md, not its creator.
-    - If the change has UI surface, Visual Companion is offered during
-      /opsx:explore and the selected design is recorded in design.md's
-      UI section.
-    - /opsx:propose promotes the draft to openspec/changes/<name>/design.md,
-      then generates proposal.md, specs/, tasks.md. proposal.md is for
-      human readers (Why / Scope); tasks generation reads design + specs
-      only.
-    - /opsx:apply enforces TDD discipline and review checkpoints per the
-      schema's apply.instruction (returned by `openspec instructions apply`).
-    - /opsx:archive moves the change to archive/, syncs delta specs, drafts
-      a per-archive lessons file at docs/lessons/YYYY-MM-DD-<name>.md
-      (user-reviewed before write), and optionally updates README.md on
-      explicit user opt-in.
+#context: |
+  # Describe your project so Claude understands it. Include:
+  # - Tech stack and versions (e.g. "Python 3.12 + FastAPI + PostgreSQL")
+  # - Directory structure (e.g. "backend/app/, frontend/src/")
+  # - How to run tests (e.g. "pytest from repo root, vitest from frontend/")
+  # - Key conventions (naming, error handling, auth patterns)
+  # - Any shared components or patterns Claude should reuse
+  # This context is injected into every artifact generation prompt.
 
-# Per-artifact rules — additive to the schema's built-in guidance.
-# Keep project-specific shell commands and paths here so the schema stays
-# project-agnostic.
-rules:
-  tasks:
-    - >-
-      M.J Playwright E2E execution (final group when UI is touched): start
-      the backend with `./start.sh`, start the frontend with
-      `cd frontend && npm start`, run the test with
-      `cd e2e && npx playwright test`, then stop both servers with
-      `kill $(lsof -ti :4200)` and `kill $(lsof -ti :8080)`.
-    - >-
-      M.K verification-before-completion commands: run
-      `cd backend && ./mvnw test`, run
-      `cd frontend && npx ng test --no-watch`, grep the diff for stray
-      `System.out.println` and `console.log`, and perform a diff review
-      before claiming the work is done.
+rules: {}
+  # Per-artifact rules appended to artifact-specific instructions.
+  # Examples:
+  # tasks:
+  #   - "Django rule: use pytest-django fixtures; never instantiate models without factory_boy."
+  # design:
+  #   - "For any database change: state migration strategy and rollback plan."
+  # specs:
+  #   - "All API endpoints SHALL document authentication requirements."

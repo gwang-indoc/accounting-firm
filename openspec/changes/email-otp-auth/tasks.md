@@ -1,4 +1,4 @@
-# Tasks — email-otp-auth
+pause# Tasks — email-otp-auth
 
 ## 1. Code persistence + lifecycle service (backend engine)
 
@@ -8,15 +8,15 @@
 - **Code**: D2 — `SecureRandom` int in [0,999999] zero-padded; `BCrypt(code)` via existing `PasswordEncoder` bean; verify selects latest row where `consumed_at IS NULL AND expires_at > now()` ordered by `created_at DESC`; mismatch increments `attempts`, `attempts >= 5` is dead. D7 — V9 migration + index on `(email, created_at DESC)`. Never persist plaintext.
 - **Threshold**: 80
 
-- [ ] 1.0 CONTRACT — write openspec/changes/email-otp-auth/contracts/group-1.md with the ### Contract block above; confirm Spec, Runtime, Code non-empty before proceeding
-- [ ] 1.1 GREEN — add `V9__create_email_login_codes.sql` Flyway migration (table + index on `(email, created_at)`); verify it applies against local PostgreSQL
-- [ ] 1.2 RED — Invoke superpowers:test-driven-development. Write failing `@DataJpaTest` `EmailLoginCodeRepositoryTest`: persist + fetch latest active row for an email, ordered by `created_at DESC`, excluding consumed/expired
-- [ ] 1.3 GREEN — add `EmailLoginCode` entity + `EmailLoginCodeRepository` (finder for latest active row; count-since and exists-since queries for rate limiting) to pass 1.2
-- [ ] 1.4 RED — failing `EmailLoginCodeServiceTest`: `generateCode` returns a zero-padded 6-digit string and persists a row whose `code_hash` matches the plaintext via `PasswordEncoder` and never equals the plaintext
-- [ ] 1.5 GREEN — implement `EmailLoginCodeService.generateAndStore(email)` using `SecureRandom` + `PasswordEncoder` + 10-min `expires_at`
-- [ ] 1.6 RED — failing test: `verify(email, code)` returns success on correct unexpired code, increments `attempts` on mismatch, returns failure when expired, consumed, or `attempts >= 5`
-- [ ] 1.7 GREEN — implement `verify` (select latest active row, `passwordEncoder.matches`, attempt increment, mark `consumed_at` on success) to pass 1.6
-- [ ] 1.E EVAL — spawn evaluator subagent (haiku); reads contracts/group-1.md + spec + design + group diff; invokes superpowers:requesting-code-review (CRITICAL/HIGH = BLOCK); scores Spec/Runtime/Code; total ≥ 80 → PASS; < 80 → append FIX tasks + retry (max 3 attempts, plateau < 5pt = escalate)
+- [x] 1.0 CONTRACT — write openspec/changes/email-otp-auth/contracts/group-1.md with the ### Contract block above; confirm Spec, Runtime, Code non-empty before proceeding
+- [x] 1.1 GREEN — add `V9__create_email_login_codes.sql` Flyway migration (table + index on `(email, created_at)`); verify it applies against local PostgreSQL
+- [x] 1.2 RED — Invoke superpowers:test-driven-development. Write failing `@DataJpaTest` `EmailLoginCodeRepositoryTest`: persist + fetch latest active row for an email, ordered by `created_at DESC`, excluding consumed/expired
+- [x] 1.3 GREEN — add `EmailLoginCode` entity + `EmailLoginCodeRepository` (finder for latest active row; count-since and exists-since queries for rate limiting) to pass 1.2
+- [x] 1.4 RED — failing `EmailLoginCodeServiceTest`: `generateCode` returns a zero-padded 6-digit string and persists a row whose `code_hash` matches the plaintext via `PasswordEncoder` and never equals the plaintext
+- [x] 1.5 GREEN — implement `EmailLoginCodeService.generateAndStore(email)` using `SecureRandom` + `PasswordEncoder` + 10-min `expires_at`
+- [x] 1.6 RED — failing test: `verify(email, code)` returns success on correct unexpired code, increments `attempts` on mismatch, returns failure when expired, consumed, or `attempts >= 5`
+- [x] 1.7 GREEN — implement `verify` (select latest active row, `passwordEncoder.matches`, attempt increment, mark `consumed_at` on success) to pass 1.6
+- [x] 1.E EVAL — spawn evaluator subagent (haiku); reads contracts/group-1.md + spec + design + group diff; invokes superpowers:requesting-code-review (CRITICAL/HIGH = BLOCK); scores Spec/Runtime/Code; total ≥ 80 → PASS; < 80 → append FIX tasks + retry (max 3 attempts, plateau < 5pt = escalate)
 
 ## 2. request-code endpoint (rate limit + send + uniform response)
 
@@ -26,14 +26,14 @@
 - **Code**: D3 — cooldown = reject if a row for the email has `created_at` within last 60s (429); hourly cap = reject if COUNT rows for email within last hour ≥ 5 (429); both via repository queries, no scheduler. D4 — identical `{ "status": "code_sent" }` body for known/unknown; mail send synchronous, on `JavaMailSender` failure return 502 (uniform). `SecurityConfig` already permits `/api/auth/**`.
 - **Threshold**: 80
 
-- [ ] 2.0 CONTRACT — write openspec/changes/email-otp-auth/contracts/group-2.md with the ### Contract block above
-- [ ] 2.1 RED — Invoke superpowers:test-driven-development. Failing controller test: `POST /api/auth/email/request-code` returns 200 with uniform body and triggers a mail send for BOTH an existing-user email and an unknown email (mock `JavaMailSender`)
-- [ ] 2.2 GREEN — add request-code handler + request DTO calling `EmailLoginCodeService.generateAndStore` then sending the code email via the mail sender; uniform body
-- [ ] 2.3 RED — failing test: second request within 60s returns 429 with no new mail send; 6th request within an hour returns 429 with no new mail send
-- [ ] 2.4 GREEN — implement cooldown + hourly-cap checks (repository count/exists-since queries) before generating
-- [ ] 2.5 RED — failing test: when `JavaMailSender` throws, endpoint returns 502 (same for known/unknown email)
-- [ ] 2.6 GREEN — wrap send; map send failure to 502
-- [ ] 2.E EVAL — spawn evaluator subagent (haiku); reads contracts/group-2.md + spec + design + group diff; invokes superpowers:requesting-code-review (CRITICAL/HIGH = BLOCK); scores Spec/Runtime/Code; total ≥ 80 → PASS; < 80 → append FIX tasks + retry (max 3 attempts, plateau < 5pt = escalate)
+- [x] 2.0 CONTRACT — write openspec/changes/email-otp-auth/contracts/group-2.md with the ### Contract block above
+- [x] 2.1 RED — Invoke superpowers:test-driven-development. Failing controller test: `POST /api/auth/email/request-code` returns 200 with uniform body and triggers a mail send for BOTH an existing-user email and an unknown email (mock `JavaMailSender`)
+- [x] 2.2 GREEN — add request-code handler + request DTO calling `EmailLoginCodeService.generateAndStore` then sending the code email via the mail sender; uniform body
+- [x] 2.3 RED — failing test: second request within 60s returns 429 with no new mail send; 6th request within an hour returns 429 with no new mail send
+- [x] 2.4 GREEN — implement cooldown + hourly-cap checks (repository count/exists-since queries) before generating
+- [x] 2.5 RED — failing test: when `JavaMailSender` throws, endpoint returns 502 (same for known/unknown email)
+- [x] 2.6 GREEN — wrap send; map send failure to 502
+- [x] 2.E EVAL — spawn evaluator subagent (haiku); reads contracts/group-2.md + spec + design + group diff; invokes superpowers:requesting-code-review (CRITICAL/HIGH = BLOCK); scores Spec/Runtime/Code; total ≥ 80 → PASS; < 80 → append FIX tasks + retry (max 3 attempts, plateau < 5pt = escalate)
 
 ## 3. verify-code + complete-signup endpoints
 
@@ -43,15 +43,15 @@
 - **Code**: D1 — signup token = signed JWT (purpose=`signup`, sub=verified email, 10-min expiry) returned in body, NOT a cookie; complete-signup validates it then creates user; single-use enforced by `users.email` UNIQUE (replay after account exists → 401/409). D5 — reuse shared JWT-cookie builder (same attributes as OAuth2 flow) at both issuance sites; invoke `UserClientLinkService.linkIfPossible`.
 - **Threshold**: 80
 
-- [ ] 3.0 CONTRACT — write openspec/changes/email-otp-auth/contracts/group-3.md with the ### Contract block above
-- [ ] 3.1 GREEN — extract the JWT-cookie builder from `AuthController.buildJwtCookie` into a shared helper reused by the OAuth2 handler path and the new endpoints (no cookie-attribute change)
-- [ ] 3.2 RED — Invoke superpowers:test-driven-development. Failing test: verify-code with a valid code for an EXISTING user → 200 `{status:authenticated}`, sets httpOnly/SameSite=Strict JWT cookie, marks code consumed, calls `linkIfPossible`
-- [ ] 3.3 GREEN — implement verify-code existing-user branch (reuse `EmailLoginCodeService.verify`, `JwtService.issueToken`, shared cookie builder, client linking)
-- [ ] 3.4 RED — failing test: verify-code with a valid code for an UNKNOWN email → 200 `{status:signup_required, signupToken}`, NO cookie, NO user row; wrong/expired/consumed code → 401
-- [ ] 3.5 GREEN — implement signup-token issuance (signed JWT, purpose=signup, 10-min) for the new-email branch; 401 paths
-- [ ] 3.6 RED — failing test: complete-signup with a valid signup token + name (1–255 trimmed) → 200, creates USER row (email, name, no password), sets JWT cookie, calls `linkIfPossible`; blank name → 400; invalid/reused/expired token → 401
-- [ ] 3.7 GREEN — implement complete-signup (validate signup token, create user, issue cookie, link); rely on `users.email` UNIQUE for replay safety
-- [ ] 3.E EVAL — spawn evaluator subagent (haiku); reads contracts/group-3.md + spec + design + group diff; invokes superpowers:requesting-code-review (CRITICAL/HIGH = BLOCK); scores Spec/Runtime/Code; total ≥ 80 → PASS; < 80 → append FIX tasks + retry (max 3 attempts, plateau < 5pt = escalate)
+- [x] 3.0 CONTRACT — write openspec/changes/email-otp-auth/contracts/group-3.md with the ### Contract block above
+- [x] 3.1 GREEN — extract the JWT-cookie builder from `AuthController.buildJwtCookie` into a shared helper reused by the OAuth2 handler path and the new endpoints (no cookie-attribute change)
+- [x] 3.2 RED — Invoke superpowers:test-driven-development. Failing test: verify-code with a valid code for an EXISTING user → 200 `{status:authenticated}`, sets httpOnly/SameSite=Strict JWT cookie, marks code consumed, calls `linkIfPossible`
+- [x] 3.3 GREEN — implement verify-code existing-user branch (reuse `EmailLoginCodeService.verify`, `JwtService.issueToken`, shared cookie builder, client linking)
+- [x] 3.4 RED — failing test: verify-code with a valid code for an UNKNOWN email → 200 `{status:signup_required, signupToken}`, NO cookie, NO user row; wrong/expired/consumed code → 401
+- [x] 3.5 GREEN — implement signup-token issuance (signed JWT, purpose=signup, 10-min) for the new-email branch; 401 paths
+- [x] 3.6 RED — failing test: complete-signup with a valid signup token + name (1–255 trimmed) → 200, creates USER row (email, name, no password), sets JWT cookie, calls `linkIfPossible`; blank name → 400; invalid/reused/expired token → 401
+- [x] 3.7 GREEN — implement complete-signup (validate signup token, create user, issue cookie, link); rely on `users.email` UNIQUE for replay safety
+- [x] 3.E EVAL — spawn evaluator subagent (haiku); reads contracts/group-3.md + spec + design + group diff; invokes superpowers:requesting-code-review (CRITICAL/HIGH = BLOCK); scores Spec/Runtime/Code; total ≥ 80 → PASS; < 80 → append FIX tasks + retry (max 3 attempts, plateau < 5pt = escalate)
 
 ## 4. Remove password flow + drop password_hash
 
@@ -61,12 +61,12 @@
 - **Code**: D6 — delete `register`/`login` handlers, `AuthService.register/login`, `RegisterRequest`/`LoginRequest` DTOs and their tests; remove `passwordHash` field from `User` entity. D7 — `V10__drop_password_hash.sql` = `ALTER TABLE users DROP COLUMN password_hash;`. Existing users keep `email` → log in via code (no data loss).
 - **Threshold**: 80
 
-- [ ] 4.0 CONTRACT — write openspec/changes/email-otp-auth/contracts/group-4.md with the ### Contract block above
-- [ ] 4.1 RED — update/replace controller tests to assert `POST /api/auth/register` and `POST /api/auth/login` return 404 (removed); this fails until handlers are removed
-- [ ] 4.2 GREEN — delete `register`/`login` handlers from `AuthController`, `AuthService.register/login`, and `RegisterRequest`/`LoginRequest` DTOs; delete their now-dead tests
-- [ ] 4.3 GREEN — add `V10__drop_password_hash.sql`; remove the `passwordHash` field from the `User` entity; fix any references
-- [ ] 4.4 GREEN — run `cd backend && ./mvnw test`; confirm full suite green and app boots with V9+V10 applied
-- [ ] 4.E EVAL — spawn evaluator subagent (haiku); reads contracts/group-4.md + spec + design + group diff; invokes superpowers:requesting-code-review (CRITICAL/HIGH = BLOCK); scores Spec/Runtime/Code; total ≥ 80 → PASS; < 80 → append FIX tasks + retry (max 3 attempts, plateau < 5pt = escalate)
+- [x] 4.0 CONTRACT — write openspec/changes/email-otp-auth/contracts/group-4.md with the ### Contract block above
+- [x] 4.1 RED — update/replace controller tests to assert `POST /api/auth/register` and `POST /api/auth/login` return 404 (removed); this fails until handlers are removed
+- [x] 4.2 GREEN — delete `register`/`login` handlers from `AuthController`, `AuthService.register/login`, and `RegisterRequest`/`LoginRequest` DTOs; delete their now-dead tests
+- [x] 4.3 GREEN — add `V10__drop_password_hash.sql`; remove the `passwordHash` field from the `User` entity; fix any references
+- [x] 4.4 GREEN — run `cd backend && ./mvnw test`; confirm full suite green and app boots with V9+V10 applied
+- [x] 4.E EVAL — spawn evaluator subagent (haiku); reads contracts/group-4.md + spec + design + group diff; invokes superpowers:requesting-code-review (CRITICAL/HIGH = BLOCK); scores Spec/Runtime/Code; total ≥ 80 → PASS; < 80 → append FIX tasks + retry (max 3 attempts, plateau < 5pt = escalate)
 
 ## 5. Frontend AuthService email-code methods
 
@@ -76,10 +76,10 @@
 - **Code**: Reuse existing `HttpClient` + `CredentialsInterceptor` (withCredentials already global). `verifyEmailCode` resolves with `{status, signupToken?}`. Remove `register`/`loginWithEmail`. Zoneless/signals — keep `currentUser` signal usage unchanged.
 - **Threshold**: 80
 
-- [ ] 5.0 CONTRACT — write openspec/changes/email-otp-auth/contracts/group-5.md with the ### Contract block above
-- [ ] 5.1 RED — Invoke superpowers:test-driven-development. Failing Vitest spec: `requestEmailCode`, `verifyEmailCode`, `completeEmailSignup` each POST to the correct endpoint (HttpTestingController); verify returns the parsed status
-- [ ] 5.2 GREEN — add the three methods to `AuthService`; remove `register` and `loginWithEmail`
-- [ ] 5.E EVAL — spawn evaluator subagent (haiku); reads contracts/group-5.md + spec + design + group diff; invokes superpowers:requesting-code-review (CRITICAL/HIGH = BLOCK); scores Spec/Runtime/Code; total ≥ 80 → PASS; < 80 → append FIX tasks + retry (max 3 attempts, plateau < 5pt = escalate)
+- [x] 5.0 CONTRACT — write openspec/changes/email-otp-auth/contracts/group-5.md with the ### Contract block above
+- [x] 5.1 RED — Invoke superpowers:test-driven-development. Failing Vitest spec: `requestEmailCode`, `verifyEmailCode`, `completeEmailSignup` each POST to the correct endpoint (HttpTestingController); verify returns the parsed status
+- [x] 5.2 GREEN — add the three methods to `AuthService`; remove `register` and `loginWithEmail`
+- [x] 5.E EVAL — spawn evaluator subagent (haiku); reads contracts/group-5.md + spec + design + group diff; invokes superpowers:requesting-code-review (CRITICAL/HIGH = BLOCK); scores Spec/Runtime/Code; total ≥ 80 → PASS; < 80 → append FIX tasks + retry (max 3 attempts, plateau < 5pt = escalate)
 
 ## 6. Frontend email-code UI + login page + remove old components
 
@@ -89,21 +89,21 @@
 - **Code**: D6 — replace `RegisterComponent` + `LoginEmailComponent` with the multi-step email-code component; update `LoginComponent` (Google + email-code, drop "Create an account" + password "Sign in with email"); remove `/register` and `/login/email` routes. Follow existing Material design system (dot-grid bg, sky-blue accent stripe, GWH brand block). Reuse `AuthService` methods from group 5.
 - **Threshold**: 80
 
-- [ ] 6.0 CONTRACT — write openspec/changes/email-otp-auth/contracts/group-6.md with the ### Contract block above
-- [ ] 6.1 RED — Invoke superpowers:test-driven-development. Failing component spec for the email-code component: email step → request-code + advance to code step
-- [ ] 6.2 GREEN — implement email step (email form, calls `requestEmailCode`, advances)
-- [ ] 6.3 RED — failing spec: code step with `authenticated` → `loadCurrentUser()` + navigate `/portal/dashboard`; with `signup_required` → advance to name step; 401 → `data-testid="login-error"` banner
-- [ ] 6.4 GREEN — implement code step (calls `verifyEmailCode`, branches, error banner)
-- [ ] 6.5 RED — failing spec: name step submit → `completeEmailSignup` then `loadCurrentUser()` + navigate `/portal/dashboard`
-- [ ] 6.6 GREEN — implement name step
-- [ ] 6.7 RED — failing `LoginComponent` spec: renders Google link + "Sign in with email →" control entering the email-code flow; no register link
-- [ ] 6.8 GREEN — update `LoginComponent`; delete `RegisterComponent` + `LoginEmailComponent`; remove `/register` and `/login/email` routes; fix router references
-- [ ] 6.E EVAL — spawn evaluator subagent (haiku); reads contracts/group-6.md + spec + design + group diff; invokes superpowers:requesting-code-review (CRITICAL/HIGH = BLOCK); scores Spec/Runtime/Code; total ≥ 80 → PASS; < 80 → append FIX tasks + retry (max 3 attempts, plateau < 5pt = escalate)
+- [x] 6.0 CONTRACT — write openspec/changes/email-otp-auth/contracts/group-6.md with the ### Contract block above
+- [x] 6.1 RED — Invoke superpowers:test-driven-development. Failing component spec for the email-code component: email step → request-code + advance to code step
+- [x] 6.2 GREEN — implement email step (email form, calls `requestEmailCode`, advances)
+- [x] 6.3 RED — failing spec: code step with `authenticated` → `loadCurrentUser()` + navigate `/portal/dashboard`; with `signup_required` → advance to name step; 401 → `data-testid="login-error"` banner
+- [x] 6.4 GREEN — implement code step (calls `verifyEmailCode`, branches, error banner)
+- [x] 6.5 RED — failing spec: name step submit → `completeEmailSignup` then `loadCurrentUser()` + navigate `/portal/dashboard`
+- [x] 6.6 GREEN — implement name step
+- [x] 6.7 RED — failing `LoginComponent` spec: renders Google link + "Sign in with email →" control entering the email-code flow; no register link
+- [x] 6.8 GREEN — update `LoginComponent`; delete `RegisterComponent` + `LoginEmailComponent`; remove `/register` and `/login/email` routes; fix router references
+- [x] 6.E EVAL — spawn evaluator subagent (haiku); reads contracts/group-6.md + spec + design + group diff; invokes superpowers:requesting-code-review (CRITICAL/HIGH = BLOCK); scores Spec/Runtime/Code; total ≥ 80 → PASS; < 80 → append FIX tasks + retry (max 3 attempts, plateau < 5pt = escalate)
 
 ## 7. Verification + E2E + ship
 
-- [ ] 7.1 Add a committed Playwright E2E in `e2e/` covering new-user signup (email → code → name → portal) and returning-user login (email → code → portal); read the code from the dev mail/log sink the flow uses in test
-- [ ] 7.2 Run backend test suite — `cd backend && ./mvnw test` — ensure no regressions
-- [ ] 7.3 Run frontend test suite — `cd frontend && npx ng test --no-watch` — ensure no regressions
-- [ ] 7.4 Run e2e suite — `cd e2e && npx playwright test` (backend + frontend must be running) — ensure new + returning login flows pass
-- [ ] 7.5 Run superpowers:verification-before-completion (run the three suites above; `grep -rn "console.log" frontend/src`; confirm no `password_hash` / `register` / `loginWithEmail` references remain)
+- [x] 7.1 Add a committed Playwright E2E in `e2e/` covering new-user signup (email → code → name → portal) and returning-user login (email → code → portal); read the code from the dev mail/log sink the flow uses in test
+- [x] 7.2 Run backend test suite — `cd backend && ./mvnw test` — ensure no regressions
+- [x] 7.3 Run frontend test suite — `cd frontend && npx ng test --no-watch` — ensure no regressions
+- [x] 7.4 Run e2e suite — `cd e2e && npx playwright test` (backend + frontend must be running) — ensure new + returning login flows pass
+- [x] 7.5 Run superpowers:verification-before-completion (run the three suites above; `grep -rn "console.log" frontend/src`; confirm no `password_hash` / `register` / `loginWithEmail` references remain)

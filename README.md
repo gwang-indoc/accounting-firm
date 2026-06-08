@@ -2,8 +2,6 @@
 
 > A full-stack web application for an accounting firm: premium public marketing site, encrypted client document portal, secure messaging, and an admin management panel — all in one monorepo.
 
-![Home](docs/screenshots/01-home-hero.png)
-
 ---
 
 ## What This Project Is
@@ -81,97 +79,9 @@ User clicks "Continue with Google"
 
 ---
 
-## Pages & Screenshots
+## User Guide
 
-### 🏠 Home
-
-The marketing homepage — hero section with animated kanji, stats strip, services preview, client portal teaser, security badges, and a consultation CTA.
-
-![Home hero](docs/screenshots/01-home-hero.png)
-
----
-
-### 🔐 Client Login
-
-Split-screen login: dark brand panel on the left, clean sign-in form on the right. Supports Google OAuth2 (primary), email/password, and new-account registration.
-
-![Login](docs/screenshots/02-login.png)
-
----
-
-### 💼 Services
-
-Six service cards — Tax Preparation, Bookkeeping, Financial Consulting, Business Advisory, Payroll Services, and Estate Planning — with animated entrance effects.
-
-![Services](docs/screenshots/03-services.png)
-
----
-
-### 🛡️ Security
-
-Four security pillars (AES-256 encryption, OAuth2 identity, isolated document storage, RBAC) plus a grid of security practices.
-
-![Security](docs/screenshots/04-security.png)
-
----
-
-### ✉️ Contact & Book Consultation
-
-Contact page with office details and an embedded map. Book Consultation page with a full inquiry form delivered by email to the firm.
-
-<table>
-<tr>
-<td><img src="docs/screenshots/05-contact.png" alt="Contact" /></td>
-<td><img src="docs/screenshots/06-book-consultation.png" alt="Book Consultation" /></td>
-</tr>
-</table>
-
----
-
-### 📂 Client Portal *(requires login)*
-
-After signing in with Google OAuth2, clients land on a personalised **Dashboard** showing document counts, the latest tax year on file, and their most recent message threads — with unread badges in both the nav and the message list.
-
-#### Dashboard
-The welcome screen shows live stats (total documents, latest year), quick navigation, and the top 3 message threads with unread indicators.
-
-![Portal Dashboard](docs/screenshots/07-portal-dashboard.png)
-
-#### Document Management
-Clients can upload their own files (W2s, 1099s) and download firm-prepared documents (tax returns, financial reports). Documents are grouped and filterable by **tax year** via a year selector.
-
-![Portal Documents](docs/screenshots/08-portal-documents.png)
-
-#### Secure Messaging — Inbox
-A threaded message inbox for private, encrypted communication with the accounting team. Each thread shows a preview and timestamp; unread threads are highlighted with a badge.
-
-![Portal Messages](docs/screenshots/09-portal-messages.png)
-
-#### Secure Messaging — Thread View
-Full conversation view with alternating client/accountant message bubbles, timestamps, and a reply composer. The client can start new threads from the inbox.
-
-![Portal Thread](docs/screenshots/10-portal-thread.png)
-
----
-
-### 🗂️ Admin Panel *(requires ADMIN role)*
-
-Staff log in through the same Google OAuth2 flow and are redirected to the back-office client roster. Admins see the client's name in the navbar instead of portal links.
-
-#### Client Management
-A searchable, paginated roster of all clients. Each row shows portal-link status (Linked / Not linked), plus one-click access to Documents and Messages for that client. Staff can create, edit, and delete client records inline.
-
-![Admin Clients](docs/screenshots/11-admin-clients.png)
-
-#### Per-Client Document Management
-Upload, download, and delete documents on behalf of any client. A tax-year selector (10-year range) lets staff manage documents across multiple filing years.
-
-![Admin Client Documents](docs/screenshots/12-admin-client-documents.png)
-
-#### Per-Client Messaging
-A full thread list for the selected client with three-state **chip indicators**: sky-blue unread badge (client replied), amber "Awaiting client" (admin sent, not yet opened), and grey "Client read" (acknowledged). Staff can open any thread or start a new one.
-
-![Admin Client Messages](docs/screenshots/13-admin-client-messages.png)
+Screenshots and step-by-step walkthroughs for every page: [docs/user-guide.md](docs/user-guide.md)
 
 ---
 

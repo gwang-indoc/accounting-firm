@@ -2,8 +2,13 @@ package com.gwhaitech.accountingfirm.auth.filter;
 
 import com.gwhaitech.accountingfirm.auth.domain.User;
 import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
-import com.gwhaitech.accountingfirm.auth.service.AuthService;
+import com.gwhaitech.accountingfirm.auth.service.EmailLoginCodeService;
+import com.gwhaitech.accountingfirm.auth.service.JwtCookieHelper;
 import com.gwhaitech.accountingfirm.auth.service.JwtService;
+import com.gwhaitech.accountingfirm.client.service.MeDocumentService;
+import com.gwhaitech.accountingfirm.client.service.UserClientLinkService;
+import com.gwhaitech.accountingfirm.messaging.service.MessagingService;
+import org.springframework.mail.javamail.JavaMailSender;
 import com.gwhaitech.accountingfirm.client.service.ClientService;
 import com.gwhaitech.accountingfirm.client.service.DocumentService;
 import com.gwhaitech.accountingfirm.contact.service.ContactService;
@@ -73,9 +78,24 @@ class JwtAuthFilterTest {
     @MockitoBean
     private UserRepository userRepository;
 
-    // satisfies AuthController constructor wiring in the WebMvcTest context
+    // satisfies AuthController/AuthEmailController constructor wiring in the WebMvcTest context
     @MockitoBean
-    private AuthService authService;
+    private JwtCookieHelper jwtCookieHelper;
+
+    @MockitoBean
+    private EmailLoginCodeService emailLoginCodeService;
+
+    @MockitoBean
+    private JavaMailSender mailSender;
+
+    @MockitoBean
+    private UserClientLinkService userClientLinkService;
+
+    @MockitoBean
+    private MeDocumentService meDocumentService;
+
+    @MockitoBean
+    private MessagingService messagingService;
 
     // satisfies ClientController constructor wiring in the WebMvcTest context
     @MockitoBean

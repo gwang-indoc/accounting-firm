@@ -2,6 +2,7 @@ package com.gwhaitech.accountingfirm.auth.handler;
 
 import com.gwhaitech.accountingfirm.auth.domain.User;
 import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
+import com.gwhaitech.accountingfirm.auth.service.JwtCookieHelper;
 import com.gwhaitech.accountingfirm.auth.service.JwtService;
 import com.gwhaitech.accountingfirm.client.service.UserClientLinkService;
 import jakarta.servlet.http.Cookie;
@@ -27,6 +28,7 @@ class OAuth2SuccessHandlerTest {
 
     private UserRepository mockUserRepo;
     private JwtService mockJwtService;
+    private JwtCookieHelper mockCookieHelper;
     private UserClientLinkService mockLinkService;
     private HttpServletRequest mockRequest;
     private HttpServletResponse mockResponse;
@@ -50,18 +52,27 @@ class OAuth2SuccessHandlerTest {
     void setUp() {
         mockUserRepo = mock(UserRepository.class);
         mockJwtService = mock(JwtService.class);
+        mockCookieHelper = mock(JwtCookieHelper.class);
         mockLinkService = mock(UserClientLinkService.class);
         mockRequest = mock(HttpServletRequest.class);
         mockResponse = mock(HttpServletResponse.class);
 
+        when(mockCookieHelper.buildJwtCookie(any(String.class))).thenAnswer(inv -> {
+            Cookie c = new Cookie("jwt", inv.getArgument(0));
+            c.setHttpOnly(true);
+            c.setPath("/");
+            c.setAttribute("SameSite", "Strict");
+            c.setMaxAge(86400);
+            return c;
+        });
+
         handler = new OAuth2SuccessHandler(
             mockUserRepo,
             mockJwtService,
+            mockCookieHelper,
             mockLinkService,
-            false,
             "http://localhost:4200/admin/clients",
-            "http://localhost:4200/portal/dashboard",
-            86400000L
+            "http://localhost:4200/portal/dashboard"
         );
     }
 
@@ -147,11 +158,9 @@ class OAuth2SuccessHandlerTest {
     @Test
     void adminUser_redirectsToAdminClients() throws Exception {
         OAuth2SuccessHandler adminHandler = new OAuth2SuccessHandler(
-            mockUserRepo, mockJwtService, mockLinkService,
-            false,
+            mockUserRepo, mockJwtService, mockCookieHelper, mockLinkService,
             "http://localhost:4200/admin/clients",
-            "http://localhost:4200/portal/dashboard",
-            86400000L
+            "http://localhost:4200/portal/dashboard"
         );
 
         User adminUser = new User();
@@ -170,11 +179,9 @@ class OAuth2SuccessHandlerTest {
     @Test
     void userRole_redirectsToPortalDashboard() throws Exception {
         OAuth2SuccessHandler userHandler = new OAuth2SuccessHandler(
-            mockUserRepo, mockJwtService, mockLinkService,
-            false,
+            mockUserRepo, mockJwtService, mockCookieHelper, mockLinkService,
             "http://localhost:4200/admin/clients",
-            "http://localhost:4200/portal/dashboard",
-            86400000L
+            "http://localhost:4200/portal/dashboard"
         );
 
         User normalUser = new User();

@@ -2,10 +2,10 @@ package com.gwhaitech.accountingfirm.auth.controller;
 
 import com.gwhaitech.accountingfirm.auth.domain.User;
 import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
-import com.gwhaitech.accountingfirm.auth.exception.EmailAlreadyRegisteredException;
-import com.gwhaitech.accountingfirm.auth.service.AuthService;
+import com.gwhaitech.accountingfirm.auth.service.JwtCookieHelper;
 import com.gwhaitech.accountingfirm.auth.service.JwtService;
-import com.gwhaitech.accountingfirm.auth.dto.LoginRequest;
+import jakarta.servlet.http.Cookie;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,14 +20,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -70,14 +65,24 @@ class AuthControllerTest {
     private UserRepository userRepository;
 
     @MockitoBean
-    private AuthService authService;
+    private JwtCookieHelper jwtCookieHelper;
+
+    @BeforeEach
+    void setUpCookieMocks() {
+        when(jwtCookieHelper.clearJwtCookie()).thenReturn(new Cookie("jwt", "") {{
+            setMaxAge(0); setHttpOnly(true); setPath("/");
+        }});
+        when(jwtCookieHelper.buildJwtCookie(any(String.class))).thenAnswer(inv -> {
+            Cookie c = new Cookie("jwt", inv.getArgument(0));
+            c.setHttpOnly(true); c.setPath("/"); c.setMaxAge(86400);
+            return c;
+        });
+    }
 
     private User testUser() {
         User user = new User();
-        user.setId(1L);
-        user.setEmail("test@example.com");
-        user.setName("Test User");
-        user.setRole("USER");
+        user.setId(1L); user.setEmail("test@example.com");
+        user.setName("Test User"); user.setRole("USER");
         return user;
     }
 
@@ -112,89 +117,23 @@ class AuthControllerTest {
     }
 
     @Test
-    void registerWithValidData_returns201() throws Exception {
-        doNothing().when(authService).register(any());
+    void register_endpointRemoved_returns404() throws Exception {
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {"fullName":"Alice","email":"alice@example.com",
                          "password":"secret123","confirmPassword":"secret123"}
                         """))
-                .andExpect(status().isCreated());
-        verify(authService).register(any());
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    void registerWithMismatchedPasswords_returns400() throws Exception {
-        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passwords do not match"))
-                .when(authService).register(any());
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                        {"fullName":"Alice","email":"alice@example.com",
-                         "password":"secret123","confirmPassword":"different"}
-                        """))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void registerWithDuplicateEmail_returns409() throws Exception {
-        doThrow(new EmailAlreadyRegisteredException())
-                .when(authService).register(any());
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                        {"fullName":"Alice","email":"alice@example.com",
-                         "password":"secret123","confirmPassword":"secret123"}
-                        """))
-                .andExpect(status().isConflict());
-    }
-
-    @Test
-    void loginWithValidCredentials_returns200WithJwtCookie() throws Exception {
-        User user = testUser();
-        when(authService.login(any(LoginRequest.class))).thenReturn(user);
-        when(jwtService.issueToken(user)).thenReturn("test-jwt-token");
+    void login_endpointRemoved_returns404() throws Exception {
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {"email":"test@example.com","password":"secret123"}
                         """))
-                .andExpect(status().isOk())
-                .andExpect(header().string(HttpHeaders.SET_COOKIE, org.hamcrest.Matchers.containsString("jwt=test-jwt-token")));
-    }
-
-    @Test
-    void loginWithWrongPassword_returns401() throws Exception {
-        doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED))
-                .when(authService).login(any(LoginRequest.class));
-        mockMvc.perform(post("/api/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                        {"email":"test@example.com","password":"wrong"}
-                        """))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    void loginWithUnknownEmail_returns401() throws Exception {
-        doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED))
-                .when(authService).login(any(LoginRequest.class));
-        mockMvc.perform(post("/api/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                        {"email":"nobody@example.com","password":"secret123"}
-                        """))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    void loginWithBlankEmail_returns400() throws Exception {
-        mockMvc.perform(post("/api/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                        {"email":"","password":"secret123"}
-                        """))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 }

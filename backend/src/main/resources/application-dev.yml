@@ -1,2 +1,15 @@
-# No property overrides needed for dev.
+# Local-dev overrides.
 # Mail uses defaults from application.yml (override via SPRING_MAIL_* env vars).
+
+# The base application.yml hardcodes the Google OAuth2 callback to the production
+# domain (gwhaitech.com). In local dev that bounces the browser to production after
+# the Google consent screen, serving the old prod frontend. Override the callback to
+# localhost so the whole flow stays on the dev machine.
+# This URI must be registered in Google Cloud Console as an authorized redirect URI.
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            redirect-uri: "http://localhost:8080/login/oauth2/code/google"

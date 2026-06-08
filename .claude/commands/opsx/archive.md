@@ -1,207 +1,129 @@
 ---
 name: "OPSX: Archive"
-description: Archive a completed change in the experimental workflow
+description: Archive a completed change + post-archive checklist (Purpose, README, pitfalls, project README, dev log, commit)
 category: Workflow
 tags: [workflow, archive, experimental]
 ---
 
-Archive a completed change in the experimental workflow.
+Run `openspec archive` and then perform the post-archive cleanup that closes the loop on capability docs and pitfall sinking. Four numbered cleanup steps + dev log check + final commit.
 
-**Input**: Optionally specify a change name after `/opsx:archive` (e.g., `/opsx:archive add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
+**Input**: Optionally specify a change name. If omitted, infer from conversation context. If ambiguous, run `openspec list --json` and use **AskUserQuestion** to let the user select.
+
+---
 
 **Steps**
 
-1. **If no change name provided, prompt for selection**
+### 1. Pre-flight: confirm the change is shipped
 
-   Run `openspec list --json` to get available changes. Use the **AskUserQuestion tool** to let the user select.
+Run:
 
-   Show only active changes (not already archived).
-   Include the schema used for each change if available.
-
-   **IMPORTANT**: Do NOT guess or auto-select a change. Always let the user choose.
-
-2. **Check artifact completion status**
-
-   Run `openspec status --change "<name>" --json` to check artifact completion.
-
-   Parse the JSON to understand:
-   - `schemaName`: The workflow being used
-   - `artifacts`: List of artifacts with their status (`done` or other)
-
-   **If any artifacts are not `done`:**
-   - Display warning listing incomplete artifacts
-   - Prompt user for confirmation to continue
-   - Proceed if user confirms
-
-3. **Check task completion status**
-
-   Read the tasks file (typically `tasks.md`) to check for incomplete tasks.
-
-   Count tasks marked with `- [ ]` (incomplete) vs `- [x]` (complete).
-
-   **If incomplete tasks found:**
-   - Display warning showing count of incomplete tasks
-   - Prompt user for confirmation to continue
-   - Proceed if user confirms
-
-   **If no tasks file exists:** Proceed without task-related warning.
-
-4. **Assess delta spec sync state**
-
-   Check for delta specs at `openspec/changes/<name>/specs/`. If none exist, proceed without sync prompt.
-
-   **If delta specs exist:**
-   - Compare each delta spec with its corresponding main spec at `openspec/specs/<capability>/spec.md`
-   - Determine what changes would be applied (adds, modifications, removals, renames)
-   - Show a combined summary before prompting
-
-   **Prompt options:**
-   - If changes needed: "Sync now (recommended)", "Archive without syncing"
-   - If already synced: "Archive now", "Sync anyway", "Cancel"
-
-   If user chooses sync, use Task tool (subagent_type: "general-purpose", prompt: "Use Skill tool to invoke openspec-sync-specs for change '<name>'. Delta spec analysis: <include the analyzed delta spec summary>"). Proceed to archive regardless of choice.
-
-5. **Perform the archive**
-
-   Create the archive directory if it doesn't exist:
-   ```bash
-   mkdir -p openspec/changes/archive
-   ```
-
-   Generate target name using current date: `YYYY-MM-DD-<change-name>`
-
-   **Check if target already exists:**
-   - If yes: Fail with error, suggest renaming existing archive or using different date
-   - If no: Move the change directory to archive
-
-   ```bash
-   mv openspec/changes/<name> openspec/changes/archive/YYYY-MM-DD-<name>
-   ```
-
-6. **Display summary**
-
-   Show archive completion summary including:
-   - Change name
-   - Schema that was used
-   - Archive location
-   - Spec sync status (synced / sync skipped / no delta specs)
-   - Note about any warnings (incomplete artifacts/tasks)
-
-7. **Generate lessons-learned file**
-
-   a. **Read source material**:
-      - Read `openspec/changes/archive/YYYY-MM-DD-<name>/` artifacts (proposal, design, tasks, specs).
-      - Read the most recent `docs/log/*.md` entries that mention `<name>` or whose date overlaps the change's active window.
-
-   b. **Draft a SHORT bulleted lessons list.** Hard limits:
-      - **Max 5 bullets total.** Fewer is better. Zero is fine — if nothing surprising happened, skip the file.
-      - **One line per bullet (~20 words).** Name the gotcha, don't tell the story.
-      - **Only include lessons that would change future behavior.** Skip generic observations, recaps of what shipped, or anything obvious from reading the code.
-      - Categories to scan (but don't enforce all four): scope drift, recurring review findings, TDD gotchas, library/framework surprises.
-
-      These files are read on-demand by future tasks — keep them lean. A lesson worth keeping is one a future Claude can absorb in a glance.
-
-   c. **Show the draft to the user** and accept edits. Use the AskUserQuestion tool with options "Looks good, write it" / "Let me edit" / "Skip lessons for this change". Do NOT auto-write. If the user picks "Let me edit", let them revise the draft inline, then re-present the same three options.
-
-   d. **If approved**, write to `docs/lessons/YYYY-MM-DD-<name>.md` (create `docs/lessons/` if missing). Use this minimal template:
-
-      ```markdown
-      # Lessons: <Change Name>
-
-      **Archived:** YYYY-MM-DD
-      **Source:** `openspec/changes/archive/YYYY-MM-DD-<name>/`
-
-      - <terse one-line lesson>
-      - <terse one-line lesson>
-      ```
-
-      No section headers. No padding bullets. If a category has nothing worth saying, omit it entirely.
-
-   e. **If `CLAUDE.md` does not already have a `## Lessons Learned` section**, add this one-line section (one-time):
-
-      ```markdown
-      ## Lessons Learned
-
-      Lessons from archived changes live in `docs/lessons/` — one file per archive, named `YYYY-MM-DD-<change-name>.md`.
-      ```
-
-      Check first with `grep -c '^## Lessons Learned' CLAUDE.md`. Only add if zero.
-
-8. **Prompt for README update**
-
-   Use the AskUserQuestion tool:
-   > "Update README.md based on what shipped in this change? (y/n)"
-
-   - If "n": skip and proceed to Output.
-   - If "y": read README.md, identify candidate edits that reflect the change (new feature, new env var, new run instruction, etc.), propose them to the user, accept edits, write only after explicit approval.
-
-**Output On Success**
-
-```
-## Archive Complete
-
-**Change:** <change-name>
-**Schema:** <schema-name>
-**Archived to:** openspec/changes/archive/YYYY-MM-DD-<name>/
-**Specs:** ✓ Synced to main specs
-
-All artifacts complete. All tasks complete.
+```bash
+openspec status --change <name>
 ```
 
-**Output On Success (No Delta Specs)**
+Every artifact must be `done`. Every task in `tasks.md` must be `- [x]`. If any are not, warn the user and ask for confirmation to proceed.
 
-```
-## Archive Complete
+If delta specs exist at `openspec/changes/<name>/specs/`, show a sync summary (compare each delta with the corresponding `openspec/specs/<capability>/spec.md`):
 
-**Change:** <change-name>
-**Schema:** <schema-name>
-**Archived to:** openspec/changes/archive/YYYY-MM-DD-<name>/
-**Specs:** No delta specs
+> "Delta specs detected for capabilities: `<list>`. Sync now (recommended) | Archive without syncing | Cancel."
 
-All artifacts complete. All tasks complete.
-```
+If sync chosen, invoke `openspec-sync-specs` via the Skill tool.
 
-**Output On Success With Warnings**
+### 2. Run the archive
 
-```
-## Archive Complete (with warnings)
+**Before archiving, capture the commit range for this change** so later cleanup steps (3 and 5) can refer back to it after the change directory moves:
 
-**Change:** <change-name>
-**Schema:** <schema-name>
-**Archived to:** openspec/changes/archive/YYYY-MM-DD-<name>/
-**Specs:** Sync skipped (user chose to skip)
-
-**Warnings:**
-- Archived with 2 incomplete artifacts
-- Archived with 3 incomplete tasks
-- Delta spec sync was skipped (user chose to skip)
-
-Review the archive if this was not intentional.
+```bash
+# Note the first commit that touched this change directory:
+git log --diff-filter=A --format="%H" -- openspec/changes/<name>/.openspec.yaml | tail -1
+# Note HEAD (latest commit on the change):
+git rev-parse HEAD
 ```
 
-**Output On Error (Archive Exists)**
+Save both SHAs in your working memory as `<change-base-sha>..<change-head-sha>`.
 
+```bash
+openspec archive <name>
 ```
-## Archive Failed
 
-**Change:** <change-name>
-**Target:** openspec/changes/archive/YYYY-MM-DD-<name>/
+Expected: change directory moves to `openspec/changes/archive/<date>-<name>/`. Capability specs at `openspec/specs/<capability>/spec.md` are created (if new) or updated (if delta). The proposal / specs / design / tasks files now live at `openspec/changes/archive/<date>-<name>/` (referred to as `<archived-dir>` below).
 
-Target archive directory already exists.
+### 3. Cleanup step 1 — fill capability spec `## Purpose`
 
-**Options:**
-1. Rename the existing archive
-2. Delete the existing archive if it's a duplicate
-3. Wait until a different date to archive
+`openspec archive` leaves a `## Purpose\nTBD - created by archiving change.` placeholder in any newly-created capability spec. Find them:
+
+```bash
+grep -l 'TBD - created by archiving' openspec/specs/*/spec.md
 ```
+
+For each match, write a 1-3 sentence Purpose derived from:
+- The change's `<archived-dir>/proposal.md` Why section
+- The requirements doc at `<archived-dir>/requirements.md` Goals section (it now lives inside the change dir and archives with it)
+
+Replace the placeholder. Commit when all are filled.
+
+### 4. Cleanup step 2 — update `openspec/specs/README.md`
+
+Open `openspec/specs/README.md`. Find the section listing capabilities. Add or update the entry for the new/modified capability. Use the existing format:
+
+```markdown
+### `<capability-name>` ✅ Implemented
+**User Story**: <one sentence>
+**Covered Requirements**: <requirement IDs>
+**Backend**: <bullet list>
+**Frontend**: <bullet list>
+**Acceptance Criteria**: <one sentence>
+```
+
+If the format differs, follow the existing pattern in this specific README — don't impose your own.
+
+### 5. Cleanup step 3 — update `CLAUDE.md` pitfalls
+
+First, read `openspec/changes/archive/<date>-<name>/eval-log.md` (it was archived with the other artifacts). Find any entries where `attempt > 1` — these groups needed multiple evaluator passes, which is a structural signal that something non-obvious happened. For each such group, read the `findings` from the failed attempts: if they describe a foot-gun worth documenting (timing-sensitive behavior, env-var ordering, schema migration edge case, boundary condition the spec didn't make explicit), that's a CLAUDE.md pitfall candidate.
+
+Then read the dev log entry at `docs/log/<date>.md` (if it exists) and the change diff via `git log --oneline <change-base-sha>..<change-head-sha>` plus `git diff <change-base-sha>..<change-head-sha>` (using the SHAs captured in step 2). If any non-obvious gotcha emerged (timing-sensitive bootstrap, env-var ordering, schema migration foot-gun, file-handling edge case), append a 2-3 line entry to the relevant section of `CLAUDE.md`'s Pitfalls.
+
+If no new pitfall surfaced, skip this step. Don't fabricate pitfalls.
+
+### 6. Cleanup step 4 — conditional project README
+
+Decision: does this change introduce **user-visible** new features or behavior changes?
+
+- Yes → ask the user: "This change introduces <description>. Do you want to update the project root README.md? Suggested addition: <draft>." Only update with user confirmation.
+- No (operations / internals / infrastructure only) → skip.
+
+Examples:
+- `multi-user-auth-core` → YES (new login flow) → update README's "Getting Started" section
+- `nas-deployment` → NO (ops change, no user-facing behavior) → skip
+- `auth-rate-limiting` → NO (internal hardening, no UX change) → skip
+- `multi-user-auth-admin-ui` → YES (new admin UI) → update README
+
+### 7. Dev log check
+
+Check whether `docs/log/YYYY-MM-DD.md` for today's date exists (use the Glob tool or, in bash: `ls docs/log/$(date +%Y-%m-%d).md 2>/dev/null`; in PowerShell: `Get-ChildItem docs/log/$((Get-Date).ToString('yyyy-MM-dd')).md`).
+
+If missing, prompt:
+
+> "No dev log entry for today (`docs/log/<today>.md`). Want me to draft one based on this change? (Y/N)"
+
+If Y, draft from the proposal + commits + review findings; let the user finalize. If N, skip.
+
+### 8. Commit cleanup + final summary
+
+```bash
+git add openspec/specs/ CLAUDE.md README.md docs/log/
+git commit -m "chore: archive <name> cleanup (Purpose, README, pitfalls, dev log)"
+```
+
+Output:
+
+> "Change `<name>` archived. Workflow complete. Capability spec(s) at openspec/specs/<...>/. Archive at openspec/changes/archive/<date>-<name>/."
+
+---
 
 **Guardrails**
-- Always prompt for change selection if not provided
-- Use artifact graph (openspec status --json) for completion checking
-- Don't block archive on warnings - just inform and confirm
-- Preserve .openspec.yaml when moving to archive (it moves with the directory)
-- Show clear summary of what happened
-- If sync is requested, use the Skill tool to invoke `openspec-sync-specs` (agent-driven)
-- If delta specs exist, always run the sync assessment and show the combined summary before prompting
-- **Lessons-learned is user-reviewed, never auto-written.** Always show the draft and get approval before writing `docs/lessons/YYYY-MM-DD-<name>.md`.
-- **README updates require explicit "y".** Default to "n" (no update). Even on "y", propose specific edits and get approval before writing.
+
+- NEVER skip Cleanup step 1 (Purpose). The TBD placeholder is the canonical example of what this rewrite is fixing.
+- DO ask for confirmation before updating project README — that's user-facing surface.
+- DO NOT fabricate pitfalls for CLAUDE.md if nothing genuinely surprised you in the change.
+- DO commit cleanup steps as one atomic commit (not per-file) so the archive log is clean.

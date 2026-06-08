@@ -1,157 +1,106 @@
 ---
 name: "OPSX: Explore"
-description: "Enter explore mode - think through ideas, investigate problems, clarify requirements, and produce a draft design.md"
+description: "Explore mode + draft requirements — produces docs/superpowers/specs/<date>-<topic>-requirements.md"
 category: Workflow
 tags: [workflow, explore, experimental, thinking]
 ---
 
-Enter explore mode. Think deeply. Visualize freely. Follow the conversation wherever it goes. When exploration converges, write a draft `design.md` to `openspec/changes/_draft/<topic>/`, then invoke `superpowers:brainstorming` as a REVIEWER to surface gaps before the design crystallizes.
+4-phase explore command. Single user invocation, agent walks through phases in order.
 
-**IMPORTANT: Explore mode is for thinking AND producing the design draft, not for implementing application code.** You MAY:
-- Read files, search code, investigate the codebase.
-- Write `openspec/changes/_draft/<topic>/design.md` and iterate on it.
-- Invoke `superpowers:brainstorming` to review the draft.
-- Optionally offer Visual Companion when the change involves visual decisions that benefit from side-by-side mockups, and record the chosen design.
+**Input**: The argument after `/opsx:explore` is whatever the user wants to think about. Could be a vague idea ("real-time collaboration"), a specific problem ("the auth system is getting unwieldy"), a comparison ("postgres vs sqlite for this"), or nothing (just enter explore mode).
 
-You may NOT write application code or modify production files. If the user asks to implement, remind them to run `/opsx:propose` first.
-
-**Input**: The argument after `/opsx:explore` is whatever the user wants to think about. Could be:
-- A vague idea: "real-time collaboration"
-- A specific problem: "the auth system is getting unwieldy"
-- A change name: "add-dark-mode" (to explore in context of that change)
-- A comparison: "postgres vs sqlite for this"
-- Nothing (just enter explore mode)
+If a topic is given, derive a kebab-case `<topic>` from it (e.g., "real-time collaboration" → `realtime-collab`). The same `<topic>` will be the OpenSpec change name in `/opsx:propose`.
 
 ---
 
-## The Stance
+## Phase 1 — Explore stance (free thinking)
 
-- **Curious, not prescriptive** - Ask questions that emerge naturally, don't follow a script.
-- **Open threads, not interrogations** - Surface multiple interesting directions and let the user follow what resonates.
-- **Visual** - Use ASCII diagrams liberally when they'd help clarify thinking.
-- **Adaptive** - Follow interesting threads, pivot when new information emerges.
-- **Patient** - Don't rush to conclusions, let the shape of the problem emerge.
-- **Grounded** - Explore the actual codebase when relevant, don't just theorize.
+**This phase is the existing explore mode. NEVER write code, never modify code, never propose implementation. Thinking only.**
 
----
+You may:
+- Read files, search code, investigate the codebase
+- Map existing architecture relevant to the discussion
+- Find integration points and identify patterns already in use
+- Surface hidden complexity
+- Use ASCII diagrams liberally when they help
+- Ask clarifying questions one at a time
+- Compare options conversationally
 
-## What You Might Do
+You may NOT:
+- Write or modify code
+- Create OpenSpec artifacts (proposal/design/specs/tasks)
+- Tell the user "now I'll implement"
 
-Depending on what the user brings, you might:
-
-**Explore the problem space** — ask clarifying questions, challenge assumptions, reframe, find analogies.
-
-**Investigate the codebase** — map architecture, find integration points, identify patterns, surface hidden complexity.
-
-**Compare options** — brainstorm approaches, build comparison tables, sketch tradeoffs, recommend a path (if asked).
-
-**Visualize** — ASCII diagrams for system flows, state machines, data flows, dependency graphs, comparison tables.
-
-**Surface risks and unknowns** — identify what could go wrong, find gaps, suggest spikes.
+The goal of Phase 1 is **the user's brain becomes clear about what they want**.
 
 ---
 
-## Producing the design draft
+## Phase 2 — Draft requirements (DRAFT status)
 
-When exploration converges and the shape of the problem is clear, transition into draft-production mode:
+When you judge that the conversation has reached enough clarity (typically after 5-15 turns), proactively offer:
 
-1. **Ask for a topic slug.** Use the AskUserQuestion tool (open-ended):
-   > "What's a short kebab-case slug for this topic? (e.g., `realtime-collab`, `auth-cleanup`) — vague is fine, the final change name is decided at propose time."
+> "I think we have enough to write a draft requirements doc. I'll save it to `docs/superpowers/specs/<date>-<topic>-requirements.md` with `Status: DRAFT`. We'll review it together in the next phase."
 
-2. **Write the draft `design.md`** at `openspec/changes/_draft/<topic>/design.md`. Use this template:
+Wait for the user's confirmation. Then write the file using the requirements template (`openspec instructions requirements --schema superpowers-driven --json` returns the template). Required frontmatter:
 
-   ```markdown
-   # Design: <Topic Title>
+```yaml
+---
+Date: <YYYY-MM-DD>
+Change: <topic>
+Status: DRAFT
+---
+```
 
-   **Date:** YYYY-MM-DD
-   **Status:** Draft — produced via /opsx:explore
+Sections (Goals / Non-Goals / Constraints / Success Criteria / User Stories / Open Questions / Referenced Capabilities). Rough is fine. TODOs are allowed at this stage.
 
-   ## Context
-
-   <Background, current state, constraints, stakeholders.>
-
-   ## Goals / Non-Goals
-
-   **Goals:**
-   - <Bullet>
-
-   **Non-Goals:**
-   - <Bullet>
-
-   ## Approach
-
-   <High-level architecture and component breakdown.>
-
-   ## Decisions
-
-   ### Decision: <name>
-   **Choice:** <chosen approach>
-   **Alternatives considered:** <list>
-   **Rationale:** <why X over Y>
-
-   ## Risks / Trade-offs
-
-   - [Risk] → Mitigation
-
-   ## Migration Plan
-
-   <Steps to deploy, rollback strategy. Omit section if not applicable.>
-
-   ## UI
-
-   <Selected mockup/wireframe with rationale. Omit section if no UI surface.>
-
-   ## Open Questions
-
-   - <Bullet>
-   ```
-
-3. **Invoke `superpowers:brainstorming` as REVIEWER.** Use the Skill tool with this prompt:
-   > "Review the existing design.md at `openspec/changes/_draft/<topic>/design.md`. DO NOT start a new design. Run the spec self-review checklist (placeholder scan, internal consistency, scope, ambiguity check) and return findings as a structured list. The design was produced via /opsx:explore and will be promoted into a real change by /opsx:propose; your role is to surface issues so the user can refine it."
-
-4. **Apply findings** to `design.md`. Iterate until the user is satisfied.
-
-5. **UI-surface check — optional.**
-
-   Visual Companion is an optional tool, not a required step. Before sending the "Draft ready" notification (step 6), use judgment: does this change involve visual decisions that would genuinely benefit from side-by-side mockups (e.g., comparing multiple layout options, exploring a brand-new screen, picking between visual treatments)? If yes — and only if yes — you MAY offer Visual Companion as **its own message** (no other content in the same message):
-
-   > "This change has visual decisions to make. Want me to open Visual Companion to compare mockups? (Requires opening a local URL.)"
-
-   Wait for the user's response.
-   - If they accept: run Visual Companion, capture the selected mockup/wireframe (as ASCII, description, or reference to a saved image) into the UI section of `design.md`, then go to step 6.
-   - If they decline or you didn't offer: go to step 6.
-
-   For small UI tweaks, behavior changes to existing components, or anything where an ASCII mockup in the design.md is sufficient, skip the offer entirely. The user can always invoke Visual Companion explicitly if they want it.
-
-6. **Notify the user**:
-   > "Draft ready at `openspec/changes/_draft/<topic>/design.md`. The draft is gitignored — it lives outside source control until /opsx:propose promotes it. When you're ready to formalize this as a change, run `/opsx:propose`."
+`git add` the file but DO NOT commit yet. Phase 4 commits.
 
 ---
 
-## OpenSpec Awareness
+## Phase 3 — Brainstorming review (REVIEWED status)
 
-If the user mentions an EXISTING change (already in `openspec/changes/<name>/`, not in `_draft/`), read its artifacts for context (`proposal.md`, `design.md`, `specs/`, `tasks.md`). Reference them naturally in conversation. If insights warrant updates, offer:
+Invoke `superpowers:brainstorming` with the draft as input. Run its spec self-review checklist:
 
-| Insight Type               | Where to Capture               |
-|----------------------------|--------------------------------|
-| New requirement discovered | `specs/<capability>/spec.md`   |
-| Requirement changed        | `specs/<capability>/spec.md`   |
-| Design decision made       | `design.md`                    |
-| Scope changed              | `proposal.md`                  |
-| New work identified        | `tasks.md`                     |
-| Assumption invalidated     | Relevant artifact              |
+1. **Placeholder scan:** Any TBD / TODO / "..." / "fill in" remaining? Fix or escalate to the user.
+2. **Internal consistency:** Do sections contradict each other? Does the architecture in (implicit) thinking match the requirements?
+3. **Scope check:** Is this focused enough for a single OpenSpec change, or does it need decomposition? If it needs splitting, propose 2-3 sub-changes and ask which to pursue first.
+4. **Ambiguity check:** Could any requirement be interpreted two ways? Pick one with the user, make it explicit.
 
-Offer and move on. Don't pressure. Don't auto-capture.
+After all gaps are resolved, change frontmatter `Status: DRAFT` → `Status: REVIEWED`. The propose phase will refuse to start if it sees `DRAFT`.
 
 ---
 
-## Guardrails
+## Phase 4 — Commit + handoff
 
-- **Don't implement application code** — explore is for thinking and producing the design draft. Application code happens during /opsx:apply.
-- **Don't commit `_draft/`** — it's gitignored.
-- **Don't run `openspec new change`** during explore — that's /opsx:propose's job. Explore keeps the design in `_draft/` so the kebab-case name decision is deferred.
-- **Don't fake understanding** — if something is unclear, dig deeper.
-- **Don't rush** — discovery is thinking time, not task time.
-- **Do visualize** — a good diagram is worth many paragraphs.
-- **Do explore the codebase** — ground discussions in reality.
-- **Do question assumptions** — including the user's and your own.
+Commit the staged requirements. This is a checkpoint of the reviewed doc at its staging path — `/opsx:propose` later `git mv`s `requirements.md` into the change dir, where it archives with the change.
+
+```bash
+git add docs/superpowers/specs/<date>-<topic>-requirements.md
+git commit -m "docs: stage requirements for <topic>"
+```
+
+Output to the user:
+
+> "Requirements ready and reviewed. Next: `/opsx:propose <topic>` (do not auto-invoke; let the user trigger it)."
+
+**Anti-pattern guard:** if the user says "just go ahead and propose / implement", REFUSE. Tell them: "Phase boundaries are explicit. Run `/opsx:propose <topic>` separately so the propose phase has a clean entry."
+
+---
+
+## Stance reminders
+
+- One question at a time
+- Multiple choice preferred over open-ended when applicable
+- Patient — don't rush phases. If Phase 1 needs 20 turns, that's fine
+- Visualize freely (ASCII diagrams)
+- Open threads, not interrogations — surface multiple directions, let the user follow what resonates
+
+## What you might do (not exhaustive)
+
+**Explore the problem space** — clarifying questions, challenge assumptions, reframe, find analogies.
+
+**Investigate the codebase** — map existing architecture, find integration points, identify patterns already in use, surface hidden complexity.
+
+**Compare options** — brainstorm multiple approaches, build comparison tables, sketch tradeoffs, recommend a path if asked.
+
+**Visualize** — ASCII diagrams when text isn't sufficient.
