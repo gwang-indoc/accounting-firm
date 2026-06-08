@@ -41,7 +41,6 @@
           <th>{{ 'clients.name' | translate }}</th>
           <th>{{ 'clients.email' | translate }}</th>
           <th>{{ 'clients.phone' | translate }}</th>
-          <th>{{ 'clients.portalLink' | translate }}</th>
           <th>{{ 'clients.actions' | translate }}</th>
         </tr>
       </thead>
@@ -51,13 +50,6 @@
             <td class="name-cell">{{ client.name }}</td>
             <td class="muted-cell">{{ client.email ?? '—' }}</td>
             <td class="muted-cell">{{ client.phone ?? '—' }}</td>
-            <td>
-              @if (client.linkedUserId) {
-                <span class="badge badge-linked">{{ 'clients.linked' | translate }}</span>
-              } @else {
-                <span class="badge badge-unlinked">{{ 'clients.notLinked' | translate }}</span>
-              }
-            </td>
             <td class="actions-cell">
               <button mat-button class="action-btn action-edit" (click)="openEditDialog(client)">{{ 'clients.edit' | translate }}</button>
               <button mat-button class="action-btn action-delete" (click)="confirmDelete(client)">{{ 'clients.delete' | translate }}</button>
@@ -74,7 +66,7 @@
           </tr>
         } @empty {
           <tr>
-            <td colspan="5" class="empty-cell">
+            <td colspan="4" class="empty-cell">
               @if (clients().length === 0) {
                 {{ 'clients.empty' | translate }}
               } @else {
