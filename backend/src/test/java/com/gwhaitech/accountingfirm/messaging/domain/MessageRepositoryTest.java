@@ -43,8 +43,8 @@ class MessageRepositoryTest {
         String unique = UUID.randomUUID().toString();
         Object id = em.getEntityManager()
                 .createNativeQuery(
-                        "INSERT INTO users (email, google_sub, role, created_at) " +
-                        "VALUES (:email, :sub, 'ADMIN', now()) RETURNING id")
+                        "INSERT INTO users (email, google_sub, name, role, created_at) " +
+                        "VALUES (:email, :sub, 'SeedUser', 'ADMIN', now()) RETURNING id")
                 .setParameter("email", "test-" + unique + "@x.com")
                 .setParameter("sub", "sub-" + unique)
                 .getSingleResult();
@@ -52,8 +52,11 @@ class MessageRepositoryTest {
     }
 
     private Long seedThread() {
+        Object uid = em.getEntityManager()
+                .createNativeQuery("INSERT INTO users (email, name, role) VALUES ('seed-msg@test.com', 'Seed', 'ADMIN') ON CONFLICT (email) DO UPDATE SET name=EXCLUDED.name RETURNING id")
+                .getSingleResult();
         Object cid = em.getEntityManager()
-                .createNativeQuery("INSERT INTO clients (name, created_at) VALUES ('X', now()) RETURNING id")
+                .createNativeQuery("INSERT INTO clients (name, email, admin_id, created_at) VALUES ('X', gen_random_uuid()::text || '@test.com', " + ((Number) uid).longValue() + ", now()) RETURNING id")
                 .getSingleResult();
         MessageThread t = new MessageThread();
         t.setClientId(((Number) cid).longValue());

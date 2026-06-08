@@ -11,8 +11,8 @@ import { ClientDto } from '../../../core/models/client.model';
 import { of } from 'rxjs';
 
 const sampleClients: ClientDto[] = [
-  { id: 1, name: 'Jane Smith', email: 'jane@gmail.com', phone: '555-1234', createdAt: '2026-01-01T00:00:00', linkedUserId: 42 },
-  { id: 2, name: 'Bob Lee',    email: 'bob@work.com',   phone: null,        createdAt: '2026-01-02T00:00:00', linkedUserId: null },
+  { id: 1, name: 'Jane Smith', email: 'jane@gmail.com', phone: '555-1234', createdAt: '2026-01-01T00:00:00', linkedUserId: 42, adminId: 1 },
+  { id: 2, name: 'Bob Lee',    email: 'bob@work.com',   phone: null,        createdAt: '2026-01-02T00:00:00', linkedUserId: null, adminId: 1 },
 ];
 
 function makeClients(n: number): ClientDto[] {
@@ -23,6 +23,7 @@ function makeClients(n: number): ClientDto[] {
     phone: null,
     createdAt: '2026-01-01T00:00:00',
     linkedUserId: null,
+    adminId: 1
   }));
 }
 

@@ -16,6 +16,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -174,6 +175,27 @@ class OAuth2SuccessHandlerTest {
         adminHandler.onAuthenticationSuccess(mockRequest, mockResponse, buildAuth());
 
         verify(mockResponse).sendRedirect("http://localhost:4200/admin/clients");
+    }
+
+    @Test
+    void nullGoogleName_fallsBackToEmailPrefix() throws Exception {
+        Map<String, Object> attrs = new HashMap<>();
+        attrs.put("sub", "google-sub-null-name");
+        attrs.put("email", "fallback@example.com");
+        attrs.put("name", null);
+        OAuth2User oauthUser = new DefaultOAuth2User(
+            List.of(new SimpleGrantedAuthority("ROLE_USER")), attrs, "sub"
+        );
+        OAuth2AuthenticationToken auth = new OAuth2AuthenticationToken(oauthUser, oauthUser.getAuthorities(), "google");
+
+        when(mockUserRepo.findByGoogleSub("google-sub-null-name")).thenReturn(Optional.empty());
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        when(mockUserRepo.save(userCaptor.capture())).thenAnswer(inv -> inv.getArgument(0));
+        when(mockJwtService.issueToken(any(User.class))).thenReturn("jwt");
+
+        handler.onAuthenticationSuccess(mockRequest, mockResponse, auth);
+
+        assertThat(userCaptor.getValue().getName()).isEqualTo("fallback");
     }
 
     @Test

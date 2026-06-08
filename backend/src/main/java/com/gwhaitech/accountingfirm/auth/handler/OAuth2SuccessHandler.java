@@ -51,6 +51,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String googleSub = oauthUser.getAttribute("sub");
         String email = oauthUser.getAttribute("email");
         String name = oauthUser.getAttribute("name");
+        if (name == null) name = email.substring(0, email.indexOf('@'));
 
         User user = userRepository.findByGoogleSub(googleSub).orElseGet(User::new);
         user.setGoogleSub(googleSub);

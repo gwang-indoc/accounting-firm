@@ -1,5 +1,8 @@
 package com.gwhaitech.accountingfirm.common.exception;
 
+import com.gwhaitech.accountingfirm.client.exception.ClientAccessDeniedException;
+import com.gwhaitech.accountingfirm.client.exception.ClientEmailAlreadyExistsException;
+import com.gwhaitech.accountingfirm.client.exception.ClientEmailNotRegisteredException;
 import com.gwhaitech.accountingfirm.client.exception.ClientNotFoundException;
 import com.gwhaitech.accountingfirm.client.exception.DocumentNameConflictException;
 import com.gwhaitech.accountingfirm.client.exception.DocumentNotFoundException;
@@ -19,6 +22,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ClientNotFoundException.class)
     public ResponseEntity<Void> handleClientNotFound(ClientNotFoundException ex) {
         return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(ClientEmailNotRegisteredException.class)
+    public ResponseEntity<Map<String, String>> handleEmailNotRegistered(ClientEmailNotRegisteredException ex) {
+        return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ClientEmailAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handleEmailAlreadyExists(ClientEmailAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ClientAccessDeniedException.class)
+    public ResponseEntity<Void> handleClientAccessDenied(ClientAccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     @ExceptionHandler(DocumentNotFoundException.class)

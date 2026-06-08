@@ -54,8 +54,11 @@ class MessageThreadRepositoryTest {
     }
 
     private Long seedClient() {
+        Object uid = em.getEntityManager()
+                .createNativeQuery("INSERT INTO users (email, name, role) VALUES ('seed-thread@test.com', 'Seed', 'ADMIN') ON CONFLICT (email) DO UPDATE SET name=EXCLUDED.name RETURNING id")
+                .getSingleResult();
         Object id = em.getEntityManager()
-                .createNativeQuery("INSERT INTO clients (name, created_at) VALUES ('Test', now()) RETURNING id")
+                .createNativeQuery("INSERT INTO clients (name, email, admin_id, created_at) VALUES ('Test', gen_random_uuid()::text || '@test.com', " + ((Number) uid).longValue() + ", now()) RETURNING id")
                 .getSingleResult();
         return ((Number) id).longValue();
     }

@@ -1,5 +1,7 @@
 package com.gwhaitech.accountingfirm.client.domain;
 
+import com.gwhaitech.accountingfirm.auth.domain.User;
+import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -22,12 +24,22 @@ class ClientEntityTest {
     @Autowired
     private TestEntityManager em;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Test
     void persistAndRetrieveClient() {
+        User admin = new User();
+        admin.setEmail("admin@acmecorp.com");
+        admin.setName("Admin");
+        admin.setRole("ADMIN");
+        User savedAdmin = userRepository.save(admin);
+
         Client client = new Client();
         client.setName("Acme Corp");
         client.setEmail("contact@acme.com");
         client.setPhone("555-1234");
+        client.setAdminId(savedAdmin.getId());
 
         Client saved = em.persistFlushFind(client);
 

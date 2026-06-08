@@ -9,5 +9,7 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
     List<Client> findByEmailIgnoreCaseOrderById(String email);
 
+    List<Client> findByAdminId(Long adminId);
+
     Optional<Client> findByUserId(Long userId);
 }

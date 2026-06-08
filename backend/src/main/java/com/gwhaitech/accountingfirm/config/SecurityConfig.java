@@ -43,6 +43,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/oauth2/**", "/login/oauth2/**", "/api/auth/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/clients", "/api/clients/*", "/api/clients/*/documents", "/api/clients/*/documents/**").hasRole("ADMIN")
                 .requestMatchers("/api/clients/*/threads", "/api/clients/*/threads/**", "/api/clients/unread-counts").hasRole("ADMIN")
                 .requestMatchers("/api/portal/**").authenticated()

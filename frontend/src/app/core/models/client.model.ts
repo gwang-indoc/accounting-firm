@@ -5,4 +5,5 @@ export interface ClientDto {
   phone: string | null;
   createdAt: string;
   linkedUserId: number | null;
+  adminId: number | null;
 }

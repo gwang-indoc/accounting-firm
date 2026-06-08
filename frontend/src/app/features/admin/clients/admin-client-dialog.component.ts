@@ -1,11 +1,21 @@
-import { Component, inject } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject, signal } from '@angular/core';
+import {
+  AbstractControl,
+  AsyncValidatorFn,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { take } from 'rxjs/operators';
+import { Observable, of, timer } from 'rxjs';
+import { catchError, map, switchMap, take } from 'rxjs/operators';
 import { AdminClientsService } from '../../../core/services/admin-clients.service';
 import { ClientDto } from '../../../core/models/client.model';
 
@@ -38,12 +48,20 @@ export interface AdminClientDialogData {
         <mat-form-field appearance="outline" class="dlg-field dlg-field-email">
           <mat-label>Email Address</mat-label>
           <input matInput type="email" formControlName="email" placeholder="e.g. jane@example.com" />
-          <mat-hint>Must match the email the client used when registering their account</mat-hint>
+          @if (emailHint()) {
+            <mat-hint>{{ emailHint() }}</mat-hint>
+          }
           @if (form.get('email')?.hasError('required') && form.get('email')?.touched) {
             <mat-error>Email is required</mat-error>
           }
           @if (form.get('email')?.hasError('email') && form.get('email')?.touched) {
             <mat-error>Enter a valid email address</mat-error>
+          }
+          @if (form.get('email')?.hasError('notRegistered')) {
+            <mat-error>Email not registered — client must have an account first</mat-error>
+          }
+          @if (form.get('email')?.hasError('duplicateClient')) {
+            <mat-error>Client already exists</mat-error>
           }
         </mat-form-field>
 
@@ -56,7 +74,8 @@ export interface AdminClientDialogData {
 
     <mat-dialog-actions class="dlg-actions">
       <button mat-button class="dlg-cancel" [mat-dialog-close]="null">Cancel</button>
-      <button mat-flat-button color="primary" class="dlg-submit" form="clientForm" type="submit">
+      <button mat-flat-button color="primary" class="dlg-submit" form="clientForm" type="submit"
+              [disabled]="form.invalid || form.pending">
         {{ isEdit ? 'Save Changes' : 'Add Client' }}
       </button>
     </mat-dialog-actions>
@@ -134,11 +153,42 @@ export class AdminClientDialogComponent {
 
   protected isEdit = this.data.client !== null;
 
+  emailHint = signal('');
+
   form = new FormGroup({
     name: new FormControl(this.data.client?.name ?? '', Validators.required),
-    email: new FormControl(this.data.client?.email ?? '', [Validators.required, Validators.email]),
+    email: new FormControl(
+      this.data.client?.email ?? '',
+      [Validators.required, Validators.email],
+      this.isEdit ? [] : [this.emailLookupValidator()],
+    ),
     phone: new FormControl(this.data.client?.phone ?? ''),
   });
+
+  private emailLookupValidator(): AsyncValidatorFn {
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      const email = control.value as string;
+      if (!email || Validators.email(control) !== null) {
+        this.emailHint.set('');
+        return of(null);
+      }
+      return timer(400).pipe(
+        switchMap(() => this.adminClientsService.lookupUserByEmail(email)),
+        map((result) => {
+          this.emailHint.set(`Registered user: ${result.name}`);
+          this.form.get('name')?.setValue(result.name, { emitEvent: false });
+          return null;
+        }),
+        catchError((err: HttpErrorResponse) => {
+          this.emailHint.set('');
+          if (err.status === 404) {
+            return of({ notRegistered: true } as ValidationErrors);
+          }
+          return of(null);
+        }),
+      );
+    };
+  }
 
   submit(): void {
     if (this.form.invalid) {
@@ -153,7 +203,13 @@ export class AdminClientDialogComponent {
 
     obs$.pipe(take(1)).subscribe({
       next: (result) => this.dialogRef.close(result),
-      error: () => this.snackBar.open('Failed to save client. Please try again.', 'OK'),
+      error: (err: HttpErrorResponse) => {
+        if (err.status === 409) {
+          this.form.get('email')?.setErrors({ duplicateClient: true });
+        } else {
+          this.snackBar.open('Failed to save client. Please try again.', 'OK');
+        }
+      },
     });
   }
 }

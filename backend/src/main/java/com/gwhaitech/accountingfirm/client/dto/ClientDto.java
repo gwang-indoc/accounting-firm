@@ -8,5 +8,6 @@ public record ClientDto(
         String email,
         String phone,
         LocalDateTime createdAt,
-        Long linkedUserId
+        Long linkedUserId,
+        Long adminId
 ) {}
