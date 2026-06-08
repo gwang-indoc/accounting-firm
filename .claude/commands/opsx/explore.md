@@ -59,18 +59,25 @@ Sections (Goals / Non-Goals / Constraints / Success Criteria / User Stories / Op
 
 ## Phase 3 — Brainstorming review (REVIEWED status)
 
-Invoke `superpowers:brainstorming` with the draft as input. Run its spec self-review checklist:
+**This entire phase runs through `superpowers:brainstorming`.** Invoke it with the draft as input — not just for the opening checklist, but for every round of discussion and revision below. Stay in the brainstorming stance until the gate flips.
+
+**Opening pass** — run the spec self-review checklist:
 
 1. **Placeholder scan:** Any TBD / TODO / "..." / "fill in" remaining? Fix or escalate to the user.
 2. **Internal consistency:** Do sections contradict each other? Does the architecture in (implicit) thinking match the requirements?
 3. **Scope check:** Is this focused enough for a single OpenSpec change, or does it need decomposition? If it needs splitting, propose 2-3 sub-changes and ask which to pursue first.
 4. **Ambiguity check:** Could any requirement be interpreted two ways? Pick one with the user, make it explicit.
 
-**Additional inputs:** If the user supplies any new input before the doc reaches REVIEWED — new constraints, corrections, scope changes, extra requirements — fold it into the brainstorming review. Update the draft to reflect it and re-run the relevant checklist items. Do not treat the draft as frozen until REVIEWED is set.
+**Multi-round loop (DRAFT throughout).** Review is an open loop, not one-shot. After the checklist, keep discussing through brainstorming. The user may raise questions, challenge decisions, explore alternatives, add constraints or requirements. Each round: discuss → update the draft → re-run the relevant checklist items. Repeat as many rounds as the user wants. The draft stays `Status: DRAFT` the whole time — it is never frozen until the gate flips.
 
-**Review is an open loop, not one-shot.** After the checklist pass, stay in brainstorming. The user may keep discussing — raising questions, challenging decisions, exploring alternatives, adding requirements. Each round: discuss, update the draft, re-run the relevant checklist items. Repeat as many times as the user wants. The draft stays DRAFT throughout this loop.
+**The REVIEWED gate (explicit yes required).** The status flip is the ONLY way out of this phase, and only the user opens it:
 
-**Final manual confirmation (required):** Do NOT change the status automatically and do NOT treat your own summary as the trigger. The loop ends only when the user explicitly says they are done. When you think it's settled, summarize what changed and ask — e.g. "Ready to mark this REVIEWED?" — but if the user responds with more discussion instead of confirming, go back into the loop. Only after an explicit user confirmation, change frontmatter `Status: DRAFT` → `Status: REVIEWED`. The propose phase will refuse to start if it sees `DRAFT`.
+- Do NOT flip automatically. Do NOT treat your own summary as the trigger.
+- When you think it's settled, summarize what changed and ask: "Ready to mark this REVIEWED?"
+- If the user responds with more discussion instead of an affirmative, you did NOT get the go — drop back into the loop.
+- Only on a clear affirmative ("yes" / "ready" / "go") change frontmatter `Status: DRAFT` → `Status: REVIEWED`.
+
+`/opsx:propose` refuses to start while it sees `DRAFT`.
 
 ---
 
