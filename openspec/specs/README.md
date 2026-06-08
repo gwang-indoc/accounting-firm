@@ -24,14 +24,22 @@ One spec per capability. Each spec is the authoritative record of what the syste
 ### `client-portal-ui` ✅ Implemented
 **User Story**: Authenticated clients access a dashboard, documents, and messages through a guarded portal.
 
-### `client-registration` ✅ Implemented
+### `client-registration` ⚠️ Superseded
 **User Story**: New clients register an account linked to their client record.
+**Note**: Superseded by `email-otp-auth` — account creation now happens inline on first email-code login. `/register` route and `RegisterComponent` removed.
 
 ### `contact-page` ✅ Implemented
 **User Story**: Visitors view office contact details and a map on the `/contact` page.
 
-### `email-password-auth` ✅ Implemented
+### `email-otp-auth` ✅ Implemented
+**User Story**: Clients sign in with a 6-digit email code; first-time users create an account by supplying a display name after code verification — no password required.
+**Backend**: `POST /api/auth/email/request-code` (BCrypt-hashed code in `email_login_codes`, SMTP delivery); `POST /api/auth/email/verify-code` (JWT on match, signup token if new email); `POST /api/auth/email/complete-signup` (creates user, issues JWT). Rate limits: 10-min expiry, 5 attempts/code, 60s resend cooldown, 5 codes/email/hour.
+**Frontend**: `LoginEmailCodeComponent` — three-step flow (email → code → name for new users); Angular Material card design matching login page; routes into auth via `AuthService`.
+**Acceptance Criteria**: Existing user can log in with just their email; new email results in account creation after name step; wrong/expired/reused codes are rejected.
+
+### `email-password-auth` ⚠️ Superseded
 **User Story**: Clients authenticate with email and password (legacy; superseded by email-code OTP).
+**Note**: Superseded by `email-otp-auth` — `POST /api/auth/login`, `password_hash` column, and `LoginEmailComponent` removed.
 
 ### `google-oauth2-auth` ✅ Implemented
 **User Story**: Clients authenticate via Google OAuth2; a JWT cookie is issued on success.

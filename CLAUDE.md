@@ -188,6 +188,9 @@ Angular async validators (`switchMap` + HTTP) fire real requests during e2e test
 ### Angular Material `getByLabel` uses `mat-label` text only
 `mat-label` is the accessible name. Placeholder text is NOT appended. `getByLabel('Phone (optional)')` fails if the mat-label is just `Phone`; use `getByLabel('Phone')`.
 
+### Angular forms: always use `mat-form-field` + `matInput`, not bare `<input>`
+New Angular components often use raw `<input>` elements that pass tests but fail Material design consistency. Any form field must be `<mat-form-field appearance="outline"><input matInput .../></mat-form-field>` to get Material theming, error display, and label integration. Bare `<input>` elements look functional but break the design system.
+
 ## Lessons Learned
 
 Lessons from archived changes live in `docs/lessons/` — one file per archive, named `YYYY-MM-DD-<change-name>.md`.
