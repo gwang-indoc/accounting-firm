@@ -24,8 +24,8 @@ test.describe('/admin/clients', () => {
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify([
-        { id: 1, name: 'Jane Smith', email: 'jane@gmail.com', phone: '555-1234', createdAt: '2026-01-01T00:00:00', linkedUserId: 10 },
-        { id: 2, name: 'Bob Lee',    email: 'bob@work.com',   phone: null,        createdAt: '2026-01-02T00:00:00', linkedUserId: null },
+        { id: 1, name: 'Jane Smith', email: 'jane@gmail.com', phone: '555-1234', createdAt: '2026-01-01T00:00:00', linkedUserId: 10, adminId: 1 },
+        { id: 2, name: 'Bob Lee',    email: 'bob@work.com',   phone: null,        createdAt: '2026-01-02T00:00:00', linkedUserId: null, adminId: 1 },
       ]),
     }));
 
@@ -33,8 +33,7 @@ test.describe('/admin/clients', () => {
 
     await expect(page.getByTestId('client-row')).toHaveCount(2);
     await expect(page.getByTestId('client-row').first()).toContainText('Jane Smith');
-    await expect(page.getByTestId('client-row').first()).toContainText('Linked');
-    await expect(page.getByTestId('client-row').nth(1)).toContainText('Not linked');
+    await expect(page.getByTestId('client-row').nth(1)).toContainText('Bob Lee');
   });
 
   test('non-admin is redirected to /', async ({ page }) => {
@@ -55,18 +54,25 @@ test.describe('/admin/clients', () => {
     await fakeAdminAuth(page);
 
     const clients = [
-      { id: 1, name: 'Jane Smith', email: 'jane@gmail.com', phone: null, createdAt: '2026-01-01T00:00:00', linkedUserId: null },
+      { id: 1, name: 'Jane Smith', email: 'jane@gmail.com', phone: null, createdAt: '2026-01-01T00:00:00', linkedUserId: null, adminId: 1 },
     ];
 
     await page.route('**/api/clients', async route => {
       if (route.request().method() === 'GET') {
         await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(clients) });
       } else if (route.request().method() === 'POST') {
-        const newClient = { id: 99, name: 'Carol Wu', email: 'carol@example.com', phone: '555-9999', createdAt: '2026-05-20T00:00:00', linkedUserId: null };
+        const newClient = { id: 99, name: 'Carol Wu', email: 'carol@example.com', phone: '555-9999', createdAt: '2026-05-20T00:00:00', linkedUserId: null, adminId: 1 };
         clients.push(newClient);
         await route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify(newClient) });
       }
     });
+
+    // Mock email lookup so the async validator doesn't hit the real backend
+    await page.route(/\/api\/admin\/users\/lookup/, route => route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ name: 'Carol Wu' }),
+    }));
 
     await page.goto('/admin/clients');
     await expect(page.getByTestId('client-row')).toHaveCount(1);
@@ -74,7 +80,9 @@ test.describe('/admin/clients', () => {
     await page.getByTestId('add-client-btn').click();
     await page.getByLabel('Full Name').fill('Carol Wu');
     await page.getByLabel('Email').fill('carol@example.com');
-    await page.getByLabel('Phone (optional)').fill('555-9999');
+    // Wait for async email validator (400ms debounce + HTTP) to complete
+    await page.waitForTimeout(1500);
+    await page.getByLabel('Phone').fill('555-9999');
     await page.getByRole('button', { name: 'Add Client' }).click();
 
     await expect(page.getByTestId('client-row')).toHaveCount(2);

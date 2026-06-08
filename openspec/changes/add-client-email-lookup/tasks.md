@@ -73,5 +73,5 @@
 
 - [x] 6.1 Run full backend test suite — `cd backend && ./mvnw test` — no regressions
 - [x] 6.2 Run full frontend test suite — `cd frontend && npx ng test --no-watch` — no regressions
-- [ ] 6.3 Run e2e suite — `cd e2e && npx playwright test` — existing flows unbroken
+- [x] 6.3 Run e2e suite — `cd e2e && npx playwright test` — existing flows unbroken
 - [x] 6.4 Run superpowers:verification-before-completion
