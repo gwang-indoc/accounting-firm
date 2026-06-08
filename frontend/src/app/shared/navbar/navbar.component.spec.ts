@@ -181,7 +181,7 @@ describe('Navigation links', () => {
       getUnreadCount: vi.fn().mockReturnValue(of({ unreadCount })),
     };
     TestBed.configureTestingModule({
-      imports: [NavbarComponent, RouterModule.forRoot([])],
+      imports: [NavbarComponent, RouterModule.forRoot([]), TranslateModule.forRoot()],
       providers: [
         provideHttpClient(),
         provideNgReflectAttributes(),
@@ -204,9 +204,11 @@ describe('Navigation links', () => {
     expect(fixture.nativeElement.querySelector('[data-testid="messages-nav-link"]')).toBeNull();
   });
 
-  it('does not render admin-nav-link for ADMIN', () => {
+  it('renders admin-clients-nav-link for ADMIN', () => {
     setup('ADMIN');
-    expect(fixture.nativeElement.querySelector('[data-testid="admin-nav-link"]')).toBeNull();
+    const link = fixture.nativeElement.querySelector('[data-testid="admin-clients-nav-link"]');
+    expect(link).not.toBeNull();
+    expect(link.getAttribute('routerLink')).toBe('/admin/clients');
   });
 
   it('renders dashboard-nav-link for USER', () => {

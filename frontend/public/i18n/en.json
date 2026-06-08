@@ -7,6 +7,7 @@
   "navbar.portalDashboard": "Dashboard",
   "navbar.portalDocuments": "Documents",
   "navbar.portalMessages": "Messages",
+  "navbar.clientManagement": "Client Management",
   "navbar.logout": "Logout",
   "navbar.language": "中文",
   "footer.copyright": "© 2026 GWH Accounting. All rights reserved.",

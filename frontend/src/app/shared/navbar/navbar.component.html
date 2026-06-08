@@ -12,7 +12,11 @@
     <a mat-button routerLink="/security" routerLinkActive="active">{{ 'navbar.security' | translate }}</a>
     @if (authService.isAuthenticated()) {
       <span class="nav-user-name">{{ authService.currentUser()?.name }}</span>
-      @if (authService.currentUser()?.role !== 'ADMIN') {
+      @if (authService.currentUser()?.role === 'ADMIN') {
+        <a mat-button routerLink="/admin/clients" routerLinkActive="active" data-testid="admin-clients-nav-link">
+          {{ 'navbar.clientManagement' | translate }}
+        </a>
+      } @else {
         <a mat-button routerLink="/portal/dashboard" routerLinkActive="active" data-testid="dashboard-nav-link">
           {{ 'navbar.portalDashboard' | translate }}
           @if (unreadCount() > 0) {
