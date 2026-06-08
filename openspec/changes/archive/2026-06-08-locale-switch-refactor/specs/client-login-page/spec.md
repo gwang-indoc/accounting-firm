@@ -29,6 +29,8 @@ The system SHALL render `LoginComponent` at `/login` as a standalone Angular com
 - **THEN** all visible text on `/login` (headings, labels, button text, trust bullets) switches to Chinese without page reload
 - **THEN** user-entered form values (if any) are unchanged
 
+## ADDED Requirements
+
 ### Requirement: Email OTP login flow is fully bilingual
 The system SHALL render all visible strings in the `LoginEmailCodeComponent` (email step, code step, name step) through `| translate`, using `emailCode.*` translation keys. Error messages set in the component SHALL use translation key strings (not raw English) so the template's `{{ error() | translate }}` renders them in the active language.
 

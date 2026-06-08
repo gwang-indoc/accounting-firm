@@ -1,37 +1,47 @@
+## Purpose
+Render the `/login` page where clients authenticate via Google OAuth2 or email-code OTP, with all visible text driven by `ngx-translate` so the page works in both English and Chinese.
 ## Requirements
-
 ### Requirement: Dedicated /login page presents all auth options using Angular Material
-The system SHALL render `LoginComponent` at `/login` as a standalone Angular component. The page SHALL present three auth options in a single centered `mat-card` using Angular Material components. The route SHALL be accessible without authentication.
+The system SHALL render `LoginComponent` at `/login` as a standalone Angular component. The page SHALL present Google OAuth2 and email-code authentication options. The route SHALL be accessible without authentication. All visible text on the page SHALL be rendered through the `| translate` pipe using `ngx-translate`, enabling EN/Chinese switching without page reload.
 
-**Page layout:** The page background is `#f1f5f9` with a subtle dot-grid texture. A single `mat-card` (max-width 400px) is centered horizontally and vertically. The card uses Material CSS variables (`--mdc-elevated-card-container-color`, `--mdc-elevated-card-container-shape`) and has a 3px sky-blue gradient accent stripe (`#0ea5e9` → `#38bdf8` → `#7dd3fc`) pinned to its top edge.
+**Page layout:** Two-panel layout: left brand panel (`brand-panel`) and right login form panel (`login-panel`). Brand panel contains the firm name, tagline, headline, description, trust bullet list, and copyright — all translated via `| translate`. Login panel contains eyebrow, heading, subtitle, Google button, "or" divider, email-code sub-component, and security note — all translated via `| translate`.
 
-**Card content (top to bottom):**
-1. Brand block — dark navy 税 icon (42×42px, `#0f172a` background, `#38bdf8` text) + "GWH Accounting" name + "Secure Tax & Accounting Portal" tagline
-2. "CLIENT PORTAL" eyebrow label (sky-blue `#0ea5e9`, uppercase, tracked)
-3. "Welcome back" `<h1>` heading
-4. "Sign in to access your account" subtitle
-5. Google Sign-In button — custom `<a>` styled as a white bordered button with inline Google G SVG logo; links to `/oauth2/authorization/google`
-6. "or" divider row (custom, not `mat-divider`)
-7. "Create an account" `mat-stroked-button` navigating to `/register`
-8. "Sign in with email →" `mat-button` navigating to `/login/email`
-9. Security note — lock SVG icon + "Your data is always encrypted in transit"
+**Card content (top to bottom, login panel):**
+1. Eyebrow label (`login.eyebrow`) — translated
+2. Heading (`login.welcome`) — translated
+3. Subtitle (`login.sub`) — translated
+4. Google Sign-In button — label via `login.google` key; links to `/oauth2/authorization/google`
+5. "or" divider row — label via `login.orDivider` key
+6. `<app-login-email-code>` sub-component (multi-step email OTP flow, fully bilingual)
+7. Security note — label via `login.dataProtection` key
 
 #### Scenario: Login page structure
 - **WHEN** the user navigates to `/login`
-- **THEN** the page renders a `mat-card` containing the text "Client Portal" (in the eyebrow label)
-- **THEN** a Google Sign-In link (`<a href="/oauth2/authorization/google">`) is present with the Google G logo
-- **THEN** a "Create an account" `mat-stroked-button` navigates to `/register`
-- **THEN** a "Sign in with email →" `mat-button` navigates to `/login/email`
-
-#### Scenario: Success snackbar after registration
-- **WHEN** the user arrives at `/login?registered=true`
-- **THEN** a `MatSnackBar` notification is shown: "Account created! Please sign in."
+- **THEN** the page renders the brand panel and login panel
+- **THEN** a Google Sign-In link (`<a href="/oauth2/authorization/google">`) is present
+- **THEN** the `app-login-email-code` sub-component is rendered
 
 #### Scenario: Route is not guarded
 - **WHEN** an unauthenticated user navigates to `/login`
 - **THEN** the page renders without redirection
 
-#### Scenario: Mobile layout
-- **WHEN** the viewport width is < 768px
-- **THEN** the `mat-card` fills the screen width with horizontal padding
-- **THEN** the navbar shows the hamburger icon
+#### Scenario: Login page text switches language
+- **WHEN** the user toggles from EN to ZH
+- **THEN** all visible text on `/login` (headings, labels, button text, trust bullets) switches to Chinese without page reload
+- **THEN** user-entered form values (if any) are unchanged
+
+### Requirement: Email OTP login flow is fully bilingual
+The system SHALL render all visible strings in the `LoginEmailCodeComponent` (email step, code step, name step) through `| translate`, using `emailCode.*` translation keys. Error messages set in the component SHALL use translation key strings (not raw English) so the template's `{{ error() | translate }}` renders them in the active language.
+
+#### Scenario: Email step renders in active language
+- **WHEN** the user is on the email step of the login flow
+- **THEN** the field label, button text, and any error messages render in the currently selected language
+
+#### Scenario: Code step renders in active language
+- **WHEN** the user is on the code step
+- **THEN** "We sent a 6-digit code to …" message, button labels, resend/change links render in the currently selected language
+
+#### Scenario: Name step renders in active language
+- **WHEN** the user is on the name step (new account signup)
+- **THEN** the instruction text, field label, and button text render in the currently selected language
+
