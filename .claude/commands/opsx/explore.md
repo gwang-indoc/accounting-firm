@@ -59,6 +59,8 @@ Sections (Goals / Non-Goals / Constraints / Success Criteria / User Stories / Op
 
 ## Phase 3 — Brainstorming review (REVIEWED status)
 
+> **MANDATORY: Invoke `superpowers:brainstorming` via the Skill tool at the START of this phase, before doing anything else. This is not optional. Do not run the checklist, do not discuss, do not write — invoke the skill first. The entire phase executes inside the brainstorming skill's framework.**
+
 **This entire phase runs through `superpowers:brainstorming`.** Invoke it with the draft as input — not just for the opening checklist, but for every round of discussion and revision below. Stay in the brainstorming stance until the gate flips.
 
 **Opening pass** — run the spec self-review checklist:
