@@ -63,5 +63,7 @@
   "documents.errorTooLarge": "文件过大。最大大小为 10 MB。",
   "documents.errorFailed": "上传失败。请重试。",
   "messages.senderTypeClient": "您",
-  "messages.senderTypeAdmin": "您的会计师"
+  "messages.senderTypeAdmin": "您的会计师",
+  "documents.fileTypeFallback": "文件",
+  "documents.uploaded": "上传于"
 }

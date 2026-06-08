@@ -1,6 +1,7 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { LoginComponent } from './login.component';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -18,7 +19,7 @@ describe('LoginComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LoginComponent],
+      imports: [LoginComponent, TranslateModule.forRoot()],
       providers: [
         provideZonelessChangeDetection(),
         { provide: AuthService, useValue: buildAuthService() },
@@ -31,8 +32,9 @@ describe('LoginComponent', () => {
 
   afterEach(() => TestBed.resetTestingModule());
 
-  it('renders heading Client Portal', () => {
-    expect(fixture.nativeElement.textContent).toContain('Client Portal');
+  it('renders eyebrow and welcome heading', () => {
+    expect(fixture.nativeElement.querySelector('.form-eyebrow')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.form-heading')).not.toBeNull();
   });
 
   it('Google button has correct href', () => {

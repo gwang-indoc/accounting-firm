@@ -4,21 +4,21 @@
     data-testid="drawer-client-login-btn"
     (click)="toggle(); $event.stopPropagation()"
   >
-    Client Login
+    {{ 'clientPortalLogin.button' | translate }}
   </button>
 
   @if (isOpen()) {
   <div class="login-dropdown">
-    <h3>Client Portal</h3>
-    <p>Secure access to your accounting documents and reports.</p>
+    <h3>{{ 'clientPortalLogin.heading' | translate }}</h3>
+    <p>{{ 'clientPortalLogin.desc' | translate }}</p>
     <a
       data-testid="google-signin-link"
       href="/oauth2/authorization/google"
       class="google-signin-btn"
     >
-      Sign in with Google
+      {{ 'clientPortalLogin.signIn' | translate }}
     </a>
-    <p class="security-label">🔒 Secured with Google OAuth2</p>
+    <p class="security-label">{{ 'clientPortalLogin.secured' | translate }}</p>
   </div>
   }
 </div>

@@ -2,7 +2,7 @@
   <div class="page-header">
     <div>
       <h1 class="page-title">{{ 'clients.title' | translate }}</h1>
-      <p class="page-subtitle">{{ clients().length }} {{ clients().length === 1 ? 'client' : 'clients' }}</p>
+      <p class="page-subtitle">{{ clients().length }} {{ clients().length === 1 ? ('clients.clientSingular' | translate) : ('clients.clientPlural' | translate) }}</p>
     </div>
   </div>
 

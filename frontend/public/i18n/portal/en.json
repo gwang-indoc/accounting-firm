@@ -63,5 +63,7 @@
   "documents.errorTooLarge": "File is too large. Maximum size is 10 MB.",
   "documents.errorFailed": "Upload failed. Please try again.",
   "messages.senderTypeClient": "You",
-  "messages.senderTypeAdmin": "Your accountant"
+  "messages.senderTypeAdmin": "Your accountant",
+  "documents.fileTypeFallback": "file",
+  "documents.uploaded": "uploaded"
 }

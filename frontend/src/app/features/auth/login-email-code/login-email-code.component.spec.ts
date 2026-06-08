@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { Router } from '@angular/router';
 import { vi } from 'vitest';
+import { TranslateModule } from '@ngx-translate/core';
 import { LoginEmailCodeComponent } from './login-email-code.component';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -25,7 +26,7 @@ async function setup(authOverrides?: Parameters<typeof buildAuthService>[0]) {
   const router = { navigate: vi.fn().mockResolvedValue(true) };
 
   await TestBed.configureTestingModule({
-    imports: [LoginEmailCodeComponent],
+    imports: [LoginEmailCodeComponent, TranslateModule.forRoot()],
     providers: [
       provideZonelessChangeDetection(),
       { provide: AuthService, useValue: authService },

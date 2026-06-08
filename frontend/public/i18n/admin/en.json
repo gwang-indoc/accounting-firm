@@ -47,5 +47,9 @@
   "messages.backToMessages": "← Back to Messages",
   "messages.reply": "Write a reply…",
   "messages.send": "Send",
-  "messages.noMessages": "No messages"
+  "messages.noMessages": "No messages",
+  "clients.clientSingular": "client",
+  "clients.clientPlural": "clients",
+  "documents.documentSingular": "document",
+  "documents.documentPlural": "documents"
 }

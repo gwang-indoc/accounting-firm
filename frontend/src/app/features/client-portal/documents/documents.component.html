@@ -82,7 +82,7 @@
             <div class="doc-info">
               <div class="doc-filename">{{ doc.filename }}</div>
               <div class="doc-meta">
-                {{ doc.mimeType || 'file' }} · {{ formatBytes(doc.sizeBytes) }} · uploaded {{ formatUploadedAt(doc.uploadedAt) }}
+                {{ doc.mimeType || 'documents.fileTypeFallback' | translate }} · {{ formatBytes(doc.sizeBytes) }} · {{ 'documents.uploaded' | translate }} {{ formatUploadedAt(doc.uploadedAt) }}
               </div>
               @if (doc.uploadedByMe) {
                 <mat-chip class="badge-you" disableRipple>{{ 'documents.uploadedByYou' | translate }}</mat-chip>

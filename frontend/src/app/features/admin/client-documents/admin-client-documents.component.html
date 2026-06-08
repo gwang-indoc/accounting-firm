@@ -21,7 +21,7 @@
         }
       </select>
     </label>
-    <span class="doc-count">· {{ documents().length }} {{ documents().length === 1 ? 'document' : 'documents' }}</span>
+    <span class="doc-count">· {{ documents().length }} {{ documents().length === 1 ? ('documents.documentSingular' | translate) : ('documents.documentPlural' | translate) }}</span>
 
     <div class="spacer"></div>
 
