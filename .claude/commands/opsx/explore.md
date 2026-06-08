@@ -66,7 +66,11 @@ Invoke `superpowers:brainstorming` with the draft as input. Run its spec self-re
 3. **Scope check:** Is this focused enough for a single OpenSpec change, or does it need decomposition? If it needs splitting, propose 2-3 sub-changes and ask which to pursue first.
 4. **Ambiguity check:** Could any requirement be interpreted two ways? Pick one with the user, make it explicit.
 
-After all gaps are resolved, change frontmatter `Status: DRAFT` → `Status: REVIEWED`. The propose phase will refuse to start if it sees `DRAFT`.
+**Additional inputs:** If the user supplies any new input before the doc reaches REVIEWED — new constraints, corrections, scope changes, extra requirements — fold it into the brainstorming review. Update the draft to reflect it and re-run the relevant checklist items. Do not treat the draft as frozen until REVIEWED is set.
+
+**Review is an open loop, not one-shot.** After the checklist pass, stay in brainstorming. The user may keep discussing — raising questions, challenging decisions, exploring alternatives, adding requirements. Each round: discuss, update the draft, re-run the relevant checklist items. Repeat as many times as the user wants. The draft stays DRAFT throughout this loop.
+
+**Final manual confirmation (required):** Do NOT change the status automatically and do NOT treat your own summary as the trigger. The loop ends only when the user explicitly says they are done. When you think it's settled, summarize what changed and ask — e.g. "Ready to mark this REVIEWED?" — but if the user responds with more discussion instead of confirming, go back into the loop. Only after an explicit user confirmation, change frontmatter `Status: DRAFT` → `Status: REVIEWED`. The propose phase will refuse to start if it sees `DRAFT`.
 
 ---
 
