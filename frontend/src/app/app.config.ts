@@ -8,12 +8,15 @@ import { credentialsInterceptor } from './core/interceptors/credentials.intercep
 import { AuthService } from './core/services/auth.service';
 import { TranslationService } from './core/services/translation.service';
 
-function initAuth(authService: AuthService) {
-  return () => authService.loadCurrentUser();
-}
-
-function initTranslation(translationService: TranslationService) {
-  return () => translationService.init();
+function initApp(authService: AuthService, translationService: TranslationService) {
+  return async () => {
+    await Promise.all([
+      translationService.init(() => authService.isAuthenticated()),
+      authService.loadCurrentUser(),
+    ]);
+    const user = authService.currentUser();
+    await translationService.applyProfileLanguage(user?.language ?? null);
+  };
 }
 
 export const appConfig: ApplicationConfig = {
@@ -26,14 +29,8 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(TranslateModule.forRoot()),
     {
       provide: APP_INITIALIZER,
-      useFactory: initAuth,
-      deps: [AuthService],
-      multi: true,
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: initTranslation,
-      deps: [TranslationService],
+      useFactory: initApp,
+      deps: [AuthService, TranslationService],
       multi: true,
     },
   ],

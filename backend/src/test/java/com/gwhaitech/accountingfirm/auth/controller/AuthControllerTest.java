@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -135,5 +136,56 @@ class AuthControllerTest {
                         {"email":"test@example.com","password":"secret123"}
                         """))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void authenticatedUser_getMe_returnsLanguageField() throws Exception {
+        User user = testUser();
+        user.setLanguage("zh");
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+            user, null, List.of(new SimpleGrantedAuthority("ROLE_USER"))
+        );
+        mockMvc.perform(get("/api/auth/me")
+                .with(authentication(auth)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.language").value("zh"));
+    }
+
+    @Test
+    void authenticatedUser_getMe_returnsNullLanguageForNewUser() throws Exception {
+        User user = testUser();
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+            user, null, List.of(new SimpleGrantedAuthority("ROLE_USER"))
+        );
+        mockMvc.perform(get("/api/auth/me")
+                .with(authentication(auth)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.language").doesNotExist());
+    }
+
+    @Test
+    void unauthenticated_patchLanguage_returns401() throws Exception {
+        mockMvc.perform(patch("/api/auth/me/language")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"language":"zh"}
+                        """))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void authenticatedUser_patchLanguage_returns204AndPersists() throws Exception {
+        User user = testUser();
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+            user, null, List.of(new SimpleGrantedAuthority("ROLE_USER"))
+        );
+        mockMvc.perform(patch("/api/auth/me/language")
+                .with(authentication(auth))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"language":"zh"}
+                        """))
+                .andExpect(status().isNoContent());
     }
 }

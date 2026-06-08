@@ -1,38 +1,55 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { firstValueFrom } from 'rxjs';
+import { EMPTY, firstValueFrom } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class TranslationService {
   currentLanguage = signal<'en' | 'zh'>('en');
+  private isAuthFn: () => boolean = () => false;
 
   constructor(
     private translate: TranslateService,
     private http: HttpClient
   ) {}
 
-  async init(): Promise<void> {
+  async init(isAuthFn?: () => boolean): Promise<void> {
+    if (isAuthFn) {
+      this.isAuthFn = isAuthFn;
+    }
     this.translate.setDefaultLang('en');
-
-    // Load default English translations (merge all files)
     const enTranslations = await this.loadAndMergeLanguage('en');
     this.translate.setTranslation('en', enTranslations);
-
-    // Check for saved language preference
-    const saved = localStorage.getItem('language') as 'en' | 'zh' | null;
-    if (saved === 'zh') {
-      await this.loadLanguage('zh');
-      this.currentLanguage.set('zh');
-    } else {
-      this.translate.use('en');
-    }
+    this.translate.use('en');
   }
 
   async setLanguage(lang: 'en' | 'zh'): Promise<void> {
     await this.loadLanguage(lang);
     this.currentLanguage.set(lang);
     localStorage.setItem('language', lang);
+    if (this.isAuthFn()) {
+      this.http.patch('/api/auth/me/language', { language: lang })
+        .pipe(catchError(() => EMPTY)).subscribe();
+    }
+  }
+
+  async applyProfileLanguage(lang: 'en' | 'zh' | null): Promise<void> {
+    if (lang !== null) {
+      await this.loadLanguage(lang).catch(() => {});
+      this.currentLanguage.set(lang);
+      localStorage.setItem('language', lang);
+    } else {
+      const saved = localStorage.getItem('language') as 'en' | 'zh' | null;
+      if (saved) {
+        await this.loadLanguage(saved).catch(() => {});
+        this.currentLanguage.set(saved);
+        if (this.isAuthFn()) {
+          this.http.patch('/api/auth/me/language', { language: saved })
+            .pipe(catchError(() => EMPTY)).subscribe();
+        }
+      }
+    }
   }
 
   private async loadLanguage(lang: 'en' | 'zh'): Promise<void> {

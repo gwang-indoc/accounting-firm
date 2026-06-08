@@ -22,6 +22,9 @@ public class User {
     @Column(nullable = false, length = 50)
     private String role = "USER";
 
+    @Column(length = 10)
+    private String language;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -41,5 +44,7 @@ public class User {
     public void setGoogleSub(String googleSub) { this.googleSub = googleSub; }
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+    public String getLanguage() { return language; }
+    public void setLanguage(String language) { this.language = language; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 }
