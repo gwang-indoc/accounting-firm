@@ -1,0 +1,101 @@
+<div class="documents-page">
+  <a mat-button class="back-link" routerLink="/portal/dashboard" data-testid="back-to-dashboard-link">
+    <mat-icon>arrow_back</mat-icon>
+    {{ 'documents.backToDashboard' | translate }}
+  </a>
+
+  <header class="page-header">
+    <h1>{{ 'documents.title' | translate }}</h1>
+    <p class="subtitle">{{ 'documents.subtitle' | translate }}</p>
+  </header>
+
+  @if (response() === null) {
+    <p class="loading">{{ 'documents.loading' | translate }}</p>
+  } @else if (!response()!.linked) {
+    <div class="empty-state">
+      <mat-icon>info_outline</mat-icon>
+      <p>{{ 'documents.portalNotSetUp' | translate }}</p>
+    </div>
+  } @else if (response()!.documents.length === 0) {
+    <div class="empty-state">
+      <mat-icon>folder_open</mat-icon>
+      <p>{{ 'documents.empty' | translate }}</p>
+      <div class="empty-controls">
+        <label class="year-label">
+          {{ 'documents.selectYear' | translate }}
+          <select class="empty-year-select" (change)="onEmptyYearChange($any($event.target).value)">
+            @for (y of emptyStateYearOptions; track y) {
+              <option [value]="y" [selected]="y === emptyStateYear()">{{ y }}</option>
+            }
+          </select>
+        </label>
+        <button mat-flat-button color="primary"
+                class="empty-upload-btn"
+                [disabled]="uploading()"
+                (click)="onUploadClick()">
+          <mat-icon>upload</mat-icon>
+          {{ uploading() ? ('documents.uploading' | translate) : ('documents.upload' | translate) }}
+        </button>
+      </div>
+    </div>
+  } @else {
+    <div class="controls">
+      <label class="year-label">
+        {{ 'documents.selectYear' | translate }}
+        <select class="year-select" (change)="onYearChange($any($event.target).value)">
+          @for (y of years(); track y) {
+            <option [value]="y" [selected]="y === selectedYear()">{{ y }}</option>
+          }
+        </select>
+      </label>
+      <span class="doc-count">· {{ filteredDocs().length }} {{ filteredDocs().length === 1 ? ('documents.documentSingular' | translate) : ('documents.documentPlural' | translate) }}</span>
+
+      <div class="spacer"></div>
+
+      <button mat-stroked-button
+              class="upload-btn"
+              [disabled]="uploading()"
+              (click)="onUploadClick()">
+        <mat-icon>upload</mat-icon>
+        {{ uploading() ? ('documents.uploading' | translate) : ('documents.upload' | translate) }}
+      </button>
+
+      <button mat-flat-button color="primary"
+              class="download-all-btn"
+              [disabled]="filteredDocs().length === 0"
+              (click)="downloadYearZip()">
+        <mat-icon>download</mat-icon>
+        {{ 'documents.downloadAll' | translate }} {{ selectedYear() }}
+      </button>
+    </div>
+
+    @if (filteredDocs().length === 0) {
+      <div class="empty-state">
+        <mat-icon>folder_open</mat-icon>
+        <p>{{ 'documents.noDocumentsForYear' | translate: {year: selectedYear()} }}</p>
+      </div>
+    } @else {
+      <div class="doc-list">
+        @for (doc of filteredDocs(); track doc.id) {
+          <div class="doc-row">
+            <mat-icon class="doc-icon">description</mat-icon>
+            <div class="doc-info">
+              <div class="doc-filename">{{ doc.filename }}</div>
+              <div class="doc-meta">
+                {{ doc.mimeType || 'documents.fileTypeFallback' | translate }} · {{ formatBytes(doc.sizeBytes) }} · {{ 'documents.uploaded' | translate }} {{ formatUploadedAt(doc.uploadedAt) }}
+              </div>
+              @if (doc.uploadedByMe) {
+                <mat-chip class="badge-you" disableRipple>{{ 'documents.uploadedByYou' | translate }}</mat-chip>
+              }
+            </div>
+            <a mat-stroked-button class="download-link" [attr.href]="downloadHref(doc.id)" download>
+              {{ 'documents.download' | translate }}
+            </a>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <input type="file" hidden accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls,.csv,.doc,.docx" #fileInput (change)="onFileSelected($event)">
+</div>

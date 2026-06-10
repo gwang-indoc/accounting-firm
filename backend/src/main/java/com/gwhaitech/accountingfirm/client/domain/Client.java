@@ -14,9 +14,13 @@ public class Client {
     @Column(name = "user_id")
     private Long userId;
 
+    @Column(name = "admin_id", nullable = false)
+    private Long adminId;
+
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false, unique = true)
     private String email;
 
     private String phone;
@@ -33,6 +37,8 @@ public class Client {
     public void setId(Long id) { this.id = id; }
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
+    public Long getAdminId() { return adminId; }
+    public void setAdminId(Long adminId) { this.adminId = adminId; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     public String getEmail() { return email; }

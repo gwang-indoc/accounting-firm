@@ -1,0 +1,91 @@
+<div class="admin-clients">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">{{ 'clients.title' | translate }}</h1>
+      <p class="page-subtitle">{{ clients().length }} {{ clients().length === 1 ? ('clients.clientSingular' | translate) : ('clients.clientPlural' | translate) }}</p>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="filter-field">
+      <span class="filter-icon">⌕</span>
+      <input data-testid="filter-name"
+             class="filter-input"
+             [attr.placeholder]="'clients.searchName' | translate"
+             [value]="nameFilter()"
+             (input)="onNameFilterInput($any($event.target).value)" />
+    </div>
+    <div class="filter-field">
+      <span class="filter-icon">@</span>
+      <input data-testid="filter-email"
+             class="filter-input"
+             [attr.placeholder]="'clients.searchEmail' | translate"
+             [value]="emailFilter()"
+             (input)="onEmailFilterInput($any($event.target).value)" />
+    </div>
+  </div>
+
+  <div class="table-toolbar">
+    <span class="result-count">
+      {{ filteredClients().length }} {{ 'clients.recordPlural' | translate: {from: 'of', count: clients().length} }}
+    </span>
+    <button mat-flat-button color="primary" class="add-btn" data-testid="add-client-btn" (click)="openAddDialog()">
+      <span class="add-icon">+</span> {{ 'clients.addClient' | translate }}
+    </button>
+  </div>
+
+  <div class="table-card">
+    <table class="clients-table">
+      <thead>
+        <tr>
+          <th>{{ 'clients.name' | translate }}</th>
+          <th>{{ 'clients.email' | translate }}</th>
+          <th>{{ 'clients.phone' | translate }}</th>
+          <th>{{ 'clients.actions' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (client of pagedClients(); track client.id) {
+          <tr data-testid="client-row">
+            <td class="name-cell">{{ client.name }}</td>
+            <td class="muted-cell">{{ client.email ?? '—' }}</td>
+            <td class="muted-cell">{{ client.phone ?? '—' }}</td>
+            <td class="actions-cell">
+              <button mat-button class="action-btn action-edit" (click)="openEditDialog(client)">{{ 'clients.edit' | translate }}</button>
+              <button mat-button class="action-btn action-delete" (click)="confirmDelete(client)">{{ 'clients.delete' | translate }}</button>
+              <button mat-button class="action-btn action-docs" data-testid="client-documents-btn" (click)="openDocuments(client)">{{ 'clients.documents' | translate }}</button>
+              <button mat-button class="action-btn action-messages"
+                      data-testid="client-messages-btn"
+                      (click)="openMessages(client.id)">
+                {{ 'clients.messages' | translate }}
+                @if (unreadFor(client.id) > 0) {
+                  <span class="messages-badge" data-testid="client-messages-badge">{{ unreadFor(client.id) }}</span>
+                }
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4" class="empty-cell">
+              @if (clients().length === 0) {
+                {{ 'clients.empty' | translate }}
+              } @else {
+                {{ 'clients.noMatches' | translate }}
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (filteredClients().length > pageSize) {
+    <div class="pagination">
+      <button mat-stroked-button data-testid="prev-page-btn" [disabled]="isFirstPage()" (click)="prevPage()">{{ 'clients.prevPage' | translate }}</button>
+      <span class="page-indicator" data-testid="page-indicator">{{ 'clients.pageIndicator' | translate: {page: page(), totalPages: totalPages()} }}</span>
+      <button mat-stroked-button data-testid="next-page-btn" [disabled]="isLastPage()" (click)="nextPage()">{{ 'clients.nextPage' | translate }}</button>
+    </div>
+  }
+
+  <a mat-button routerLink="/portal/dashboard" class="back-link">← {{ 'clients.backToPortal' | translate }}</a>
+</div>

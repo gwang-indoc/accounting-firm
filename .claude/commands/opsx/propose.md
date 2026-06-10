@@ -1,106 +1,132 @@
 ---
 name: "OPSX: Propose"
-description: Propose a new change - create it and generate all artifacts in one step
+description: Create an OpenSpec change from a reviewed requirements doc; generates all artifacts
 category: Workflow
 tags: [workflow, artifacts, experimental]
 ---
 
-Propose a new change - create the change and generate all artifacts in one step.
+Create an OpenSpec change with all artifacts. Pre-condition: a reviewed requirements doc exists at `docs/superpowers/specs/<date>-<topic>-requirements.md`.
 
-I'll create a change with artifacts:
-- proposal.md (what & why)
-- design.md (how)
-- tasks.md (implementation steps)
-
-When ready to implement, run /opsx:apply
+**Input**: The argument after `/opsx:propose` is the change name (kebab-case). The same `<topic>` used in `/opsx:explore`.
 
 ---
 
-**Input**: The argument after `/opsx:propose` is the change name (kebab-case), OR a description of what the user wants to build.
-
 **Steps**
 
-1. **If no input provided, ask what they want to build**
+### 1. Pre-flight: requirements gate
 
-   Use the **AskUserQuestion tool** (open-ended, no preset options) to ask:
-   > "What change do you want to work on? Describe what you want to build or fix."
+Locate the requirements doc:
 
-   From their description, derive a kebab-case name (e.g., "add user authentication" → `add-user-auth`).
+```bash
+ls docs/superpowers/specs/*-<topic>-requirements.md 2>/dev/null
+```
 
-   **IMPORTANT**: Do NOT proceed without understanding what the user wants to build.
+If no file matches → REFUSE with:
 
-2. **Create the change directory**
-   ```bash
-   openspec new change "<name>"
-   ```
-   This creates a scaffolded change at `openspec/changes/<name>/` with `.openspec.yaml`.
+> "No requirements doc found for `<topic>`. Run `/opsx:explore <topic>` first to produce `docs/superpowers/specs/<date>-<topic>-requirements.md`."
 
-3. **Get the artifact build order**
-   ```bash
-   openspec status --change "<name>" --json
-   ```
-   Parse the JSON to get:
-   - `applyRequires`: array of artifact IDs needed before implementation (e.g., `["tasks"]`)
-   - `artifacts`: list of all artifacts with their status and dependencies
+If found, read its frontmatter. Check `Status:` field:
 
-4. **Create artifacts in sequence until apply-ready**
+- `Status: DRAFT` → REFUSE with:
+  > "Requirements doc is `Status: DRAFT`. Run `/opsx:explore <topic>` Phase 3 (brainstorming review) to bring it to `Status: REVIEWED` before proposing."
+- `Status: REVIEWED` → proceed.
 
-   Use the **TodoWrite tool** to track progress through the artifacts.
+### 2. Create the change directory
 
-   Loop through artifacts in dependency order (artifacts with no pending dependencies first):
+```bash
+openspec new change <topic> --schema superpowers-driven
+```
 
-   a. **For each artifact that is `ready` (dependencies satisfied)**:
-      - Get instructions:
-        ```bash
-        openspec instructions <artifact-id> --change "<name>" --json
-        ```
-      - The instructions JSON includes:
-        - `context`: Project background (constraints for you - do NOT include in output)
-        - `rules`: Artifact-specific rules (constraints for you - do NOT include in output)
-        - `template`: The structure to use for your output file
-        - `instruction`: Schema-specific guidance for this artifact type
-        - `outputPath`: Where to write the artifact
-        - `dependencies`: Completed artifacts to read for context
-      - Read any completed dependency files for context
-      - Create the artifact file using `template` as the structure
-      - Apply `context` and `rules` as constraints - but do NOT copy them into the file
-      - Show brief progress: "Created <artifact-id>"
+This scaffolds `openspec/changes/<topic>/` with `.openspec.yaml` set to `superpowers-driven`.
 
-   b. **Continue until all `applyRequires` artifacts are complete**
-      - After creating each artifact, re-run `openspec status --change "<name>" --json`
-      - Check if every artifact ID in `applyRequires` has `status: "done"` in the artifacts array
-      - Stop when all `applyRequires` artifacts are done
+### 2a. Move the staged requirements doc into the change dir
 
-   c. **If an artifact requires user input** (unclear context):
-      - Use **AskUserQuestion tool** to clarify
-      - Then continue with creation
+`/opsx:explore` staged the requirements doc at `docs/superpowers/specs/<date>-<topic>-requirements.md`. The `requirements` artifact's `generates` path is `requirements.md` (change-relative), so move the staged file into the change dir now — before generating any artifact. This makes openspec see `requirements` as `done` and ensures the doc archives with the change.
 
-5. **Show final status**
-   ```bash
-   openspec status --change "<name>"
-   ```
+```bash
+git mv docs/superpowers/specs/<date>-<topic>-requirements.md openspec/changes/<topic>/requirements.md
+```
 
-**Output**
+(Use `mv` instead of `git mv` if the staged file was never committed.) After the move, `openspec status --change <topic> --json` must report `requirements` as `done`. If it does not, the move target is wrong — fix it before proceeding.
 
-After completing all artifacts, summarize:
-- Change name and location
-- List of artifacts created with brief descriptions
-- What's ready: "All artifacts created! Ready for implementation."
-- Prompt: "Run `/opsx:apply` to start implementing."
+### 3. Generate artifacts in dependency order
 
-**Artifact Creation Guidelines**
+```bash
+openspec status --change <topic> --json
+```
 
-- Follow the `instruction` field from `openspec instructions` for each artifact type
-- The schema defines what each artifact should contain - follow it
-- Read dependency artifacts for context before creating new ones
-- Use `template` as the structure for your output file - fill in its sections
-- **IMPORTANT**: `context` and `rules` are constraints for YOU, not content for the file
-  - Do NOT copy `<context>`, `<rules>`, `<project_context>` blocks into the artifact
-  - These guide what you write, but should never appear in the output
+Use the `artifacts` array to walk dependency-ready artifacts. For each:
+
+```bash
+openspec instructions <artifact-id> --change <topic> --json
+```
+
+Read the returned `template`, `instruction`, `dependencies`. For each dependency listed, READ the dependency artifact file from disk before generating.
+
+Use the **TodoWrite tool** to track artifact-generation progress.
+
+Order: `proposal` → `specs` → `design` → `tasks`.
+(`requirements` was staged in `/opsx:explore` and moved into the change dir in Step 2a; openspec sees it as `done`.)
+
+All artifacts generate at change-relative paths (`proposal.md`, `specs/**/*.md`, `design.md`, `tasks.md`), so no `{{date}}`/`{{change}}` substitution is needed.
+
+### 3a. Fill in Contract blocks in tasks.md
+
+After the `tasks` artifact is generated, the `### Contract` blocks contain placeholder comments. Fill them in now — the N.0 CONTRACT task in apply will copy this content to a file; the content decisions happen here.
+
+The generated `tasks.md` uses the harness template: each group has an `N.0 CONTRACT` task (first) and an `N.E EVAL` task (last). Verify these entries appear in the generated file — if you see `N.Z Run superpowers:requesting-code-review` instead, the schema lock is pointing to the old template. Fix it before proceeding.
+
+For each `## N` group in `openspec/changes/<topic>/tasks.md`:
+
+**Spec field:** Read `openspec/changes/<topic>/specs/<cap>/spec.md`. Identify which SHALL statements this group's tasks implement (by reading the task descriptions). Copy those SHALL statements verbatim into the Contract's Spec field. If multiple capabilities are touched, include statements from each. If no SHALL statements map to this group (e.g., pure infrastructure task), write `N/A — infrastructure group` and note why.
+
+**Runtime field:** Read `openspec/config.yaml` → `project.test_commands`. Choose the command most relevant to this group's tests (e.g., for a backend group: `pytest tests/<module>/`; for a frontend group: `vitest run src/<module>/`). Scope the path to the files this group touches if possible. Set expected to a plain-language description of what passing looks like (e.g., "all 4 tests pass, no import errors"). If `project.test_commands` is absent or empty in `openspec/config.yaml`, write `command: TBD` and `expected: TBD — test harness not yet configured`.
+
+**Code field:** Read `openspec/changes/<topic>/design.md`. Extract the design decisions and risk points that apply to this group. 1–3 bullet points. Examples: "must use repository pattern, no direct DB calls in route handler", "token must be validated before any capability check".
+
+**Threshold field:** Default `80`.
+
+After filling all groups, pre-create the `contracts/` directory and `eval-log.md`:
+
+```bash
+mkdir -p openspec/changes/<topic>/contracts
+```
+
+Create `openspec/changes/<topic>/eval-log.md` with this header (substituting the actual topic name):
+
+```markdown
+# Eval Log — <topic>
+
+<!-- Appended by evaluator subagent after each N.E EVAL run -->
+```
+
+### 4. Verify all artifacts
+
+```bash
+openspec status --change <topic>
+```
+
+Every artifact should be `done`. If any are not, troubleshoot the specific artifact.
+
+### 5. Commit and handoff
+
+```bash
+git add openspec/changes/<topic>/
+git commit -m "docs: propose <topic> change"
+```
+
+The `git add` includes the `requirements.md` moved in Step 2a (its deletion from the staging path is also staged by `git mv`).
+
+Output:
+
+> "Change `<topic>` proposed. Artifacts: requirements (moved into the change dir), proposal, specs, design, tasks. Next: `/opsx:apply <topic>`."
+
+---
 
 **Guardrails**
-- Create ALL artifacts needed for implementation (as defined by schema's `apply.requires`)
-- Always read dependency artifacts before creating a new one
-- If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum
-- If a change with that name already exists, ask if user wants to continue it or create a new one
-- Verify each artifact file exists after writing before proceeding to next
+
+- NEVER bypass the Status: REVIEWED check. If the user insists, send them back to `/opsx:explore` Phase 3.
+- NEVER write artifacts that the schema would generate via `openspec instructions`. Always go through the CLI.
+- If a change with that name already exists at `openspec/changes/<topic>/`, ask the user whether to continue (delete and re-create) or pick a different name.
+- ALWAYS fill in `### Contract` blocks in tasks.md before committing. Placeholder comments in Contract blocks are plan failures — the evaluator cannot score against empty criteria.
+- `context` and `rules` from `openspec instructions` output are constraints on YOU (the agent), not content to copy into artifact files.

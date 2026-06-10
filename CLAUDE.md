@@ -46,29 +46,12 @@ accounting-firm/
 
 ### TDD Discipline
 
-Write the failing test first. **The RED phase must be verified** — run the test, confirm it fails with the expected message, then implement. Do not mark a RED task complete without running the test and seeing it fail.
+Authoritative TDD/checkbox/parallel/review/dev-log rules live in `openspec/schemas/openspec-superpowers/schema.yaml` — `tasks.instruction` (for authoring `tasks.md`) and `apply.instruction` (for executing it). Read those before starting work.
 
-```
-- [ ] N.X RED  — write failing test → run test → confirm FAILURE → paste key failure lines into dev log
-- [ ] N.X+1 GREEN — write minimal impl → run test → confirm PASS → commit test + impl together
-```
-
-**Only GREEN tests are committed to the codebase.** The committed test suite must always be fully passing — no bare failing tests. A RED test is written, verified to fail, and then immediately implemented and made GREEN before committing. The RED failure output is not code; it is captured in the dev log as TDD evidence (proof the test genuinely failed before the implementation existed).
-
-**Tests that represent planned-but-not-yet-implemented behaviour** must be tagged with a skip annotation so they do not pollute the suite or mislead AI agents:
-- JUnit 5: `@Disabled("planned — not yet implemented")`
-- Vitest / Jasmine: `it.todo(...)` or `xit(...)` / `xdescribe(...)`
-
-A tagged test is a clear promise. An untagged failing test is an undiagnosed bug.
-
-**Only GREEN tests stay permanently.** Once a test goes GREEN it must never be deleted — the committed test files accumulate all passing tests over time and serve as the regression suite for every future task group.
-
-**Before starting each new task group**, run the full test suite to confirm the baseline is green:
+Baseline test commands (run before each new task group; a failing baseline must be fixed first):
 - Backend: `cd backend && ./mvnw test`
 - Frontend: `cd frontend && npx ng test --no-watch`
 - E2E (if servers are up): `cd e2e && npx playwright test`
-
-A failing baseline must be fixed before new work begins.
 
 ## Frontend (Angular)
 
@@ -111,51 +94,28 @@ npx playwright test --grep "login"     # single test
 
 **Requirements before running:** backend must be started (`./start.sh`) and frontend must be started (`cd frontend && npm start`).
 
-**When to add E2E tests:** every change that introduces or modifies a UI flow must include a Playwright test in `e2e/` covering that flow. Ad-hoc browser automation that is not saved to disk does not count — the test must be committed.
+**If servers are not running during an apply/verify step:** start them automatically — do NOT ask the user. Check and start:
+```bash
+# Check
+curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health
+curl -s -o /dev/null -w "%{http_code}" http://localhost:4200
+
+# If backend down (returns 000): start it
+./start.sh &
+
+# If frontend down (returns 000): start it
+cd frontend && npm start &
+
+# Then wait until both are up before running e2e
+until [ "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/actuator/health)" != "000" ] && \
+      [ "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:4200)" != "000" ]; do sleep 3; done
+```
+
+**When to add E2E tests:** see schema `tasks.instruction` — the final group of any UI-touching change must include a committed Playwright test in `e2e/` covering the affected flow.
 
 ## Skills Available
 
 - `/git-command-push` - Stage all, commit, and push in one step
-
-## OpenSpec Workflow
-
-Change proposals and tasks live in `openspec/`. Use `/opsx:propose` to create a new change, `/opsx:apply` to implement it, and `/opsx:archive` when done.
-
-### `/opsx:propose` — required sequence
-
-1. `superpowers:brainstorming` runs first (auto-triggered)
-2. After brainstorming: write the design spec and commit it
-3. **STOP** — ask the user to confirm before generating any artifacts
-4. On confirmation: run `openspec new change`, then generate `proposal.md`, `design.md`, `tasks.md`
-
-> **Brainstorming terminal state:** After brainstorming completes it will suggest invoking `superpowers:writing-plans` — **ignore that**. That applies to standalone brainstorming only. Continue with step 3 above.
-
-### `/opsx:apply` — required skills (in order)
-
-Before implementing any task, invoke:
-1. `superpowers:test-driven-development` — at session start, before writing any code
-2. `superpowers:subagent-driven-development` — dispatch a fresh subagent per `[parallel]` task with two-stage review (spec compliance, then code quality)
-3. `superpowers:requesting-code-review` — at each task-group checkpoint (`N.Z`)
-
-### `tasks.md` — required structure per group
-
-**Before dispatching any subagents:** audit every `## N` group — confirm each has an N.Z (code review) and N.Z+1 (log update) task. Add them if missing.
-
-Every `## N` group must end with:
-```
-- [ ] N.Z   Run superpowers:requesting-code-review on the diff for group N
-- [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — commit hash, feature bullets, review findings, test count, and TDD evidence (paste RED failure lines for each new test)
-```
-For the final group (if UI is touched), add these two tasks immediately before `N.Z`:
-```
-- [ ] M.J Write/update Playwright E2E test under `e2e/` for the affected user flow; commit the file. Run:
-         1. ./start.sh                          # start backend
-         2. cd frontend && npm start            # start frontend
-         3. cd e2e && npx playwright test       # run E2E suite
-         4. kill $(lsof -ti :4200)              # stop frontend
-         5. kill $(lsof -ti :8080)              # stop backend
-- [ ] M.K Run superpowers:verification-before-completion (cd backend && ./mvnw test; cd frontend && npx ng test --no-watch; grep for System.out.println + console.log; diff review)
-```
 
 ## Coding Guidelines
 
@@ -217,53 +177,29 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
-### 5. Checkbox Discipline
+## Pitfalls
 
-**Mark each task complete immediately after finishing it. Never batch updates.**
+### NOT NULL migration regressions in test helpers
+When a Flyway migration adds a NOT NULL column (e.g. `users.name`, `clients.admin_id`), raw SQL INSERT helpers in `@DataJpaTest` tests break silently at runtime — the compiler won't catch missing columns. After any NOT NULL migration, grep `src/test` for INSERT statements and audit each one for the new column.
 
-When working through `tasks.md`:
-- Update `- [ ]` to `- [x]` as soon as the task is done, before moving to the next one.
-- If a subagent completes work, the coordinator must update every checkbox that subagent finished before dispatching the next subagent.
-- A checkbox marked `[x]` means the work is done AND verified — not just "I think it's done".
+### Playwright e2e: async Angular validators need explicit route mocks
+Angular async validators (`switchMap` + HTTP) fire real requests during e2e tests. Without a `page.route()` mock, the request hits Spring Security unauthenticated → redirect → dialog closes → locator times out. Use a **regex** route (e.g. `/\/api\/admin\/users\/lookup/`) not a glob (`**/api/**`) — glob patterns are less reliable against proxied routes.
 
-## Dev Log Practice
+### Angular Material `getByLabel` uses `mat-label` text only
+`mat-label` is the accessible name. Placeholder text is NOT appended. `getByLabel('Phone (optional)')` fails if the mat-label is just `Phone`; use `getByLabel('Phone')`.
 
-Every task group in `tasks.md` MUST include a log update step. When generating `tasks.md` (during `/opsx:propose`), add this task at the end of each `## N` group, after the code-review checkpoint:
+### Angular forms: always use `mat-form-field` + `matInput`, not bare `<input>`
+New Angular components often use raw `<input>` elements that pass tests but fail Material design consistency. Any form field must be `<mat-form-field appearance="outline"><input matInput .../></mat-form-field>` to get Material theming, error display, and label integration. Bare `<input>` elements look functional but break the design system.
 
-```
-- [ ] N.Z+1 Update docs/log/YYYY-MM-DD.md — add entry for group N with commit hash, feature bullet points, code review findings, test count, and TDD evidence (paste RED failure lines for each new test)
-```
+### Tika 3.x requires commons-compress 1.27+ — override Spring Boot BOM
+Spring Boot 3.5 (via testcontainers) resolves `commons-compress:1.24.0`. Tika 3.1.0 calls `ZipArchiveInputStream.getNextEntry()` which only returns `ZipArchiveEntry` in 1.26+. Result: `NoSuchMethodError` at runtime when Tika inspects ZIP/OOXML files. Setting the `commons-compress.version` property alone is NOT enough (Spring Boot doesn't manage this artifact). Must add an explicit `<dependencyManagement>` entry in `pom.xml` to force 1.27.x.
 
-Log file path: `docs/log/YYYY-MM-DD.md` — name the file by date. If the file for that day does not exist, create it.
+### Tika content detection: never pass filename to `detect()` in security-sensitive code
+`Tika.detect(InputStream, String filename)` uses the filename extension as a hint — it can return an OOXML MIME type for a plain ZIP file named `evil.xlsx` because the extension wins. Use `Tika.detect(InputStream)` (no filename) when the goal is to verify actual bytes, not guess from the extension. Same risk applies to `Tika.detect(byte[], Metadata)` with `RESOURCE_NAME_KEY` set.
 
-### Each log entry should include
+### Service-layer tests that use a real `FileUploadValidator` need real magic bytes
+When `FileUploadValidator` is instantiated directly (not mocked) in a service test — e.g. `MeDocumentServiceTest` — any `MockMultipartFile` with dummy string bytes (`"hello"`, `"content"`) will fail Tika's Layer 3 check once content inspection is active. Replace dummy bytes with real magic bytes (e.g. `%PDF-1.4\n...%%EOF` for PDF, programmatic OOXML ZIP for xlsx/docx) in every service test that exercises the happy path through a real validator.
 
-```md
-### N. Feature Name
+## Lessons Learned
 
-**Commit:** `<git hash>`
-
-**Feature:**
-
-- Briefly describe what was done using bullet points
-
-**Code Review Findings, if any:**
-| Severity | Issue | Fix |
-|---|---|---|
-
-**Tests:** X total passing (Y newly added in this group)
-
-**TDD Evidence (for each new test added in this group):**
-
-    AssertionError: expected 'static' to equal 'fixed'
-    Expected: "fixed"
-    Received: "static"
-
-_Paste the key RED failure lines from the terminal that prove each new test failed before the implementation was written. Omit if no new tests were added._
-```
-
-### Rules
-
-- Log update is a required task in every group — not optional, not deferred.
-- Use `- [ ]` for pending items and `- [x]` for completed items.
-- Keep a **To Do** section at the end of the log, listing the next batch of work or known issues.
+Lessons from archived changes live in `docs/lessons/` — one file per archive, named `YYYY-MM-DD-<change-name>.md`.

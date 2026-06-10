@@ -41,6 +41,8 @@ class ClientDocumentEntityTest {
 
         Client client = new Client();
         client.setName("Test Corp");
+        client.setEmail("testcorp@example.com");
+        client.setAdminId(savedUser.getId());
         Client savedClient = clientRepository.save(client);
 
         ClientDocument doc = new ClientDocument();
@@ -75,6 +77,8 @@ class ClientDocumentEntityTest {
 
         Client client = new Client();
         client.setName("Dupe Corp");
+        client.setEmail("dupecorp@example.com");
+        client.setAdminId(savedUser.getId());
         Client savedClient = clientRepository.save(client);
 
         ClientDocument doc1 = new ClientDocument();

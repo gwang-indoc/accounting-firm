@@ -1,0 +1,268 @@
+/* ══════════════════════════════════════════════════════════
+   Email-code flow — matches the login page design system
+   (sky-blue #38bdf8 accent · dark navy #0a1628 · 10px radius)
+   ══════════════════════════════════════════════════════════ */
+
+:host {
+  display: block;
+  margin-bottom: 24px;
+}
+
+.ec-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: ecStepIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes ecStepIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Floating-label field (email, name) ── */
+.ec-field {
+  position: relative;
+  display: block;
+}
+
+.ec-field-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  pointer-events: none;
+  transition: color 0.2s;
+  display: flex;
+}
+
+.ec-field-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.ec-field input {
+  width: 100%;
+  height: 52px;
+  box-sizing: border-box;
+  padding: 18px 16px 4px 42px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.ec-field input::placeholder { color: transparent; }
+
+.ec-field-label {
+  position: absolute;
+  left: 42px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #94a3b8;
+  pointer-events: none;
+  transition: top 0.16s ease, font-size 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+/* Float the label up on focus or when filled */
+.ec-field input:focus + .ec-field-label,
+.ec-field input:not(:placeholder-shown) + .ec-field-label {
+  top: 13px;
+  transform: translateY(0);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #0ea5e9;
+}
+
+.ec-field input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
+}
+
+.ec-field input:focus ~ .ec-field-icon,
+.ec-field input:focus + .ec-field-label ~ .ec-field-icon {
+  color: #38bdf8;
+}
+
+/* ── "We sent a code to…" helper ── */
+.ec-sentto {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #64748b;
+  margin: -2px 0 2px;
+}
+
+.ec-sentto strong {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+/* ── Premium OTP code input ── */
+.ec-code {
+  width: 100%;
+  height: 64px;
+  box-sizing: border-box;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  background:
+    linear-gradient(#ffffff, #ffffff) padding-box,
+    #ffffff;
+  text-align: center;
+  font-family: 'SFMono-Regular', 'JetBrains Mono', 'Roboto Mono', ui-monospace, monospace;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: 0.55em;
+  text-indent: 0.55em; /* compensate trailing letter-spacing for visual centring */
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.ec-code::placeholder {
+  color: #cbd5e1;
+  font-weight: 400;
+}
+
+.ec-code:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.14);
+}
+
+/* ── Primary action button (matches Google button weight) ── */
+.ec-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 52px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: #ffffff;
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.28);
+  transition: box-shadow 0.2s, transform 0.15s, filter 0.2s;
+}
+
+.ec-primary:hover:not(:disabled) {
+  box-shadow: 0 6px 22px rgba(14, 165, 233, 0.38);
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+
+.ec-primary:active:not(:disabled) { transform: translateY(0); }
+
+.ec-primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+  box-shadow: none;
+}
+
+.ec-primary-arrow {
+  width: 16px;
+  height: 16px;
+  opacity: 0.85;
+  transition: transform 0.2s;
+}
+
+.ec-primary:hover:not(:disabled) .ec-primary-arrow {
+  transform: translateX(3px);
+}
+
+/* ── Secondary text actions (resend / change email) ── */
+.ec-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.ec-link {
+  background: none;
+  border: none;
+  padding: 4px 2px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #0ea5e9;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.15s;
+}
+
+.ec-link:hover:not(:disabled) {
+  color: #0284c7;
+  text-decoration: underline;
+}
+
+.ec-link:disabled {
+  color: #cbd5e1;
+  cursor: default;
+}
+
+.ec-actions-sep {
+  color: #cbd5e1;
+  font-size: 12px;
+}
+
+/* ── Inline error banner ── */
+.ec-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 11px 13px;
+  border-radius: 9px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 12.5px;
+  line-height: 1.45;
+  animation: ecShake 0.32s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+.ec-error svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+@keyframes ecShake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-3px); }
+  40%, 60% { transform: translateX(3px); }
+}
+
+/* ── Inline success note (code resent) ── */
+.ec-note {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 13px;
+  border-radius: 9px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #047857;
+  font-size: 12.5px;
+}
+
+.ec-note svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}

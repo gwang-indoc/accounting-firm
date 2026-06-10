@@ -1,0 +1,148 @@
+<div class="ec">
+
+  <!-- ───────────── Email step ───────────── -->
+  @if (step() === 'email') {
+    <form class="ec-form" (submit)="onEmailSubmit($event)" novalidate>
+      @if (error()) {
+        <div class="ec-error" data-testid="login-error" role="alert">
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span>{{ error() | translate }}</span>
+        </div>
+      }
+
+      <label class="ec-field">
+        <span class="ec-field-icon" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path d="M3 4a2 2 0 00-2 2v1.161l8.441 4.221a1.25 1.25 0 001.118 0L19 7.162V6a2 2 0 00-2-2H3z"/>
+            <path d="M19 8.839l-7.77 3.885a2.75 2.75 0 01-2.46 0L1 8.839V14a2 2 0 002 2h14a2 2 0 002-2V8.839z"/>
+          </svg>
+        </span>
+        <input
+          type="email"
+          required
+          autocomplete="email"
+          [value]="emailValue()"
+          (input)="emailValue.set($any($event.target).value)"
+          placeholder=" "
+          [attr.aria-label]="'emailCode.emailLabel' | translate"
+        />
+        <span class="ec-field-label">{{ 'emailCode.emailLabel' | translate }}</span>
+      </label>
+
+      <button type="submit" class="ec-primary" [disabled]="submitting()">
+        <span class="ec-primary-label">{{ submitting() ? ('emailCode.sendingCode' | translate) : ('emailCode.continueWithEmail' | translate) }}</span>
+        <svg class="ec-primary-arrow" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+    </form>
+  }
+
+  <!-- ───────────── Code step ───────────── -->
+  @if (step() === 'code') {
+    <form class="ec-form" (submit)="onCodeSubmit($event)" novalidate>
+      <p class="ec-sentto" data-testid="code-sent-to">
+        {{ 'emailCode.codeSentTo' | translate }} <strong>{{ emailValue() }}</strong>
+      </p>
+
+      @if (error()) {
+        <div class="ec-error" data-testid="login-error" role="alert">
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span>{{ error() | translate }}</span>
+        </div>
+      } @else if (resent()) {
+        <div class="ec-note" role="status">
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/>
+          </svg>
+          <span>{{ 'emailCode.codeResent' | translate }}</span>
+        </div>
+      }
+
+      <input
+        data-testid="code-input"
+        class="ec-code"
+        type="text"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        maxlength="6"
+        [value]="codeValue()"
+        (input)="codeValue.set($any($event.target).value)"
+        placeholder="••••••"
+        [attr.aria-label]="'emailCode.codeAriaLabel' | translate"
+      />
+
+      <button type="submit" class="ec-primary" [disabled]="submitting()">
+        <span class="ec-primary-label">{{ submitting() ? ('emailCode.verifying' | translate) : ('emailCode.verifyContinue' | translate) }}</span>
+        <svg class="ec-primary-arrow" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+
+      <div class="ec-actions">
+        <button type="button" data-testid="resend-code" class="ec-link" [disabled]="submitting()" (click)="resendCode()">
+          {{ 'emailCode.resendCode' | translate }}
+        </button>
+        <span class="ec-actions-sep" aria-hidden="true">·</span>
+        <button type="button" data-testid="change-email" class="ec-link" (click)="changeEmail()">
+          {{ 'emailCode.differentEmail' | translate }}
+        </button>
+      </div>
+    </form>
+  }
+
+  <!-- ───────────── Name step ───────────── -->
+  @if (step() === 'name') {
+    <form class="ec-form" (submit)="onNameSubmit($event)" novalidate>
+      <p class="ec-sentto">
+        {{ 'emailCode.nameStep' | translate }}
+      </p>
+
+      @if (error()) {
+        <div class="ec-error" data-testid="login-error" role="alert">
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span>{{ error() | translate }}</span>
+        </div>
+      }
+
+      <label class="ec-field">
+        <span class="ec-field-icon" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+          </svg>
+        </span>
+        <input
+          data-testid="name-input"
+          type="text"
+          required
+          autocomplete="name"
+          [value]="nameValue()"
+          (input)="nameValue.set($any($event.target).value)"
+          placeholder=" "
+          [attr.aria-label]="'emailCode.fullNameLabel' | translate"
+        />
+        <span class="ec-field-label">{{ 'emailCode.fullNameLabel' | translate }}</span>
+      </label>
+
+      <button type="submit" class="ec-primary" [disabled]="submitting()">
+        <span class="ec-primary-label">{{ submitting() ? ('emailCode.creatingAccount' | translate) : ('emailCode.createAccount' | translate) }}</span>
+        <svg class="ec-primary-arrow" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+
+      <div class="ec-actions">
+        <button type="button" data-testid="change-email" class="ec-link" (click)="changeEmail()">
+          {{ 'emailCode.startOver' | translate }}
+        </button>
+      </div>
+    </form>
+  }
+
+</div>

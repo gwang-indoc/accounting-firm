@@ -13,8 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -34,19 +32,7 @@ public class DocumentController {
                                               @RequestParam("file") MultipartFile file,
                                               Authentication authentication) {
         long uploadedBy = resolveUserId(authentication);
-        DocumentUploadResult result;
-        try {
-            result = documentService.upload(
-                    clientId,
-                    year,
-                    file.getOriginalFilename(),
-                    file.getContentType(),
-                    file.getSize(),
-                    file.getInputStream(),
-                    uploadedBy);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        DocumentUploadResult result = documentService.upload(clientId, year, file, uploadedBy);
         int status = result.isNew() ? 201 : 200;
         return ResponseEntity.status(status).body(result.document());
     }

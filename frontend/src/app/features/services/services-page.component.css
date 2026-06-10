@@ -1,0 +1,342 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap');
+
+/* ── Layout shell ─────────────────────────────────────────────────── */
+
+.page-shell {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  min-height: calc(100vh - 68px);
+  align-items: stretch;
+}
+
+@media (max-width: 899px) {
+  .page-shell {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Info panel (left) ────────────────────────────────────────────── */
+
+.info-panel {
+  position: relative;
+  background: #0a1628;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.info-bg-decoration {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.deco-circle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.07;
+}
+
+.deco-circle-1 {
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, #38bdf8, transparent 70%);
+  top: -120px;
+  right: -120px;
+}
+
+.deco-circle-2 {
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, #38bdf8, transparent 70%);
+  bottom: 180px;
+  left: -80px;
+}
+
+.deco-watermark {
+  position: absolute;
+  bottom: 200px;
+  right: -20px;
+  font-size: 240px;
+  font-weight: 900;
+  color: #38bdf8;
+  opacity: 0.04;
+  line-height: 1;
+  user-select: none;
+  letter-spacing: -4px;
+}
+
+.info-content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  padding: 56px 48px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  animation: fadeSlideUp 0.7s ease both;
+}
+
+@media (max-width: 899px) {
+  .info-content {
+    padding: 40px 24px 32px;
+  }
+}
+
+.info-eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #38bdf8;
+  margin-bottom: 12px;
+}
+
+.info-heading {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(52px, 6vw, 80px);
+  font-weight: 900;
+  line-height: 0.95;
+  color: #ffffff;
+  margin: 0 0 20px;
+  letter-spacing: -1px;
+}
+
+.info-sub {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #94a3b8;
+  margin: 0;
+  max-width: 320px;
+}
+
+/* ── Stats ────────────────────────────────────────────────────────── */
+
+.info-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  animation: fadeSlideUp 0.7s ease both;
+}
+
+.stat-item:nth-child(1) { animation-delay: 0.1s; }
+.stat-item:nth-child(2) { animation-delay: 0.18s; }
+.stat-item:nth-child(3) { animation-delay: 0.26s; }
+
+.stat-number {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 36px;
+  font-weight: 900;
+  color: #38bdf8;
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+/* ── CTA link ─────────────────────────────────────────────────────── */
+
+.cta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #38bdf8;
+  text-decoration: none;
+  padding: 12px 0;
+  border-top: 1px solid rgba(56, 189, 248, 0.15);
+  transition: gap 0.2s ease;
+  animation: fadeSlideUp 0.7s ease 0.3s both;
+}
+
+.cta-link:hover {
+  gap: 12px;
+}
+
+.cta-link mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s ease;
+}
+
+.cta-link:hover mat-icon {
+  transform: translateX(2px);
+}
+
+/* ── Content panel (right) ────────────────────────────────────────── */
+
+.content-panel {
+  background: #0f172a;
+  padding: 48px 48px 56px;
+  animation: fadeSlideUp 0.7s ease 0.1s both;
+}
+
+@media (max-width: 899px) {
+  .content-panel {
+    padding: 40px 24px 48px;
+  }
+}
+
+/* ── Services grid ────────────────────────────────────────────────── */
+
+.services-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 1100px) {
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 899px) {
+  .services-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.service-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 24px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  cursor: default;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  animation: fadeSlideUp 0.6s ease both;
+  overflow: hidden;
+}
+
+.service-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.04), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 12px;
+}
+
+.service-card:hover {
+  background: rgba(56, 189, 248, 0.05);
+  border-color: rgba(56, 189, 248, 0.2);
+  transform: translateY(-2px);
+}
+
+.service-card:hover::before {
+  opacity: 1;
+}
+
+.card-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(56, 189, 248, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+.service-card:hover .card-icon-wrap {
+  background: rgba(56, 189, 248, 0.16);
+}
+
+.card-icon-wrap mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: #38bdf8;
+}
+
+.card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.card-tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #38bdf8;
+  opacity: 0.7;
+}
+
+.card-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0;
+  letter-spacing: -0.2px;
+  line-height: 1.2;
+}
+
+.card-desc {
+  font-size: 13px;
+  line-height: 1.65;
+  color: #64748b;
+  margin: 0;
+}
+
+.card-arrow {
+  align-self: flex-end;
+  color: #334155;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.service-card:hover .card-arrow {
+  color: #38bdf8;
+  transform: translateX(2px);
+}
+
+.card-arrow mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+/* ── Entrance animation ───────────────────────────────────────────── */
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

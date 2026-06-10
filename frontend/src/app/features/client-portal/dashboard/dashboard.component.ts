@@ -1,42 +1,79 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
+import { MyDocumentsService } from '../../../core/services/my-documents.service';
+import { PortalMessagesService } from '../../../core/services/portal-messages.service';
+import { MyDocumentsResponse } from '../../../core/models/my-documents';
+import { MessageThreadSummaryDto } from '../../../core/models/message.model';
 import { MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatAnchor } from '@angular/material/button';
 import { MatDivider } from '@angular/material/divider';
-
-interface PortalMessage {
-  id: number;
-  title: string;
-  sender: string;
-  date: string;
-  read: boolean;
-}
 
 @Component({
   selector: 'app-dashboard',
-  imports: [MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent, MatIcon, MatButton, MatDivider],
+  standalone: true,
+  imports: [
+    RouterLink, DatePipe, TranslateModule,
+    MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent,
+    MatIcon, MatButton, MatAnchor, MatDivider,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   protected authService = inject(AuthService);
+  private myDocs = inject(MyDocumentsService);
+  private portalMessages = inject(PortalMessagesService);
+  private translate = inject(TranslateService);
+  private langChangeSignal = signal<string>(this.translate.currentLang);
 
-  get unreadCount(): number {
-    return this.messages.filter(m => !m.read).length;
+  response = signal<MyDocumentsResponse | null>(null);
+  threads = signal<MessageThreadSummaryDto[]>([]);
+
+  documentCount = computed(() => this.response()?.documents.length ?? null);
+
+  mostRecentYear = computed<number | null>(() => {
+    const r = this.response();
+    if (!r || r.documents.length === 0) return null;
+    return r.documents.reduce((max, d) => Math.max(max, d.year), 0);
+  });
+
+  unreadCount = computed(() => this.threads().reduce((sum, t) => sum + t.unreadCount, 0));
+
+  ngOnInit(): void {
+    this.myDocs.getAll().subscribe({
+      next: (res) => this.response.set(res),
+      error: () => this.response.set(null),
+    });
+    this.portalMessages.listThreads().subscribe({
+      next: (list) => this.threads.set(list.slice(0, 3)),
+      error: () => this.threads.set([]),
+    });
+    this.translate.onLangChange.subscribe(() => {
+      this.langChangeSignal.set(this.translate.currentLang);
+    });
   }
 
-  readonly messages: PortalMessage[] = [
-    { id: 1, title: 'Your 2024 tax return is ready for review', sender: 'GWH Accounting', date: 'May 6', read: false },
-    { id: 2, title: 'Document received: T4 Statement 2024', sender: 'GWH Accounting', date: 'Apr 28', read: true },
-    { id: 3, title: 'Action required: Missing T5 slip', sender: 'GWH Accounting', date: 'Apr 15', read: true },
-  ];
+  senderLabel(t: MessageThreadSummaryDto): string {
+    this.langChangeSignal();
+    return t.lastSenderType === 'ADMIN'
+      ? this.translate.instant('dashboard.senderTypeAdmin')
+      : this.translate.instant('dashboard.senderTypeClient');
+  }
+
+  titleFor(t: MessageThreadSummaryDto): string {
+    return t.subject || t.lastMessagePreview;
+  }
 
   get greeting(): string {
+    this.langChangeSignal();
     const h = new Date().getHours();
-    if (h < 12) return 'Good morning';
-    if (h < 17) return 'Good afternoon';
-    return 'Good evening';
+    if (h < 12) return this.translate.instant('dashboard.greetingMorning');
+    if (h < 17) return this.translate.instant('dashboard.greetingAfternoon');
+    return this.translate.instant('dashboard.greetingEvening');
   }
 
   get today(): string {

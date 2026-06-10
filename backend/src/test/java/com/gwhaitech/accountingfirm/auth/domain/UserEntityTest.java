@@ -52,15 +52,4 @@ class UserEntityTest {
         assertThat(saved.getId()).isNotNull();
     }
 
-    @Test
-    void savesUserWithPasswordHash() {
-        User user = new User();
-        user.setEmail("email@test.com");
-        user.setName("Email User");
-        user.setGoogleSub(null);
-        user.setPasswordHash("$2a$10$testhashtesthashtesthasXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-        User saved = userRepository.save(user);
-        assertThat(saved.getId()).isNotNull();
-        assertThat(saved.getPasswordHash()).isEqualTo("$2a$10$testhashtesthashtesthasXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-    }
 }

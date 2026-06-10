@@ -1,38 +1,40 @@
 <mat-toolbar color="primary" class="navbar-toolbar">
-  <div class="brand">
+  <a class="brand" [routerLink]="brandLink()" data-testid="brand-link">
     <div class="logo-icon">税</div>
     <div class="brand-text">
-      <span class="company-name">GWH Accounting</span>
-      <span class="tagline">Secure Tax & Accounting Portal</span>
+      <span class="company-name">{{ 'brand.name' | translate }}</span>
+      <span class="tagline">{{ 'home.hero.subtitle' | translate }}</span>
     </div>
-  </div>
+  </a>
 
   <div class="nav-links">
-    <a mat-button href="#services">Services</a>
-    <a mat-button href="#security">Security</a>
+    <a mat-button routerLink="/services" routerLinkActive="active">{{ 'navbar.services' | translate }}</a>
+    <a mat-button routerLink="/security" routerLinkActive="active">{{ 'navbar.security' | translate }}</a>
     @if (authService.isAuthenticated()) {
       <span class="nav-user-name">{{ authService.currentUser()?.name }}</span>
-      <button mat-button data-testid="logout-btn" (click)="logout()">Logout</button>
+      @if (authService.currentUser()?.role === 'ADMIN') {
+        <a mat-button routerLink="/admin/clients" routerLinkActive="active" data-testid="admin-clients-nav-link">
+          {{ 'navbar.clientManagement' | translate }}
+        </a>
+      } @else {
+        <a mat-button routerLink="/portal/dashboard" routerLinkActive="active" data-testid="dashboard-nav-link">
+          {{ 'navbar.portalDashboard' | translate }}
+          @if (unreadCount() > 0) {
+            <span class="nav-badge" data-testid="messages-unread-badge">{{ unreadCount() }}</span>
+          }
+        </a>
+      }
+      <button mat-button data-testid="logout-btn" (click)="logout()">{{ 'navbar.logout' | translate }}</button>
     } @else {
-      <a mat-button routerLink="/login" data-testid="client-login-btn">Client Login</a>
+      <a mat-button routerLink="/login" data-testid="client-login-btn">{{ 'navbar.home' | translate }}</a>
     }
-    <a mat-button routerLink="/contact">Contact</a>
-    <a mat-flat-button routerLink="/contact" class="cta-btn">Book Consultation</a>
+    <a mat-button routerLink="/contact">{{ 'navbar.contact' | translate }}</a>
+    <a mat-flat-button routerLink="/book-consultation" class="cta-btn">{{ 'navbar.bookConsultation' | translate }}</a>
   </div>
 
   <div class="lang-toggle">
-    <button
-      data-testid="lang-en"
-      class="lang-pill"
-      [class.active]="lang() === 'en'"
-      (click)="setLang('en')"
-    >EN</button>
-    <button
-      data-testid="lang-zh"
-      class="lang-pill"
-      [class.active]="lang() === 'zh'"
-      (click)="setLang('zh')"
-    >中文</button>
+    <button data-testid="lang-en" class="lang-pill" [class.active]="currentLanguage() === 'en'" (click)="setLang('en')">EN</button>
+    <button data-testid="lang-zh" class="lang-pill" [class.active]="currentLanguage() === 'zh'" (click)="setLang('zh')">中文</button>
   </div>
 
   <button mat-icon-button class="hamburger" data-testid="hamburger" (click)="toggleSidenav()">{{ sidenavOpen() ? '✕' : '☰' }}</button>

@@ -41,25 +41,48 @@ describe('AuthService', () => {
     expect(service.isAuthenticated()).toBe(false);
   });
 
-  it('register POSTs to /api/auth/register and returns Observable<void>', () => {
-    const dto = { fullName: 'Alice', email: 'alice@test.com', password: 'pass1234', confirmPassword: 'pass1234' };
-    let completed = false;
-    service.register(dto).subscribe({ complete: () => { completed = true; } });
-    const req = httpMock.expectOne('/api/auth/register');
+  it('requestEmailCode POSTs to /api/auth/email/request-code', async () => {
+    const promise = service.requestEmailCode('user@example.com');
+    const req = httpMock.expectOne('/api/auth/email/request-code');
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual(dto);
-    req.flush(null);
-    expect(completed).toBe(true);
+    expect(req.request.body).toEqual({ email: 'user@example.com' });
+    req.flush({ status: 'code_sent' });
+    await promise;
   });
 
-  it('loginWithEmail POSTs to /api/auth/login and returns Observable<void>', () => {
-    const dto = { email: 'alice@test.com', password: 'pass1234' };
-    let completed = false;
-    service.loginWithEmail(dto).subscribe({ complete: () => { completed = true; } });
-    const req = httpMock.expectOne('/api/auth/login');
+  it('verifyEmailCode POSTs to /api/auth/email/verify-code and returns status', async () => {
+    const promise = service.verifyEmailCode('user@example.com', '123456');
+    const req = httpMock.expectOne('/api/auth/email/verify-code');
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual(dto);
+    expect(req.request.body).toEqual({ email: 'user@example.com', code: '123456' });
+    req.flush({ status: 'authenticated' });
+    const result = await promise;
+    expect(result.status).toBe('authenticated');
+  });
+
+  it('verifyEmailCode returns signupToken when signup_required', async () => {
+    const promise = service.verifyEmailCode('new@example.com', '999999');
+    const req = httpMock.expectOne('/api/auth/email/verify-code');
+    req.flush({ status: 'signup_required', signupToken: 'tok.123' });
+    const result = await promise;
+    expect(result.status).toBe('signup_required');
+    expect(result.signupToken).toBe('tok.123');
+  });
+
+  it('completeEmailSignup POSTs to /api/auth/email/complete-signup', async () => {
+    const promise = service.completeEmailSignup('tok.123', 'Alice');
+    const req = httpMock.expectOne('/api/auth/email/complete-signup');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ signupToken: 'tok.123', name: 'Alice' });
     req.flush(null);
-    expect(completed).toBe(true);
+    await promise;
+  });
+
+  it('register method does not exist on AuthService', () => {
+    expect((service as any).register).toBeUndefined();
+  });
+
+  it('loginWithEmail method does not exist on AuthService', () => {
+    expect((service as any).loginWithEmail).toBeUndefined();
   });
 });

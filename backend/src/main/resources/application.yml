@@ -1,4 +1,15 @@
+server:
+  forward-headers-strategy: framework
+
 spring:
+  mail:
+    host: ${SPRING_MAIL_HOST:localhost}
+    port: ${SPRING_MAIL_PORT:587}
+    username: ${SPRING_MAIL_USERNAME:}
+    password: ${SPRING_MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
   servlet:
     multipart:
       max-file-size: ${UPLOAD_MAX_FILE_SIZE_MB:10}MB
@@ -19,10 +30,15 @@ spring:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
             scope: openid,email,profile
+            redirect-uri: "https://gwhaitech.com/login/oauth2/code/google"
   flyway:
     enabled: true
 
+contact:
+  notification-email: ${CONTACT_NOTIFICATION_EMAIL}
+
 app:
+  publicBaseUrl: ${APP_PUBLIC_BASE_URL:http://localhost:4200}
   jwt:
     secret: ${JWT_SECRET}
     expiration-ms: 86400000
@@ -32,9 +48,11 @@ app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
   oauth2:
-    redirect-uri: ${OAUTH2_REDIRECT_URI:http://localhost:4200/portal/dashboard}
+    redirect-uri:
+      admin: ${OAUTH2_REDIRECT_URI_ADMIN:http://localhost:4200/admin/clients}
+      user: ${OAUTH2_REDIRECT_URI_USER:http://localhost:4200/portal/dashboard}
   storage:
     upload-dir: ${UPLOAD_DIR:./uploads}
     max-file-size-mb: ${UPLOAD_MAX_FILE_SIZE_MB:10}
     max-filename-length: ${UPLOAD_MAX_FILENAME_LENGTH:100}
-    blocked-extensions: ${BLOCKED_EXTENSIONS:exe,js}
+    allowed-extensions: ${ALLOWED_EXTENSIONS:pdf,jpg,jpeg,png,xlsx,xls,csv,doc,docx}

@@ -1,0 +1,6 @@
+### Contract
+
+- **Spec**: The system SHALL expose `POST /api/auth/email/request-code` accepting an `email`. ... send the plaintext code to that email via the existing SMTP mail sender, and return a uniform success response. The endpoint SHALL be publicly accessible and SHALL NOT reveal whether the email already has an account. // The system SHALL enforce ... a given email may receive at most one new code per 60-second cooldown; and a given email may request at most 5 codes per rolling hour. Requests exceeding the cooldown or hourly cap SHALL be rejected without sending a new email.
+- **Runtime**: `cd backend && ./mvnw test -Dtest=AuthEmailControllerTest -Dtest.method=requestCode*` (or the request-code `@WebMvcTest`/`@SpringBootTest` class) → expected: 200 uniform body for known + unknown email; email sent for both; 429 on cooldown and hourly-cap breach with no send; public access (no JWT required).
+- **Code**: D3 — cooldown = reject if a row for the email has `created_at` within last 60s (429); hourly cap = reject if COUNT rows for email within last hour ≥ 5 (429); both via repository queries, no scheduler. D4 — identical `{ "status": "code_sent" }` body for known/unknown; mail send synchronous, on `JavaMailSender` failure return 502 (uniform). `SecurityConfig` already permits `/api/auth/**`.
+- **Threshold**: 80

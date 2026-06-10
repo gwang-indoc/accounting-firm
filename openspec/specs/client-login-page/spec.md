@@ -1,7 +1,8 @@
+## Purpose
+Render the `/login` page where clients authenticate via Google OAuth2 or email-code OTP, with all visible text driven by `ngx-translate` so the page works in both English and Chinese.
 ## Requirements
-
 ### Requirement: Dedicated /login page presents all auth options using Angular Material
-The system SHALL render `LoginComponent` at `/login` as a standalone Angular component. The page SHALL present three auth options in a single centered `mat-card` using Angular Material components. The route SHALL be accessible without authentication.
+The system SHALL render `LoginComponent` at `/login` as a standalone Angular component. The page SHALL present two auth options in a single centered `mat-card` using Angular Material components: Google sign-in and passwordless email-code sign-in. The route SHALL be accessible without authentication.
 
 **Page layout:** The page background is `#f1f5f9` with a subtle dot-grid texture. A single `mat-card` (max-width 400px) is centered horizontally and vertically. The card uses Material CSS variables (`--mdc-elevated-card-container-color`, `--mdc-elevated-card-container-shape`) and has a 3px sky-blue gradient accent stripe (`#0ea5e9` → `#38bdf8` → `#7dd3fc`) pinned to its top edge.
 
@@ -12,20 +13,16 @@ The system SHALL render `LoginComponent` at `/login` as a standalone Angular com
 4. "Sign in to access your account" subtitle
 5. Google Sign-In button — custom `<a>` styled as a white bordered button with inline Google G SVG logo; links to `/oauth2/authorization/google`
 6. "or" divider row (custom, not `mat-divider`)
-7. "Create an account" `mat-stroked-button` navigating to `/register`
-8. "Sign in with email →" `mat-button` navigating to `/login/email`
-9. Security note — lock SVG icon + "Your data is always encrypted in transit"
+7. "Sign in with email →" `mat-button` that enters the email-code login flow
+8. Security note — lock SVG icon + "Your data is always encrypted in transit"
+
+The email/password "Create an account" and "Sign in with email" (password) options are replaced by the single email-code option. There is no separate `/register` route.
 
 #### Scenario: Login page structure
 - **WHEN** the user navigates to `/login`
 - **THEN** the page renders a `mat-card` containing the text "Client Portal" (in the eyebrow label)
 - **THEN** a Google Sign-In link (`<a href="/oauth2/authorization/google">`) is present with the Google G logo
-- **THEN** a "Create an account" `mat-stroked-button` navigates to `/register`
-- **THEN** a "Sign in with email →" `mat-button` navigates to `/login/email`
-
-#### Scenario: Success snackbar after registration
-- **WHEN** the user arrives at `/login?registered=true`
-- **THEN** a `MatSnackBar` notification is shown: "Account created! Please sign in."
+- **THEN** a "Sign in with email →" control enters the email-code login flow
 
 #### Scenario: Route is not guarded
 - **WHEN** an unauthenticated user navigates to `/login`
@@ -35,3 +32,19 @@ The system SHALL render `LoginComponent` at `/login` as a standalone Angular com
 - **WHEN** the viewport width is < 768px
 - **THEN** the `mat-card` fills the screen width with horizontal padding
 - **THEN** the navbar shows the hamburger icon
+
+### Requirement: Email OTP login flow is fully bilingual
+The system SHALL render all visible strings in the `LoginEmailCodeComponent` (email step, code step, name step) through `| translate`, using `emailCode.*` translation keys. Error messages set in the component SHALL use translation key strings (not raw English) so the template's `{{ error() | translate }}` renders them in the active language.
+
+#### Scenario: Email step renders in active language
+- **WHEN** the user is on the email step of the login flow
+- **THEN** the field label, button text, and any error messages render in the currently selected language
+
+#### Scenario: Code step renders in active language
+- **WHEN** the user is on the code step
+- **THEN** "We sent a 6-digit code to …" message, button labels, resend/change links render in the currently selected language
+
+#### Scenario: Name step renders in active language
+- **WHEN** the user is on the name step (new account signup)
+- **THEN** the instruction text, field label, and button text render in the currently selected language
+

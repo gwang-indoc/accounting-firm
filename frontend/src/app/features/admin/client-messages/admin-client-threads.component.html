@@ -1,0 +1,39 @@
+<div class="admin-threads">
+  <a routerLink="/admin/clients" class="back-link">← {{ 'messages.backToClients' | translate }}</a>
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">{{ 'messages.title' | translate }}</h1>
+      @if (client()) {
+        <p class="page-subtitle">with {{ client()!.name }}</p>
+      }
+    </div>
+    <button mat-flat-button class="new-btn" data-testid="new-thread-btn" (click)="openNewThread()">+ {{ 'messages.newThread' | translate }}</button>
+  </div>
+
+  <div class="threads-list">
+    @for (t of threads(); track t.id) {
+      <div class="thread-row" data-testid="thread-row" (click)="openThread(t)">
+        <div class="thread-main">
+          <div class="thread-subject">{{ t.subject }}</div>
+          <div class="thread-preview">{{ t.lastMessagePreview }}</div>
+        </div>
+        <div class="thread-meta">
+          <div class="thread-date">{{ t.lastMessageAt | date:'short' }}</div>
+          @switch (threadStatus(t)) {
+            @case ('unread') {
+              <span class="thread-chip chip-unread" data-testid="thread-chip-unread">·{{ t.unreadCount }}</span>
+            }
+            @case ('awaiting') {
+              <span class="thread-chip chip-awaiting" data-testid="thread-chip-awaiting">{{ 'messages.awaitingClient' | translate }}</span>
+            }
+            @case ('read') {
+              <span class="thread-chip chip-read" data-testid="thread-chip-read">{{ 'messages.clientRead' | translate }}</span>
+            }
+          }
+        </div>
+      </div>
+    } @empty {
+      <div class="empty-state">{{ 'messages.empty' | translate }}</div>
+    }
+  </div>
+</div>

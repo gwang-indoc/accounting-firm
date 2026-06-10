@@ -1,23 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterModule } from '@angular/router';
-import { MatCard } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { Component } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
+import { LoginEmailCodeComponent } from '../login-email-code/login-email-code.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [MatCard, MatButtonModule, MatDividerModule, RouterModule],
+  imports: [LoginEmailCodeComponent, TranslateModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
-export class LoginComponent implements OnInit {
-  constructor(private route: ActivatedRoute, private snackBar: MatSnackBar) {}
-
-  ngOnInit() {
-    if (this.route.snapshot.queryParamMap.get('registered') === 'true') {
-      this.snackBar.open('Account created! Please sign in.', 'OK', { duration: 4000 });
-    }
-  }
-}
+export class LoginComponent {}

@@ -1,0 +1,63 @@
+# Capability Specs
+
+One spec per capability. Each spec is the authoritative record of what the system must do for that capability.
+
+## Capabilities
+
+### `angular-material-theme` ✅ Implemented
+**User Story**: The app uses a consistent Angular Material design system with colour tokens, typography, and spacing.
+
+### `client-document-uploads` ✅ Implemented
+**User Story**: Admins upload documents for clients; clients upload and download their own from the portal.
+**Backend**: `POST /api/clients/{id}/documents?year=` (admin); `POST /api/portal/documents?year=` (client). Three-layer validation in `FileUploadValidator`: (1) extension allowlist (`ALLOWED_EXTENSIONS` env var, default pdf/jpg/png/xlsx/xls/csv/doc/docx), (2) declared `Content-Type` vs extension map, (3) Tika content inspection (magic bytes + OOXMLDetector). `tika-core` + `tika-parser-microsoft-module` detect renamed executables and plain ZIPs masquerading as OOXML.
+**Frontend**: Upload button triggers file picker; 400 error message shown inline.
+**Acceptance Criteria**: Renamed `evil.exe` presented as `evil.pdf` is rejected; plain `.zip` presented as `.xlsx` is rejected; legitimate files of all allowed types upload successfully.
+
+### `client-login-page` ✅ Implemented
+**User Story**: Clients authenticate at `/login` via Google OAuth2 or email-code OTP, with all text rendered in the active language (EN/ZH).
+**Backend**: JWT issued as httpOnly cookie after OAuth2 success; email-code OTP verification endpoint.
+**Frontend**: `LoginComponent` at `/login`; `LoginEmailCodeComponent` multi-step OTP flow; all strings via `| translate`.
+
+### `client-management` ✅ Implemented
+**User Story**: Admins create and manage client records scoped to their ownership, with email uniqueness enforced and each client linked to a registered user account.
+**Backend**: `clients.email` NOT NULL + UNIQUE; `clients.admin_id` NOT NULL FK to `users`; CRUD queries filtered by `admin_id`; `POST /api/clients` validates email against users table (400) and duplicate guard (409).
+**Frontend**: Add Client dialog — email field triggers debounced lookup, auto-fills name on match, blocks submission for unregistered/duplicate email.
+**Acceptance Criteria**: Admin can only see and create their own clients; duplicate emails and unregistered emails are rejected at submission time.
+
+### `client-portal-ui` ✅ Implemented
+**User Story**: Authenticated clients access a dashboard, documents, and messages through a guarded portal.
+
+### `client-registration` ⚠️ Superseded
+**User Story**: New clients register an account linked to their client record.
+**Note**: Superseded by `email-otp-auth` — account creation now happens inline on first email-code login. `/register` route and `RegisterComponent` removed.
+
+### `contact-page` ✅ Implemented
+**User Story**: Visitors view office contact details and a map on the `/contact` page.
+
+### `email-otp-auth` ✅ Implemented
+**User Story**: Clients sign in with a 6-digit email code; first-time users create an account by supplying a display name after code verification — no password required.
+**Backend**: `POST /api/auth/email/request-code` (BCrypt-hashed code in `email_login_codes`, SMTP delivery); `POST /api/auth/email/verify-code` (JWT on match, signup token if new email); `POST /api/auth/email/complete-signup` (creates user, issues JWT). Rate limits: 10-min expiry, 5 attempts/code, 60s resend cooldown, 5 codes/email/hour.
+**Frontend**: `LoginEmailCodeComponent` — three-step flow (email → code → name for new users); Angular Material card design matching login page; routes into auth via `AuthService`.
+**Acceptance Criteria**: Existing user can log in with just their email; new email results in account creation after name step; wrong/expired/reused codes are rejected.
+
+### `email-password-auth` ⚠️ Superseded
+**User Story**: Clients authenticate with email and password (legacy; superseded by email-code OTP).
+**Note**: Superseded by `email-otp-auth` — `POST /api/auth/login`, `password_hash` column, and `LoginEmailComponent` removed.
+
+### `google-oauth2-auth` ✅ Implemented
+**User Story**: Clients authenticate via Google OAuth2; a JWT cookie is issued on success.
+
+### `landing-page-navbar` ✅ Implemented
+**User Story**: All pages show a responsive navbar with links to public routes and the portal.
+
+### `user-email-lookup` ✅ Implemented
+**User Story**: Admins look up a registered user by email to validate they have an account before adding them as a client.
+**Backend**: `GET /api/admin/users/lookup?email=` — returns `{ "name": "..." }` (200), 404 if not found, 403 if non-admin, 400 if param missing.
+**Frontend**: Used internally by the Add Client dialog async validator.
+**Acceptance Criteria**: Lookup returns the user's display name on match; unregistered emails receive 404.
+
+### `user-language-preference` ✅ Implemented
+**User Story**: Authenticated users' EN/ZH language choice persists in their profile so their locale is consistent across devices and sessions.
+**Backend**: `users.language` VARCHAR(10) column (V11 migration); `PATCH /api/auth/me/language` saves preference; `GET /api/auth/me` returns `language` field.
+**Frontend**: `TranslationService.applyProfileLanguage()` syncs profile↔localStorage on login; `setLanguage()` fires background PATCH when authenticated.
+**Acceptance Criteria**: Language toggle while logged in persists across page reload and new devices.

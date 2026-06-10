@@ -13,8 +13,12 @@ out/
 
 # Environment variables
 .env
+.env.prod
 .env.local
 .env.*.local
+
+# Production compose (contains server IPs and prod-specific config)
+docker-compose.prod.yml
 
 # Logs
 logs/
@@ -39,9 +43,15 @@ temp/
 # Build outputs (Java)
 backend/target/
 
+# Local uploads
+backend/uploads/
+
 # Tool artifacts
 .playwright-mcp/
 .superpowers/
 # Package manager lock files (keep one, remove others as appropriate)
 # yarn.lock
 # package-lock.json
+
+# OpenSpec exploration drafts (produced by /opsx:explore, promoted by /opsx:propose)
+openspec/changes/_draft/

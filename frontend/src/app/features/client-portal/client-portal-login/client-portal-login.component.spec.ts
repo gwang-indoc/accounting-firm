@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TranslateModule } from '@ngx-translate/core';
 import { ClientPortalLoginComponent } from './client-portal-login.component';
 
 describe('ClientPortalLoginComponent', () => {
@@ -7,7 +8,7 @@ describe('ClientPortalLoginComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ClientPortalLoginComponent],
+      imports: [ClientPortalLoginComponent, TranslateModule.forRoot()],
     }).compileComponents();
     fixture = TestBed.createComponent(ClientPortalLoginComponent);
     component = fixture.componentInstance;

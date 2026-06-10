@@ -1,64 +1,59 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { ActivatedRoute } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { provideZonelessChangeDetection } from '@angular/core';
+import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { LoginComponent } from './login.component';
+import { AuthService } from '../../../core/services/auth.service';
+
+function buildAuthService() {
+  return {
+    requestEmailCode: vi.fn().mockResolvedValue(undefined),
+    verifyEmailCode: vi.fn().mockResolvedValue({ status: 'authenticated' }),
+    completeEmailSignup: vi.fn().mockResolvedValue(undefined),
+    loadCurrentUser: vi.fn().mockResolvedValue(undefined),
+  };
+}
 
 describe('LoginComponent', () => {
-  describe('default (no query params)', () => {
-    let fixture: ComponentFixture<LoginComponent>;
+  let fixture: ComponentFixture<LoginComponent>;
 
-    beforeEach(async () => {
-      await TestBed.configureTestingModule({
-        imports: [LoginComponent],
-        providers: [
-          provideZonelessChangeDetection(),
-          { provide: MatSnackBar, useValue: { open: vi.fn() } },
-          { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: { get: vi.fn().mockReturnValue(null) } } } },
-        ],
-      }).compileComponents();
-      fixture = TestBed.createComponent(LoginComponent);
-      fixture.detectChanges();
-    });
-
-    it('renders heading Client Portal', () => {
-      expect(fixture.nativeElement.textContent).toContain('Client Portal');
-    });
-
-    it('Google button has correct href', () => {
-      const link = fixture.nativeElement.querySelector('a[href="/oauth2/authorization/google"]');
-      expect(link).not.toBeNull();
-    });
-
-    it('Register button has routerLink /register', () => {
-      const link = fixture.nativeElement.querySelector('a[routerLink="/register"]');
-      expect(link).not.toBeNull();
-    });
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [LoginComponent, TranslateModule.forRoot()],
+      providers: [
+        provideZonelessChangeDetection(),
+        { provide: AuthService, useValue: buildAuthService() },
+        { provide: Router, useValue: { navigate: vi.fn() } },
+      ],
+    }).compileComponents();
+    fixture = TestBed.createComponent(LoginComponent);
+    fixture.detectChanges();
   });
 
-  describe('with registered=true query param', () => {
-    let snackBarMock: { open: ReturnType<typeof vi.fn> };
+  afterEach(() => TestBed.resetTestingModule());
 
-    beforeEach(async () => {
-      snackBarMock = { open: vi.fn() };
-      await TestBed.configureTestingModule({
-        imports: [LoginComponent],
-        providers: [
-          provideZonelessChangeDetection(),
-          { provide: MatSnackBar, useValue: snackBarMock },
-          { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: { get: vi.fn().mockReturnValue('true') } } } },
-        ],
-      }).compileComponents();
-      const f = TestBed.createComponent(LoginComponent);
-      f.detectChanges();
-    });
+  it('renders eyebrow and welcome heading', () => {
+    expect(fixture.nativeElement.querySelector('.form-eyebrow')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.form-heading')).not.toBeNull();
+  });
 
-    it('shows snackbar when registered=true query param', () => {
-      expect(snackBarMock.open).toHaveBeenCalledWith(
-        'Account created! Please sign in.',
-        'OK',
-        { duration: 4000 }
-      );
-    });
+  it('Google button has correct href', () => {
+    const link = fixture.nativeElement.querySelector('a[href="/oauth2/authorization/google"]');
+    expect(link).not.toBeNull();
+  });
+
+  it('renders app-login-email-code component', () => {
+    const emailCodeEl = fixture.nativeElement.querySelector('app-login-email-code');
+    expect(emailCodeEl).not.toBeNull();
+  });
+
+  it('does NOT render register link', () => {
+    const link = fixture.nativeElement.querySelector('a[routerLink="/register"]');
+    expect(link).toBeNull();
+  });
+
+  it('does NOT render /login/email link', () => {
+    const link = fixture.nativeElement.querySelector('a[routerLink="/login/email"]');
+    expect(link).toBeNull();
   });
 });

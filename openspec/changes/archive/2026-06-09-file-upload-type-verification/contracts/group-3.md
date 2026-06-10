@@ -1,0 +1,6 @@
+### Contract
+
+- **Spec**: When an authenticated user uploads a file whose `Content-Type` header does not match the expected MIME types for its extension, the system SHALL return `400 Bad Request` without writing any file. When an authenticated user uploads a file whose actual byte content (as detected by Tika) does not match the expected MIME types for its extension (e.g. a renamed `.exe` presented as `.pdf`), the system SHALL return `400 Bad Request` with message `"File content does not match its extension"`, without writing any file.
+- **Runtime**: `cd backend && ./mvnw test -Dtest=FileUploadValidatorTest --no-transfer-progress` → expected: all Layer 2 and Layer 3 test cases pass, including renamed-exe-as-pdf and plain-zip-as-xlsx rejection
+- **Code**: Extension → MIME types map is hardcoded in `FileUploadValidator` (not configurable). `application/zip` is accepted for xlsx/docx at Layer 2 (browsers send this) — Layer 3 (OOXMLDetector) then confirms it is genuinely OOXML. CSV has no magic bytes; Tika returns `text/plain` — map must accept `text/plain` for `.csv`. Use `Tika.detect(InputStream, filename)` for detection; `MultipartFile.getInputStream()` is safe to call multiple times (Spring temp-file backing).
+- **Threshold**: 80

@@ -1,0 +1,26 @@
+<div class="portal-inbox">
+  <a routerLink="/portal/dashboard" class="back-link">← {{ 'messages.backToDashboard' | translate }}</a>
+  <div class="page-header">
+    <h1 class="page-title">{{ 'messages.title' | translate }}</h1>
+    <button mat-flat-button class="new-btn" data-testid="new-message-btn" (click)="openNewThread()">{{ 'messages.newMessage' | translate }}</button>
+  </div>
+
+  <div class="threads-list">
+    @for (t of threads(); track t.id) {
+      <div class="thread-row" data-testid="thread-row" (click)="openThread(t)">
+        <div class="thread-main">
+          <div class="thread-subject">{{ t.subject }}</div>
+          <div class="thread-preview">{{ t.lastMessagePreview }}</div>
+        </div>
+        <div class="thread-meta">
+          <div class="thread-date">{{ t.lastMessageAt | date:'short' }}</div>
+          @if (t.unreadCount > 0) {
+            <span class="thread-chip" data-testid="unread-chip">{{ t.unreadCount }}</span>
+          }
+        </div>
+      </div>
+    } @empty {
+      <div class="empty-state" data-testid="empty-state">{{ 'messages.empty' | translate }}</div>
+    }
+  </div>
+</div>

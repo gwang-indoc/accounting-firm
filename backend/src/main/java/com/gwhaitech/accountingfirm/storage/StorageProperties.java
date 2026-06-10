@@ -10,5 +10,5 @@ public record StorageProperties(
         Path uploadDir,
         int maxFileSizeMb,
         int maxFilenameLength,
-        List<String> blockedExtensions
+        List<String> allowedExtensions
 ) {}

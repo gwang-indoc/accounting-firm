@@ -26,13 +26,13 @@
       <mat-card-content>
         <div class="overview-stats">
           <div class="stat-cell">
-            <span class="stat-value">—</span>
-            <span class="stat-label">Documents</span>
+            <span class="stat-value">{{ documentCount() ?? '—' }}</span>
+            <span class="stat-label">{{ 'dashboard.documents' | translate }}</span>
           </div>
           <mat-divider [vertical]="true" class="stat-divider"></mat-divider>
           <div class="stat-cell">
-            <span class="stat-value">2025</span>
-            <span class="stat-label">Tax Year</span>
+            <span class="stat-value">{{ mostRecentYear() ?? '—' }}</span>
+            <span class="stat-label">{{ 'dashboard.latestYearLabel' | translate }}</span>
           </div>
         </div>
       </mat-card-content>
@@ -41,11 +41,11 @@
     <!-- Quick Actions -->
     <mat-card class="card card-actions">
       <mat-card-header>
-        <mat-card-title>Quick Actions</mat-card-title>
+        <mat-card-title>{{ 'dashboard.quickActions' | translate }}</mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <div class="action-single">
-          <button mat-button class="action-tile">Upload Document</button>
+          <a mat-button class="action-tile" routerLink="/portal/documents" data-testid="view-documents-link">{{ 'dashboard.viewDocuments' | translate }}</a>
         </div>
       </mat-card-content>
     </mat-card>
@@ -54,34 +54,43 @@
     <mat-card class="card card-messages">
       <mat-card-header>
         <mat-card-title class="messages-heading">
-          Messages
-          @if (unreadCount > 0) {
-            <span class="unread-badge">{{ unreadCount }}</span>
+          {{ 'dashboard.messages' | translate }}
+          @if (unreadCount() > 0) {
+            <span class="unread-badge">{{ unreadCount() }}</span>
           }
         </mat-card-title>
       </mat-card-header>
       <mat-card-content class="messages-content">
-        @for (msg of messages; track msg.id) {
-          <button class="msg-row" [class.unread]="!msg.read">
+        @for (t of threads(); track t.id) {
+          <a class="msg-row" [class.unread]="t.unreadCount > 0"
+             [routerLink]="['/portal/messages', t.id]"
+             data-testid="dashboard-thread-row">
             <span class="msg-dot"></span>
             <span class="msg-body">
-              <span class="msg-title">{{ msg.title }}</span>
-              <span class="msg-sender">{{ msg.sender }}</span>
+              <span class="msg-title">{{ titleFor(t) }}</span>
+              <span class="msg-sender">{{ senderLabel(t) }}</span>
             </span>
             <span class="msg-meta">
-              <span class="msg-date">{{ msg.date }}</span>
+              <span class="msg-date">{{ t.lastMessageAt | date:'MMM d' }}</span>
               <mat-icon class="msg-chevron">chevron_right</mat-icon>
             </span>
-          </button>
+          </a>
           @if (!$last) {
             <mat-divider></mat-divider>
           }
         } @empty {
           <div class="empty-state">
             <mat-icon class="empty-icon">inbox</mat-icon>
-            <p class="empty-title">No messages</p>
-            <p class="empty-hint">Messages from your advisor will appear here</p>
+            <p class="empty-title">{{ 'dashboard.noMessages' | translate }}</p>
+            <p class="empty-hint">{{ 'dashboard.messagesEmptyHint' | translate }}</p>
           </div>
+        }
+        @if (threads().length > 0) {
+          <a class="view-all-link"
+             routerLink="/portal/messages"
+             data-testid="view-all-messages-link">
+            {{ 'dashboard.viewAllMessages' | translate }}
+          </a>
         }
       </mat-card-content>
     </mat-card>

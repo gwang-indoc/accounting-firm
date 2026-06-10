@@ -31,7 +31,6 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -89,7 +88,7 @@ class DocumentControllerTest {
 
     @Test
     void postDocuments_newFile_returns201() throws Exception {
-        when(documentService.upload(eq(1L), eq(2025), eq("tax.pdf"), anyString(), anyLong(), any(), anyLong()))
+        when(documentService.upload(eq(1L), eq(2025), any(), anyLong()))
                 .thenReturn(new DocumentUploadResult(sampleDto(), true));
 
         MockMultipartFile file = new MockMultipartFile(
@@ -106,7 +105,7 @@ class DocumentControllerTest {
 
     @Test
     void postDocuments_overwrite_returns200() throws Exception {
-        when(documentService.upload(eq(1L), eq(2025), eq("tax.pdf"), anyString(), anyLong(), any(), anyLong()))
+        when(documentService.upload(eq(1L), eq(2025), any(), anyLong()))
                 .thenReturn(new DocumentUploadResult(sampleDto(), false));
 
         MockMultipartFile file = new MockMultipartFile(
@@ -122,8 +121,8 @@ class DocumentControllerTest {
 
     @Test
     void postDocuments_blockedExtension_returns400() throws Exception {
-        when(documentService.upload(anyLong(), anyInt(), anyString(), anyString(), anyLong(), any(), anyLong()))
-                .thenThrow(new FileValidationException("Blocked file extension: .exe"));
+        when(documentService.upload(anyLong(), anyInt(), any(), anyLong()))
+                .thenThrow(new FileValidationException("File type not allowed"));
 
         MockMultipartFile file = new MockMultipartFile(
                 "file", "malware.exe", "application/octet-stream", "bad".getBytes());
@@ -137,7 +136,7 @@ class DocumentControllerTest {
 
     @Test
     void postDocuments_clientNotFound_returns404() throws Exception {
-        when(documentService.upload(anyLong(), anyInt(), anyString(), anyString(), anyLong(), any(), anyLong()))
+        when(documentService.upload(anyLong(), anyInt(), any(), anyLong()))
                 .thenThrow(new ClientNotFoundException(99L));
 
         MockMultipartFile file = new MockMultipartFile(

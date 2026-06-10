@@ -51,6 +51,12 @@ test('Contact link navigates to /contact', async ({ page }) => {
   await expect(page).toHaveURL(/\/contact/);
 });
 
+test('Book Consultation CTA navigates to /book-consultation', async ({ page }) => {
+  await page.goto('/');
+  await page.click('a.cta-btn:has-text("Book Consultation")');
+  await expect(page).toHaveURL(/\/book-consultation/);
+});
+
 test('hamburger shows on mobile viewport', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto('/');

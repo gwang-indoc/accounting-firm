@@ -1,8 +1,9 @@
 import { Component, HostListener, signal } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-client-portal-login',
-  imports: [],
+  imports: [TranslateModule],
   templateUrl: './client-portal-login.component.html',
   styleUrl: './client-portal-login.component.css',
 })

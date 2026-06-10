@@ -1,10 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterModule } from '@angular/router';
-import { EventEmitter } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
+import { EventEmitter, provideNgReflectAttributes } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
+import { of } from 'rxjs';
 import { vi } from 'vitest';
 import { NavbarComponent } from './navbar.component';
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth.service';
+import { PortalMessagesService } from '../../core/services/portal-messages.service';
 
 function mockSidenav() {
   return { toggle: vi.fn(), opened: false, openedChange: new EventEmitter<boolean>() } as any;
@@ -16,7 +19,7 @@ describe('NavbarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NavbarComponent, RouterModule.forRoot([])],
+      imports: [NavbarComponent, RouterModule.forRoot([]), TranslateModule.forRoot()],
       providers: [provideHttpClient()],
     }).compileComponents();
     fixture = TestBed.createComponent(NavbarComponent);
@@ -39,38 +42,16 @@ describe('NavbarComponent', () => {
     expect(nativeEl.textContent).toContain('Secure Tax & Accounting Portal');
   });
 
-  it('EN language pill is active by default', () => {
-    expect(component.lang()).toBe('en');
-  });
-
-  it('clicking 中文 sets lang to zh', () => {
-    const zhBtn = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="lang-zh"]') as HTMLElement;
-    zhBtn.click();
-    fixture.detectChanges();
-    expect(component.lang()).toBe('zh');
-  });
-
-  it('clicking EN after 中文 sets lang back to en', () => {
-    const zhBtn = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="lang-zh"]') as HTMLElement;
-    zhBtn.click();
-    fixture.detectChanges();
-
-    const enBtn = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="lang-en"]') as HTMLElement;
-    enBtn.click();
-    fixture.detectChanges();
-    expect(component.lang()).toBe('en');
-  });
-
-  it('"Services" link has href="#services"', () => {
+  it('"Services" link has routerLink="/services"', () => {
     const nativeEl = fixture.nativeElement as HTMLElement;
-    const link = nativeEl.querySelector('a[href="#services"]');
+    const link = nativeEl.querySelector('a[routerLink="/services"]');
     expect(link).not.toBeNull();
     expect(link!.textContent).toContain('Services');
   });
 
-  it('"Security" link has href="#security"', () => {
+  it('"Security" link has routerLink="/security"', () => {
     const nativeEl = fixture.nativeElement as HTMLElement;
-    const link = nativeEl.querySelector('a[href="#security"]');
+    const link = nativeEl.querySelector('a[routerLink="/security"]');
     expect(link).not.toBeNull();
     expect(link!.textContent).toContain('Security');
   });
@@ -82,11 +63,19 @@ describe('NavbarComponent', () => {
     expect(contactLink!.textContent?.trim()).toBe('Contact');
   });
 
-  it('"Book Consultation" link has routerLink="/contact"', () => {
+  it('"Book Consultation" link has routerLink="/book-consultation"', () => {
     const nativeEl = fixture.nativeElement as HTMLElement;
-    const ctaLinks = Array.from(nativeEl.querySelectorAll('a[routerLink="/contact"]'));
-    const ctaLink = ctaLinks.find((a) => a.textContent?.trim() === 'Book Consultation');
-    expect(ctaLink).not.toBeUndefined();
+    const ctaLink = nativeEl.querySelector('a[routerLink="/book-consultation"]');
+    expect(ctaLink).not.toBeNull();
+    expect(ctaLink!.textContent?.trim()).toBe('Book Consultation');
+  });
+
+  it('Contact and Book Consultation are separate links pointing to different routes', () => {
+    const nativeEl = fixture.nativeElement as HTMLElement;
+    const contactLink = nativeEl.querySelector('a[routerLink="/contact"]');
+    const ctaLink = nativeEl.querySelector('a[routerLink="/book-consultation"]');
+    expect(contactLink?.textContent?.trim()).toBe('Contact');
+    expect(ctaLink?.textContent?.trim()).toBe('Book Consultation');
   });
 
   it.todo('"Client Portal" renders <app-client-portal-login> inside navbar — mobile drawer replaced by MatSidenav in Group 3');
@@ -169,5 +158,99 @@ describe('NavbarComponent', () => {
     const nativeEl = fixture.nativeElement as HTMLElement;
     expect(nativeEl.querySelector('[data-testid="logout-btn"]')).not.toBeNull();
     expect(nativeEl.querySelector('[data-testid="client-login-btn"]')).toBeNull();
+  });
+
+  it('logout navigates to /login', () => {
+    const authService = TestBed.inject(AuthService);
+    vi.spyOn(authService, 'logout').mockReturnValue(of(undefined));
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    component.logout();
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/login']);
+  });
+});
+
+describe('Navigation links', () => {
+  let fixture: ComponentFixture<NavbarComponent>;
+  let component: NavbarComponent;
+
+  function setup(role: 'USER' | 'ADMIN' | null, unreadCount = 0) {
+    const mockPortalMessagesService = {
+      getUnreadCount: vi.fn().mockReturnValue(of({ unreadCount })),
+    };
+    TestBed.configureTestingModule({
+      imports: [NavbarComponent, RouterModule.forRoot([]), TranslateModule.forRoot()],
+      providers: [
+        provideHttpClient(),
+        provideNgReflectAttributes(),
+        { provide: PortalMessagesService, useValue: mockPortalMessagesService },
+      ],
+    });
+    fixture = TestBed.createComponent(NavbarComponent);
+    component = fixture.componentInstance;
+    const authService = TestBed.inject(AuthService);
+    if (role) {
+      authService.currentUser.set({ id: 1, email: 'a@b.com', name: 'Alice', role });
+    }
+    fixture.detectChanges();
+  }
+
+  afterEach(() => TestBed.resetTestingModule());
+
+  it('does not render messages-nav-link for USER', () => {
+    setup('USER');
+    expect(fixture.nativeElement.querySelector('[data-testid="messages-nav-link"]')).toBeNull();
+  });
+
+  it('renders admin-clients-nav-link for ADMIN', () => {
+    setup('ADMIN');
+    const link = fixture.nativeElement.querySelector('[data-testid="admin-clients-nav-link"]');
+    expect(link).not.toBeNull();
+    expect(link.getAttribute('routerLink')).toBe('/admin/clients');
+  });
+
+  it('renders dashboard-nav-link for USER', () => {
+    setup('USER');
+    const link = fixture.nativeElement.querySelector('[data-testid="dashboard-nav-link"]');
+    expect(link).not.toBeNull();
+    expect(link.getAttribute('routerLink')).toBe('/portal/dashboard');
+  });
+
+  it('does not render dashboard-nav-link for ADMIN', () => {
+    setup('ADMIN');
+    expect(fixture.nativeElement.querySelector('[data-testid="dashboard-nav-link"]')).toBeNull();
+  });
+
+  it('shows unread badge on dashboard link when unreadCount > 0', () => {
+    setup('USER', 3);
+    const badge = fixture.nativeElement.querySelector('[data-testid="messages-unread-badge"]');
+    expect(badge).not.toBeNull();
+    expect(badge.textContent.trim()).toBe('3');
+  });
+
+  it('hides unread badge when unreadCount is 0', () => {
+    setup('USER', 0);
+    expect(fixture.nativeElement.querySelector('[data-testid="messages-unread-badge"]')).toBeNull();
+  });
+
+  it('brand-link points to /admin/clients for ADMIN', () => {
+    setup('ADMIN');
+    const brand = fixture.nativeElement.querySelector('[data-testid="brand-link"]');
+    expect(brand).not.toBeNull();
+    expect(brand.getAttribute('ng-reflect-router-link')).toContain('admin/clients');
+  });
+
+  it('brand-link points to / for USER', () => {
+    setup('USER');
+    const brand = fixture.nativeElement.querySelector('[data-testid="brand-link"]');
+    expect(brand.getAttribute('ng-reflect-router-link')).toBe('/');
+  });
+
+  it('brand-link points to / when unauthenticated', () => {
+    setup(null);
+    const brand = fixture.nativeElement.querySelector('[data-testid="brand-link"]');
+    expect(brand.getAttribute('ng-reflect-router-link')).toBe('/');
   });
 });
