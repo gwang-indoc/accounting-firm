@@ -70,8 +70,8 @@ public class MeDocumentService {
         Client client = clientRepository.findByUserId(user.getId())
                 .orElseThrow(PortalNotLinkedException::new);
 
+        fileUploadValidator.validate(file);
         String filename = file.getOriginalFilename();
-        fileUploadValidator.validate(filename, file.getSize());
 
         documentRepository
                 .findByClientIdAndYearAndFilename(client.getId(), year, filename)

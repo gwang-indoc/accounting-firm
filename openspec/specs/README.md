@@ -8,7 +8,10 @@ One spec per capability. Each spec is the authoritative record of what the syste
 **User Story**: The app uses a consistent Angular Material design system with colour tokens, typography, and spacing.
 
 ### `client-document-uploads` ✅ Implemented
-**User Story**: Admins upload documents for clients; clients download them from their portal.
+**User Story**: Admins upload documents for clients; clients upload and download their own from the portal.
+**Backend**: `POST /api/clients/{id}/documents?year=` (admin); `POST /api/portal/documents?year=` (client). Three-layer validation in `FileUploadValidator`: (1) extension allowlist (`ALLOWED_EXTENSIONS` env var, default pdf/jpg/png/xlsx/xls/csv/doc/docx), (2) declared `Content-Type` vs extension map, (3) Tika content inspection (magic bytes + OOXMLDetector). `tika-core` + `tika-parser-microsoft-module` detect renamed executables and plain ZIPs masquerading as OOXML.
+**Frontend**: Upload button triggers file picker; 400 error message shown inline.
+**Acceptance Criteria**: Renamed `evil.exe` presented as `evil.pdf` is rejected; plain `.zip` presented as `.xlsx` is rejected; legitimate files of all allowed types upload successfully.
 
 ### `client-login-page` ✅ Implemented
 **User Story**: Clients authenticate at `/login` via Google OAuth2 or email-code OTP, with all text rendered in the active language (EN/ZH).

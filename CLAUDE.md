@@ -191,6 +191,15 @@ Angular async validators (`switchMap` + HTTP) fire real requests during e2e test
 ### Angular forms: always use `mat-form-field` + `matInput`, not bare `<input>`
 New Angular components often use raw `<input>` elements that pass tests but fail Material design consistency. Any form field must be `<mat-form-field appearance="outline"><input matInput .../></mat-form-field>` to get Material theming, error display, and label integration. Bare `<input>` elements look functional but break the design system.
 
+### Tika 3.x requires commons-compress 1.27+ — override Spring Boot BOM
+Spring Boot 3.5 (via testcontainers) resolves `commons-compress:1.24.0`. Tika 3.1.0 calls `ZipArchiveInputStream.getNextEntry()` which only returns `ZipArchiveEntry` in 1.26+. Result: `NoSuchMethodError` at runtime when Tika inspects ZIP/OOXML files. Setting the `commons-compress.version` property alone is NOT enough (Spring Boot doesn't manage this artifact). Must add an explicit `<dependencyManagement>` entry in `pom.xml` to force 1.27.x.
+
+### Tika content detection: never pass filename to `detect()` in security-sensitive code
+`Tika.detect(InputStream, String filename)` uses the filename extension as a hint — it can return an OOXML MIME type for a plain ZIP file named `evil.xlsx` because the extension wins. Use `Tika.detect(InputStream)` (no filename) when the goal is to verify actual bytes, not guess from the extension. Same risk applies to `Tika.detect(byte[], Metadata)` with `RESOURCE_NAME_KEY` set.
+
+### Service-layer tests that use a real `FileUploadValidator` need real magic bytes
+When `FileUploadValidator` is instantiated directly (not mocked) in a service test — e.g. `MeDocumentServiceTest` — any `MockMultipartFile` with dummy string bytes (`"hello"`, `"content"`) will fail Tika's Layer 3 check once content inspection is active. Replace dummy bytes with real magic bytes (e.g. `%PDF-1.4\n...%%EOF` for PDF, programmatic OOXML ZIP for xlsx/docx) in every service test that exercises the happy path through a real validator.
+
 ## Lessons Learned
 
 Lessons from archived changes live in `docs/lessons/` — one file per archive, named `YYYY-MM-DD-<change-name>.md`.

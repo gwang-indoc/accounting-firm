@@ -55,4 +55,4 @@ app:
     upload-dir: ${UPLOAD_DIR:./uploads}
     max-file-size-mb: ${UPLOAD_MAX_FILE_SIZE_MB:10}
     max-filename-length: ${UPLOAD_MAX_FILENAME_LENGTH:100}
-    blocked-extensions: ${BLOCKED_EXTENSIONS:exe,js}
+    allowed-extensions: ${ALLOWED_EXTENSIONS:pdf,jpg,jpeg,png,xlsx,xls,csv,doc,docx}

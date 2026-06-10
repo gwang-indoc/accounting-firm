@@ -19,6 +19,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -35,6 +36,10 @@ import static org.mockito.Mockito.*;
 
 class MeDocumentServiceTest {
 
+    // Real PDF magic bytes — Tika (Layer 3) detects as application/pdf
+    private static final byte[] PDF_BYTES =
+            "%PDF-1.4\n1 0 obj\n<< >>\nendobj\n%%EOF".getBytes(StandardCharsets.US_ASCII);
+
     @TempDir
     Path tempDir;
 
@@ -50,7 +55,7 @@ class MeDocumentServiceTest {
         docRepo = mock(ClientDocumentRepository.class);
         storage = mock(LocalStorageService.class);
         StorageProperties props = new StorageProperties(
-                tempDir, 10, 100, List.of("exe", "js"));
+                tempDir, 10, 100, List.of("pdf", "jpg", "jpeg", "png", "xlsx", "xls", "csv", "doc", "docx"));
         fileUploadValidator = new FileUploadValidator(props);
         service = new MeDocumentService(clientRepo, docRepo, storage, fileUploadValidator);
     }
@@ -231,12 +236,12 @@ class MeDocumentServiceTest {
 
         // Separate instance with real storage to verify the file actually lands on disk.
         LocalStorageService realStorage = new LocalStorageService(tempDir);
-        StorageProperties props = new StorageProperties(tempDir, 10, 100, List.of("exe", "js"));
+        StorageProperties props = new StorageProperties(tempDir, 10, 100, List.of("pdf", "jpg", "jpeg", "png", "xlsx", "xls", "csv", "doc", "docx"));
         FileUploadValidator realValidator = new FileUploadValidator(props);
         MeDocumentService svc = new MeDocumentService(clientRepo, docRepo, realStorage, realValidator);
 
         MockMultipartFile file = new MockMultipartFile(
-                "file", "T4-2024.pdf", "application/pdf", "hello".getBytes());
+                "file", "T4-2024.pdf", "application/pdf", PDF_BYTES);
 
         MyDocumentsDto.Item item = svc.uploadMyDocument(user(7L), 2024, file);
 
@@ -247,7 +252,7 @@ class MeDocumentServiceTest {
         // file was written to disk
         Path written = tempDir.resolve("clients/99/2024/T4-2024.pdf");
         assertThat(Files.exists(written)).isTrue();
-        assertThat(Files.readString(written)).isEqualTo("hello");
+        assertThat(Files.size(written)).isEqualTo(PDF_BYTES.length);
     }
 
     @Test
@@ -260,7 +265,7 @@ class MeDocumentServiceTest {
                 .thenReturn(Optional.of(existing));
 
         MockMultipartFile file = new MockMultipartFile(
-                "file", "T4-2024.pdf", "application/pdf", "second".getBytes());
+                "file", "T4-2024.pdf", "application/pdf", PDF_BYTES);
 
         assertThatThrownBy(() -> service.uploadMyDocument(user(7L), 2024, file))
                 .isInstanceOf(DocumentNameConflictException.class);
@@ -280,7 +285,7 @@ class MeDocumentServiceTest {
     }
 
     @Test
-    void uploadMyDocument_rejectsBlockedExtension() {
+    void uploadMyDocument_rejectsDisallowedExtension() {
         Client c = client(99L, "Jane");
         when(clientRepo.findByUserId(7L)).thenReturn(Optional.of(c));
 

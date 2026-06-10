@@ -13,8 +13,10 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.List;
 
 @Service
@@ -36,18 +38,13 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentUploadResult upload(long clientId,
-                                       int year,
-                                       String filename,
-                                       String mimeType,
-                                       long sizeBytes,
-                                       InputStream in,
-                                       long uploadedBy) {
+    public DocumentUploadResult upload(long clientId, int year, MultipartFile file, long uploadedBy) {
         if (!clientRepository.existsById(clientId)) {
             throw new ClientNotFoundException(clientId);
         }
-        fileUploadValidator.validate(filename, sizeBytes);
+        fileUploadValidator.validate(file);
 
+        String filename = file.getOriginalFilename();
         String filePath = LocalStorageService.relativePath(clientId, year, filename);
         var existingOpt = clientDocumentRepository
                 .findByClientIdAndYearAndFilename(clientId, year, filename);
@@ -56,8 +53,8 @@ public class DocumentService {
         boolean isNew;
         if (existingOpt.isPresent()) {
             doc = existingOpt.get();
-            doc.setMimeType(mimeType);
-            doc.setSizeBytes(sizeBytes);
+            doc.setMimeType(file.getContentType());
+            doc.setSizeBytes(file.getSize());
             doc.setUploadedBy(uploadedBy);
             isNew = false;
         } else {
@@ -66,14 +63,18 @@ public class DocumentService {
             doc.setYear((short) year);
             doc.setFilename(filename);
             doc.setFilePath(filePath);
-            doc.setMimeType(mimeType);
-            doc.setSizeBytes(sizeBytes);
+            doc.setMimeType(file.getContentType());
+            doc.setSizeBytes(file.getSize());
             doc.setUploadedBy(uploadedBy);
             isNew = true;
         }
         // Save to DB first — if the file write subsequently fails, @Transactional rolls back the DB row
         ClientDocument saved = clientDocumentRepository.save(doc);
-        localStorageService.store(clientId, year, filename, in);
+        try {
+            localStorageService.store(clientId, year, filename, file.getInputStream());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         return new DocumentUploadResult(toDto(saved), isNew);
     }
 

@@ -16,9 +16,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.Resource;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -69,6 +69,10 @@ class DocumentServiceTest {
         return doc;
     }
 
+    private MockMultipartFile pdf(String filename) {
+        return new MockMultipartFile("file", filename, "application/pdf", "content".getBytes());
+    }
+
     @Test
     void upload_newFile_storesFileAndCreatesRecord() {
         when(clientRepository.existsById(1L)).thenReturn(true);
@@ -81,11 +85,9 @@ class DocumentServiceTest {
                     return c;
                 });
 
-        InputStream in = new ByteArrayInputStream("content".getBytes());
-        DocumentUploadResult result = documentService.upload(
-                1L, 2025, "tax.pdf", "application/pdf", 1024L, in, 7L);
+        DocumentUploadResult result = documentService.upload(1L, 2025, pdf("tax.pdf"), 7L);
 
-        verify(localStorageService).store(eq(1L), eq(2025), eq("tax.pdf"), any(InputStream.class));
+        verify(localStorageService).store(eq(1L), eq(2025), eq("tax.pdf"), any());
         verify(clientDocumentRepository).save(any(ClientDocument.class));
         assertThat(result.isNew()).isTrue();
         assertThat(result.document().filename()).isEqualTo("tax.pdf");
@@ -100,26 +102,26 @@ class DocumentServiceTest {
         when(clientDocumentRepository.save(any(ClientDocument.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
 
-        InputStream in = new ByteArrayInputStream("new-content".getBytes());
-        DocumentUploadResult result = documentService.upload(
-                1L, 2025, "tax.pdf", "application/pdf", 2048L, in, 7L);
+        MockMultipartFile newFile = new MockMultipartFile(
+                "file", "tax.pdf", "application/pdf", "new-content".getBytes());
+        DocumentUploadResult result = documentService.upload(1L, 2025, newFile, 7L);
 
-        verify(localStorageService).store(eq(1L), eq(2025), eq("tax.pdf"), any(InputStream.class));
+        verify(localStorageService).store(eq(1L), eq(2025), eq("tax.pdf"), any());
         verify(clientDocumentRepository).save(any(ClientDocument.class));
         assertThat(result.isNew()).isFalse();
-        assertThat(existing.getSizeBytes()).isEqualTo(2048L);
+        assertThat(existing.getSizeBytes()).isEqualTo(newFile.getSize());
     }
 
     @Test
-    void upload_blockedExtension_throwsFileValidationException() {
+    void upload_disallowedExtension_throwsFileValidationException() {
         when(clientRepository.existsById(1L)).thenReturn(true);
-        doThrow(new FileValidationException("Blocked file extension: .exe"))
-                .when(fileUploadValidator).validate(eq("malware.exe"), anyLong());
-
-        InputStream in = new ByteArrayInputStream("bad".getBytes());
+        doThrow(new FileValidationException("File type not allowed"))
+                .when(fileUploadValidator).validate(any(MultipartFile.class));
 
         assertThatThrownBy(() -> documentService.upload(
-                1L, 2025, "malware.exe", "application/octet-stream", 100L, in, 7L))
+                1L, 2025,
+                new MockMultipartFile("file", "malware.exe", "application/octet-stream", "bad".getBytes()),
+                7L))
                 .isInstanceOf(FileValidationException.class);
 
         verify(localStorageService, never()).store(anyLong(), anyInt(), anyString(), any());
@@ -129,12 +131,12 @@ class DocumentServiceTest {
     void upload_filenameTooLong_throwsFileValidationException() {
         when(clientRepository.existsById(1L)).thenReturn(true);
         doThrow(new FileValidationException("Filename exceeds max length"))
-                .when(fileUploadValidator).validate(eq("way-too-long-filename.pdf"), anyLong());
-
-        InputStream in = new ByteArrayInputStream("data".getBytes());
+                .when(fileUploadValidator).validate(any(MultipartFile.class));
 
         assertThatThrownBy(() -> documentService.upload(
-                1L, 2025, "way-too-long-filename.pdf", "application/pdf", 100L, in, 7L))
+                1L, 2025,
+                new MockMultipartFile("file", "way-too-long.pdf", "application/pdf", "data".getBytes()),
+                7L))
                 .isInstanceOf(FileValidationException.class);
 
         verify(localStorageService, never()).store(anyLong(), anyInt(), anyString(), any());
@@ -143,14 +145,13 @@ class DocumentServiceTest {
     @Test
     void upload_fileTooLarge_throwsFileValidationException() {
         when(clientRepository.existsById(1L)).thenReturn(true);
-        long twoMb = 2L * 1024L * 1024L;
         doThrow(new FileValidationException("File exceeds max size of 1 MB"))
-                .when(fileUploadValidator).validate(eq("big.pdf"), eq(twoMb));
-
-        InputStream in = new ByteArrayInputStream("data".getBytes());
+                .when(fileUploadValidator).validate(any(MultipartFile.class));
 
         assertThatThrownBy(() -> documentService.upload(
-                1L, 2025, "big.pdf", "application/pdf", twoMb, in, 7L))
+                1L, 2025,
+                new MockMultipartFile("file", "big.pdf", "application/pdf", new byte[2 * 1024 * 1024]),
+                7L))
                 .isInstanceOf(FileValidationException.class);
 
         verify(localStorageService, never()).store(anyLong(), anyInt(), anyString(), any());
@@ -160,12 +161,12 @@ class DocumentServiceTest {
     void upload_filenameWithPathTraversal_throwsFileValidationException() {
         when(clientRepository.existsById(1L)).thenReturn(true);
         doThrow(new FileValidationException("Filename contains illegal path characters"))
-                .when(fileUploadValidator).validate(eq("../etc/passwd"), anyLong());
-
-        InputStream in = new ByteArrayInputStream("data".getBytes());
+                .when(fileUploadValidator).validate(any(MultipartFile.class));
 
         assertThatThrownBy(() -> documentService.upload(
-                1L, 2025, "../etc/passwd", "text/plain", 100L, in, 7L))
+                1L, 2025,
+                new MockMultipartFile("file", "../etc/passwd", "text/plain", "data".getBytes()),
+                7L))
                 .isInstanceOf(FileValidationException.class);
 
         verify(localStorageService, never()).store(anyLong(), anyInt(), anyString(), any());
@@ -175,10 +176,7 @@ class DocumentServiceTest {
     void upload_clientNotFound_throwsClientNotFoundException() {
         when(clientRepository.existsById(99L)).thenReturn(false);
 
-        InputStream in = new ByteArrayInputStream("data".getBytes());
-
-        assertThatThrownBy(() -> documentService.upload(
-                99L, 2025, "tax.pdf", "application/pdf", 100L, in, 7L))
+        assertThatThrownBy(() -> documentService.upload(99L, 2025, pdf("tax.pdf"), 7L))
                 .isInstanceOf(ClientNotFoundException.class);
 
         verify(localStorageService, never()).store(anyLong(), anyInt(), anyString(), any());
