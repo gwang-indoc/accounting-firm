@@ -225,9 +225,10 @@ artifacts:
       **Review checkpoints (mandatory):**
       - Each `## N` task group MUST end with:
         `- [ ] N.Z Run superpowers:requesting-code-review on the diff for group N; address CRITICAL/HIGH findings before moving on`
-      - Final group MUST include:
+      - Final group MUST include, in order:
+        `- [ ] N.Y Run /security-review on the branch diff; address Critical/High/Medium findings before proceeding`
         `- [ ] N.Z Run superpowers:verification-before-completion`
-        (N = final group number; Z = last position in that group)
+        (N = final group number; Y = second-to-last position, Z = last position in that group)
 
       Skill names: when a task should invoke a superpowers skill, name it
       explicitly (e.g., `Invoke superpowers:test-driven-development to scaffold
