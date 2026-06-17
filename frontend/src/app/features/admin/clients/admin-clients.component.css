@@ -96,6 +96,48 @@
   letter-spacing: 0.2px;
 }
 
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Select all button ─────────────────────────── */
+
+.select-all-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 13px;
+  background: transparent;
+  border: 1px solid #334155;
+  border-radius: 7px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+
+.select-all-btn:hover {
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.5);
+  background: rgba(56, 189, 248, 0.06);
+}
+
+.select-all-icon {
+  flex-shrink: 0;
+  opacity: 0.9;
+  transition: opacity 0.15s;
+}
+
+.select-all-btn:hover .select-all-icon {
+  opacity: 1;
+}
+
 .add-btn {
   background: #38bdf8 !important;
   color: #0f172a !important;
@@ -220,6 +262,136 @@
 
 .action-docs:hover {
   background: rgba(167, 139, 250, 0.1) !important;
+}
+
+/* ── Export toolbar ────────────────────────────── */
+
+.export-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px 10px 14px;
+  margin-bottom: 2px;
+  background: linear-gradient(to right, rgba(16, 185, 129, 0.07), rgba(16, 185, 129, 0.03));
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-left: 3px solid #10b981;
+  border-radius: 8px;
+  animation: toolbar-slide-in 0.18s ease-out;
+}
+
+@keyframes toolbar-slide-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.export-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.export-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 6px;
+  color: #10b981;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.export-toolbar-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  letter-spacing: 0.1px;
+}
+
+.clear-selection-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 9px;
+  background: transparent;
+  border: 1px solid rgba(100, 116, 139, 0.3);
+  border-radius: 5px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+
+.clear-selection-btn:hover {
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.4);
+  background: rgba(248, 113, 113, 0.06);
+}
+
+.export-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 16px;
+  background: #10b981;
+  border: none;
+  border-radius: 7px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.export-action-btn:hover:not([disabled]) {
+  background: #34d399;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.export-action-btn:active:not([disabled]) {
+  transform: translateY(1px);
+}
+
+.export-action-btn[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.export-spinner {
+  --mdc-circular-progress-active-indicator-color: #fff;
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.cap-message {
+  font-size: 12px;
+  color: #f87171;
+  font-weight: 500;
+  margin: 0 0 6px;
+  padding: 6px 12px;
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  border-radius: 6px;
+}
+
+/* ── Select column ─────────────────────────────── */
+
+.select-col {
+  width: 40px;
+  padding-left: 12px !important;
+  padding-right: 4px !important;
 }
 
 /* ── Empty state ───────────────────────────────── */

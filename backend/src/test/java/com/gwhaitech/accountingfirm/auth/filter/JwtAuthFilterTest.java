@@ -5,6 +5,7 @@ import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
 import com.gwhaitech.accountingfirm.auth.service.EmailLoginCodeService;
 import com.gwhaitech.accountingfirm.auth.service.JwtCookieHelper;
 import com.gwhaitech.accountingfirm.auth.service.JwtService;
+import com.gwhaitech.accountingfirm.client.service.AdminExportService;
 import com.gwhaitech.accountingfirm.client.service.MeDocumentService;
 import com.gwhaitech.accountingfirm.client.service.UserClientLinkService;
 import com.gwhaitech.accountingfirm.messaging.service.MessagingService;
@@ -108,6 +109,10 @@ class JwtAuthFilterTest {
     // satisfies ContactController constructor wiring in the WebMvcTest context
     @MockitoBean
     private ContactService contactService;
+
+    // satisfies AdminExportController constructor wiring in the WebMvcTest context
+    @MockitoBean
+    private AdminExportService adminExportService;
 
     @MockitoBean
     private RateLimiter rateLimiter;

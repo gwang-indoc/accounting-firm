@@ -6,6 +6,7 @@ import com.gwhaitech.accountingfirm.client.exception.ClientEmailNotRegisteredExc
 import com.gwhaitech.accountingfirm.client.exception.ClientNotFoundException;
 import com.gwhaitech.accountingfirm.client.exception.DocumentNameConflictException;
 import com.gwhaitech.accountingfirm.client.exception.DocumentNotFoundException;
+import com.gwhaitech.accountingfirm.client.exception.ExportValidationException;
 import com.gwhaitech.accountingfirm.client.exception.FileValidationException;
 import com.gwhaitech.accountingfirm.client.exception.PortalNotLinkedException;
 import org.springframework.http.HttpStatus;
@@ -62,6 +63,11 @@ public class GlobalExceptionHandler {
                 "filename", ex.getFilename(),
                 "year", ex.getYear()
         ));
+    }
+
+    @ExceptionHandler(ExportValidationException.class)
+    public ResponseEntity<Map<String, String>> handleExportValidation(ExportValidationException ex) {
+        return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
     }
 
     @ExceptionHandler(PortalNotLinkedException.class)

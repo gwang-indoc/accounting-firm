@@ -121,6 +121,10 @@ When ≥1 client is selected, the admin client list SHALL display an export tool
 - **WHEN** the active selection reaches 200 clients
 - **THEN** the "Export" button remains enabled but attempting to select a 201st client shows an inline message "Export limited to 200 clients at a time" and the 201st is not added
 
+#### Scenario: Clear selection button deselects all clients
+- **WHEN** the admin clicks the "Clear" button in the export toolbar
+- **THEN** all selected clients are deselected, the export toolbar is hidden, and any cap message is dismissed
+
 ---
 
 ### Requirement: Export triggers a file download in the browser

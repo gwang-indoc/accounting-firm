@@ -1,7 +1,9 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 
 const PAGE_SIZE = 20;
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
@@ -9,20 +11,23 @@ import { TranslateModule } from '@ngx-translate/core';
 import { take } from 'rxjs/operators';
 import { AdminClientsService } from '../../../core/services/admin-clients.service';
 import { AdminClientMessagesService } from '../../../core/services/admin-client-messages.service';
+import { AdminExportService } from '../../../core/services/admin-export.service';
 import { ClientDto } from '../../../core/models/client.model';
 import { AdminClientDialogComponent } from './admin-client-dialog.component';
 import { AdminConfirmDialogComponent } from './admin-confirm-dialog.component';
+import { AdminExportDialogComponent, ExportDialogResult } from './admin-export-dialog.component';
 
 @Component({
   selector: 'app-admin-clients',
   standalone: true,
-  imports: [MatButtonModule, RouterLink, TranslateModule],
+  imports: [MatButtonModule, MatCheckboxModule, MatProgressSpinnerModule, RouterLink, TranslateModule],
   templateUrl: './admin-clients.component.html',
   styleUrl: './admin-clients.component.css',
 })
 export class AdminClientsComponent implements OnInit {
   private adminClientsService = inject(AdminClientsService);
   private messagesService = inject(AdminClientMessagesService);
+  private exportService = inject(AdminExportService);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
   private router = inject(Router);
@@ -33,6 +38,19 @@ export class AdminClientsComponent implements OnInit {
   emailFilter = signal<string>('');
   page = signal<number>(1);
   readonly pageSize = PAGE_SIZE;
+
+  selectedClientIds = signal<Set<number>>(new Set());
+  capMessage = signal<string>('');
+  isExporting = signal(false);
+
+  constructor() {
+    effect(() => {
+      this.nameFilter();
+      this.emailFilter();
+      this.selectedClientIds.set(new Set());
+      this.capMessage.set('');
+    });
+  }
 
   filteredClients = computed<ClientDto[]>(() => {
     const name = this.nameFilter().trim().toLowerCase();
@@ -125,6 +143,60 @@ export class AdminClientsComponent implements OnInit {
 
   openDocuments(client: ClientDto): void {
     this.router.navigate(['/admin/clients', client.id, 'documents']);
+  }
+
+  toggleSelection(id: number): void {
+    const current = new Set(this.selectedClientIds());
+    if (current.has(id)) {
+      current.delete(id);
+      this.selectedClientIds.set(current);
+      this.capMessage.set('');
+    } else if (current.size >= 200) {
+      this.capMessage.set('Export limited to 200 clients at a time');
+    } else {
+      current.add(id);
+      this.selectedClientIds.set(current);
+    }
+  }
+
+  clearSelection(): void {
+    this.selectedClientIds.set(new Set());
+    this.capMessage.set('');
+  }
+
+  selectAll(): void {
+    this.exportService.getAllClientIds(this.nameFilter(), this.emailFilter()).subscribe({
+      next: (ids) => {
+        const merged = new Set(this.selectedClientIds());
+        for (const id of ids) {
+          if (merged.size < 200) merged.add(id);
+        }
+        this.selectedClientIds.set(merged);
+        if (ids.length > 200) {
+          this.capMessage.set('Export limited to 200 clients at a time');
+        }
+      },
+      error: () => this.snackBar.open('Failed to fetch client IDs.', 'OK'),
+    });
+  }
+
+  openExportDialog(): void {
+    this.dialog.open(AdminExportDialogComponent, { width: '420px' })
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe((result: ExportDialogResult | null) => {
+        if (!result) return;
+        const ids = Array.from(this.selectedClientIds());
+        this.isExporting.set(true);
+        this.exportService.downloadExport(ids, result).subscribe({
+          next: () => { this.isExporting.set(false); },
+          error: (err) => {
+            this.isExporting.set(false);
+            const msg = err?.error?.message ?? 'Export failed. Please try again.';
+            this.snackBar.open(msg, 'OK');
+          },
+        });
+      });
   }
 
   confirmDelete(client: ClientDto): void {

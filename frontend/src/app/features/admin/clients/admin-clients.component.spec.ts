@@ -7,7 +7,9 @@ import { provideRouter, Router } from '@angular/router';
 import { AdminClientsComponent } from './admin-clients.component';
 import { AdminClientsService } from '../../../core/services/admin-clients.service';
 import { AdminClientMessagesService } from '../../../core/services/admin-client-messages.service';
+import { AdminExportService } from '../../../core/services/admin-export.service';
 import { ClientDto } from '../../../core/models/client.model';
+import { TranslateModule } from '@ngx-translate/core';
 import { of } from 'rxjs';
 
 const sampleClients: ClientDto[] = [
@@ -36,7 +38,7 @@ async function setup(clients: ClientDto[]): Promise<ComponentFixture<AdminClient
   };
 
   await TestBed.configureTestingModule({
-    imports: [AdminClientsComponent],
+    imports: [AdminClientsComponent, TranslateModule.forRoot()],
     providers: [
       provideZonelessChangeDetection(),
       provideHttpClient(),
@@ -44,6 +46,7 @@ async function setup(clients: ClientDto[]): Promise<ComponentFixture<AdminClient
       provideAnimationsAsync(),
       { provide: AdminClientsService, useValue: mockService },
       { provide: AdminClientMessagesService, useValue: { getUnreadCounts: vi.fn().mockReturnValue(of([])) } },
+      { provide: AdminExportService, useValue: { getAllClientIds: vi.fn().mockReturnValue(of([])), export: vi.fn() } },
       provideRouter([]),
     ],
   }).compileComponents();
@@ -53,6 +56,43 @@ async function setup(clients: ClientDto[]): Promise<ComponentFixture<AdminClient
   await fixture.whenStable();
   fixture.detectChanges();
   return fixture;
+}
+
+async function setupForExport(
+  clients: ClientDto[],
+  exportService?: Partial<AdminExportService>
+): Promise<{ fixture: ComponentFixture<AdminClientsComponent>; mockExportService: Partial<AdminExportService> }> {
+  const mockExportService: Partial<AdminExportService> = {
+    getAllClientIds: vi.fn().mockReturnValue(of(clients.map(c => c.id))),
+    export: vi.fn().mockReturnValue(of(new Blob())),
+    ...exportService,
+  };
+  const mockService: Partial<AdminClientsService> = {
+    getAll: vi.fn().mockReturnValue(of(clients)),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+  };
+
+  await TestBed.configureTestingModule({
+    imports: [AdminClientsComponent, TranslateModule.forRoot()],
+    providers: [
+      provideZonelessChangeDetection(),
+      provideHttpClient(),
+      provideHttpClientTesting(),
+      provideAnimationsAsync(),
+      { provide: AdminClientsService, useValue: mockService },
+      { provide: AdminClientMessagesService, useValue: { getUnreadCounts: vi.fn().mockReturnValue(of([])) } },
+      { provide: AdminExportService, useValue: mockExportService },
+      provideRouter([]),
+    ],
+  }).compileComponents();
+
+  const fixture = TestBed.createComponent(AdminClientsComponent);
+  fixture.detectChanges();
+  await fixture.whenStable();
+  fixture.detectChanges();
+  return { fixture, mockExportService };
 }
 
 describe('AdminClientsComponent', () => {
@@ -220,6 +260,130 @@ describe('AdminClientsComponent', () => {
     });
   });
 
+  describe('multi-select and export', () => {
+    it('clicking a row checkbox adds that client id to selectedClientIds', async () => {
+      const { fixture } = await setupForExport(sampleClients);
+      const checkboxHosts = fixture.nativeElement.querySelectorAll('[data-testid="client-select-cb"]');
+      expect(checkboxHosts.length).toBe(2);
+      const input: HTMLInputElement = checkboxHosts[0].querySelector('input[type="checkbox"]');
+      input.click();
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      expect(fixture.componentInstance.selectedClientIds().has(sampleClients[0].id)).toBe(true);
+    });
+
+    it('clicking a checked row checkbox removes that client id from selectedClientIds', async () => {
+      const { fixture } = await setupForExport(sampleClients);
+      fixture.componentInstance.toggleSelection(sampleClients[0].id);
+      fixture.detectChanges();
+      fixture.componentInstance.toggleSelection(sampleClients[0].id);
+      fixture.detectChanges();
+      expect(fixture.componentInstance.selectedClientIds().has(sampleClients[0].id)).toBe(false);
+    });
+
+    it('clicking Select All calls getAllClientIds with current filters and merges ids', async () => {
+      const { fixture, mockExportService } = await setupForExport(sampleClients);
+      const selectAllBtn: HTMLButtonElement = fixture.nativeElement.querySelector('[data-testid="select-all-btn"]');
+      expect(selectAllBtn).not.toBeNull();
+      selectAllBtn.click();
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      expect(mockExportService.getAllClientIds).toHaveBeenCalledWith('', '');
+      expect(fixture.componentInstance.selectedClientIds().size).toBe(sampleClients.length);
+    });
+
+    it('changing name filter clears selection', async () => {
+      const { fixture } = await setupForExport(sampleClients);
+      fixture.componentInstance.toggleSelection(sampleClients[0].id);
+      fixture.detectChanges();
+      expect(fixture.componentInstance.selectedClientIds().size).toBe(1);
+
+      const input: HTMLInputElement = fixture.nativeElement.querySelector('[data-testid="filter-name"]');
+      input.value = 'jane';
+      input.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      expect(fixture.componentInstance.selectedClientIds().size).toBe(0);
+    });
+
+    it('changing email filter clears selection', async () => {
+      const { fixture } = await setupForExport(sampleClients);
+      fixture.componentInstance.toggleSelection(sampleClients[0].id);
+      fixture.detectChanges();
+      expect(fixture.componentInstance.selectedClientIds().size).toBe(1);
+
+      const input: HTMLInputElement = fixture.nativeElement.querySelector('[data-testid="filter-email"]');
+      input.value = 'work';
+      input.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      expect(fixture.componentInstance.selectedClientIds().size).toBe(0);
+    });
+
+    it('adding a 201st client shows cap message and does not add the client', async () => {
+      const { fixture } = await setupForExport(makeClients(201));
+      const comp = fixture.componentInstance;
+      const first200 = Array.from({ length: 200 }, (_, i) => i + 1);
+      comp.selectedClientIds.set(new Set(first200));
+      fixture.detectChanges();
+
+      comp.toggleSelection(201);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+
+      expect(comp.selectedClientIds().size).toBe(200);
+      const capMsg = fixture.nativeElement.querySelector('[data-testid="export-cap-msg"]');
+      expect(capMsg).not.toBeNull();
+      expect(capMsg.textContent).toContain('Export limited to 200 clients at a time');
+    });
+  });
+
+  describe('export toolbar', () => {
+    it('export toolbar is hidden when no clients are selected', async () => {
+      const { fixture } = await setupForExport(sampleClients);
+      const toolbar = fixture.nativeElement.querySelector('[data-testid="export-toolbar"]');
+      expect(toolbar).toBeNull();
+    });
+
+    it('export toolbar is visible and shows count when at least 1 client is selected', async () => {
+      const { fixture } = await setupForExport(sampleClients);
+      fixture.componentInstance.toggleSelection(sampleClients[0].id);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      const toolbar = fixture.nativeElement.querySelector('[data-testid="export-toolbar"]');
+      expect(toolbar).not.toBeNull();
+      expect(toolbar.textContent).toContain('1');
+    });
+
+    it('export toolbar shows correct count when multiple clients are selected', async () => {
+      const { fixture } = await setupForExport(sampleClients);
+      fixture.componentInstance.toggleSelection(sampleClients[0].id);
+      fixture.componentInstance.toggleSelection(sampleClients[1].id);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      const toolbar = fixture.nativeElement.querySelector('[data-testid="export-toolbar"]');
+      expect(toolbar).not.toBeNull();
+      expect(toolbar.textContent).toContain('2');
+    });
+
+    it('export toolbar has an Export button', async () => {
+      const { fixture } = await setupForExport(sampleClients);
+      fixture.componentInstance.toggleSelection(sampleClients[0].id);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      const exportBtn = fixture.nativeElement.querySelector('[data-testid="export-btn"]');
+      expect(exportBtn).not.toBeNull();
+    });
+  });
+
   describe('Messages action and unread badge', () => {
     it('renders Messages button on each row', async () => {
       const fixture = await setup(sampleClients);
@@ -259,7 +423,7 @@ async function setupWithMessages(
     delete: vi.fn(),
   };
   await TestBed.configureTestingModule({
-    imports: [AdminClientsComponent],
+    imports: [AdminClientsComponent, TranslateModule.forRoot()],
     providers: [
       provideZonelessChangeDetection(),
       provideHttpClient(),
@@ -267,6 +431,7 @@ async function setupWithMessages(
       provideAnimationsAsync(),
       { provide: AdminClientsService, useValue: mockService },
       { provide: AdminClientMessagesService, useValue: msgService },
+      { provide: AdminExportService, useValue: { getAllClientIds: vi.fn().mockReturnValue(of([])), export: vi.fn() } },
       provideRouter([]),
     ],
   }).compileComponents();
