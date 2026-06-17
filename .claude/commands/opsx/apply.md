@@ -114,9 +114,9 @@ After each evaluator result:
   - If escalating: pause with score history — "Group N failed after {attempt-1} attempts. Score history: {score_history}. Last findings: {findings}. Options: (1) Fix manually then type 'resume', (2) Skip group N, (3) Abort apply."
   - Otherwise: FIX tasks were already appended to `tasks.md` by the evaluator. Execute them, then re-spawn the evaluator.
 
-- **`- [ ] N.X Run /security-review ...`** → invoke the `security-review` skill on the current branch diff. Read the findings report by severity (findings land in your own context — no parsing contract needed).
+- **Final group's security-review task** (`Run /security-review ...`) → invoke the `security-review` skill on the current branch diff. Read the findings report by severity (findings land in your own context — no parsing contract needed).
   - **Critical / High / Medium present** → pause: "Security gate BLOCKED — {count} findings (Critical/High/Medium). Options: (1) fix then resume, (2) waive with written justification, (3) abort apply." Do NOT mark the checkbox until none remain or the user explicitly waives.
-  - **Low only (or none)** → log the Low findings as advisory, mark the checkbox `[x]`, continue to the verification task.
+  - **Low only (or none)** → surface the Low findings to the user as advisory, mark the checkbox `[x]`, continue to the verification task.
 
 - **Final group's verification task** (`Run superpowers:verification-before-completion`) → invoke `superpowers:verification-before-completion`. Runs pytest / vitest / e2e / `console.log` audit. Fix any failures before marking complete.
 
