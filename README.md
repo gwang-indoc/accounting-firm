@@ -105,6 +105,7 @@ Home → Client Login → Google OAuth2 → Portal Dashboard
 Login → /admin/clients (client list)
       → Client row → Documents tab (upload signed return)
       → Client row → Messages tab → Thread (reply to client query)
+      → Select clients (checkbox) → Export → CSV / ZIP download
 ```
 
 ---

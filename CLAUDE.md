@@ -200,6 +200,12 @@ Spring Boot 3.5 (via testcontainers) resolves `commons-compress:1.24.0`. Tika 3.
 ### Service-layer tests that use a real `FileUploadValidator` need real magic bytes
 When `FileUploadValidator` is instantiated directly (not mocked) in a service test — e.g. `MeDocumentServiceTest` — any `MockMultipartFile` with dummy string bytes (`"hello"`, `"content"`) will fail Tika's Layer 3 check once content inspection is active. Replace dummy bytes with real magic bytes (e.g. `%PDF-1.4\n...%%EOF` for PDF, programmatic OOXML ZIP for xlsx/docx) in every service test that exercises the happy path through a real validator.
 
+### HttpClient blob downloads: error responses are also Blobs
+When using `HttpClient` with `responseType: 'blob'`, Angular wraps the error body as a `Blob` too — `err.error` is a `Blob`, not a parsed object. Accessing `err.error.message` directly returns `undefined`. To surface server error messages, use `FileReader.readAsText(err.error)` followed by `JSON.parse(reader.result)` inside the `onload` callback before emitting the error. This applies to any `downloadExport`-style service that needs to surface 400/403 server messages to the UI.
+
+### `mat-checkbox (change)` does not fire in JSDOM on host element click
+Clicking the `<mat-checkbox>` host element in Angular tests (JSDOM) does not trigger the `(change)` output binding. Use `checkboxHost.querySelector('input[type="checkbox"]').click()` to fire the native change event that Angular picks up. This affects all component specs that test checkbox-driven selection logic.
+
 ## Lessons Learned
 
 Lessons from archived changes live in `docs/lessons/` — one file per archive, named `YYYY-MM-DD-<change-name>.md`.
