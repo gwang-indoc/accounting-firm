@@ -30,6 +30,7 @@ This guide helps you get the most out of our platform for managing tax documents
 ### Part 4: Admin Panel
 - Getting Started
 - Client Management
+- Bulk Client Export
 - Per-Client Document Management
 - Per-Client Messaging & Support
 
@@ -117,6 +118,7 @@ Welcome to the GWH Accounting admin panel. This is your back-office for managing
 ### What You Can Do
 
 - **Manage clients** — Add, edit, and search your client roster with portal access control
+- **Bulk export clients** — Select up to 200 clients and download their metadata as CSV, their documents as ZIP, or both
 - **Upload documents** — Submit tax returns, financial reports, and other documents directly to any client's account
 - **Organize by tax year** — Manage documents across multiple filing years for the same client
 - **Reply to client messages** — Respond to inquiries, track conversation status, prioritize unread threads
@@ -616,6 +618,64 @@ The Client Management page is your main dashboard — a searchable, sortable ros
 
 ---
 
+## Bulk Client Export
+
+You can export data for multiple clients at once — either as a CSV of client contact information, a ZIP of their documents, or both combined.
+
+### How to Select Clients
+
+![Admin client list with checkboxes visible in first column and "Select all" button in toolbar](screenshots/14-admin-client-export-select.png)
+*Figure 12: Admin client list with checkbox column and "Select all" action*
+
+1. On the Client Management page, check the **checkbox** on the left of any client row to add them to your selection
+2. Repeat for each client you want to include (up to 200 at a time)
+3. To grab all clients matching your current search, click **"Select all"** in the toolbar — this fetches all matching IDs across every page in one step
+4. To narrow your selection to a subset, use the **name or email search boxes** first, then click "Select all"
+
+> **Tip:** Changing the name or email filter automatically clears your current selection so you always start fresh.
+
+### Export Toolbar
+
+![Export toolbar showing "2 clients selected", a "Clear" button, and a green "Export" button](screenshots/15-admin-client-export-toolbar.png)
+*Figure 13: Export toolbar appears as soon as at least one client is selected*
+
+Once you have at least one client checked, a green toolbar appears above the table showing:
+
+- **Count badge** — number of currently selected clients
+- **"Clear" button** — deselects all clients and dismisses the toolbar
+- **"Export" button** — opens the export configuration dialog
+
+### Export Dialog
+
+![Export dialog with "Include client metadata" and "Include documents" checkboxes and a Year dropdown](screenshots/16-admin-client-export-dialog.png)
+*Figure 14: Export configuration dialog — choose metadata, documents, or both*
+
+Clicking **"Export"** opens the configuration dialog:
+
+| Option | What it produces |
+|--------|-----------------|
+| **Include client metadata** (checked by default) | A `.csv` file with Name, Email, Phone, Created Date, and linked portal account email for each selected client |
+| **Include documents** (checked by default) | A `.zip` file containing each client's uploaded documents in folders named `{ClientName}-{clientId}/{year}/` |
+| Both checked | A combined `.zip` containing `clients.csv` plus all document folders |
+
+**Year selector** (visible when "Include documents" is checked):
+- **"Year" / All years** — exports documents from every year on record
+- A specific year (e.g., 2025) — exports only documents uploaded under that tax year
+
+After configuring:
+1. Click **"Export"** — the button shows a spinner while the file is prepared
+2. Your browser automatically downloads the file (CSV or ZIP) with a date-stamped filename
+3. If the server returns an error (e.g., no documents found), a message appears at the bottom of the screen
+
+### Pro Tips
+
+- **Filter before select** — Use the name/email search to narrow the list, then "Select all" to grab the whole filtered set
+- **Metadata-only is fast** — No documents to stream; use it for a quick client roster export
+- **200-client cap** — If you hit 200, an inline warning appears; clear and split your export into batches if needed
+- **Combined export** — Best for archiving a client's entire history in one download
+
+---
+
 ## Per-Client Document Management
 
 For each client, you can upload, download, and organize documents by tax year.
@@ -784,7 +844,7 @@ A: You can upload PDF, DOCX, XLSX, XLS, JPG, and PNG files. Maximum file size is
 A: We keep all documents indefinitely. They're securely stored and encrypted. You can download them anytime.
 
 **Q: Can I export all my documents at once?**
-A: Not yet, but it's on our roadmap. For now, download them individually or ask your accountant for a batch export.
+A: Download them individually from your Documents tab. For bulk exports of your documents (across tax years), ask your accountant — they can use the admin export tool to bundle everything into a ZIP and send it your way.
 
 **Q: How secure are my messages?**
 A: Your messages are encrypted in transit (TLS) and at rest (AES-256). Only you and your accountant can see them. No one else has access.
