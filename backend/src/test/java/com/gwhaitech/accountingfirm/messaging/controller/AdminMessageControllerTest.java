@@ -24,7 +24,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.gwhaitech.accountingfirm.client.dto.ClientDto;
+import com.gwhaitech.accountingfirm.client.exception.ClientAccessDeniedException;
+import com.gwhaitech.accountingfirm.client.service.ClientService;
+
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -53,6 +58,9 @@ class AdminMessageControllerTest {
     @MockitoBean
     MessagingService service;
 
+    @MockitoBean
+    ClientService clientService;
+
     @Autowired
     MockMvc mvc;
 
@@ -68,9 +76,14 @@ class AdminMessageControllerTest {
             List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
     }
 
+    private ClientDto clientDto(long id) {
+        return new ClientDto(id, "ACME", "acme@example.com", null, null, null, 42L);
+    }
+
     @Test
     void listThreads_returnsOk() throws Exception {
         var dto = new MessageThreadSummaryDto(50L, 7L, "Tax", LocalDateTime.now(), 2, 0, null, "preview");
+        when(clientService.findById(7L, 42L)).thenReturn(clientDto(7L));
         when(service.listAdminThreads(7L)).thenReturn(List.of(dto));
         mvc.perform(get("/api/clients/7/threads").with(authentication(adminAuth())))
            .andExpect(status().isOk())
@@ -81,6 +94,7 @@ class AdminMessageControllerTest {
     @Test
     void listThreads_includesClientUnreadCountAndLastSenderType() throws Exception {
         var dto = new MessageThreadSummaryDto(50L, 7L, "Tax", LocalDateTime.now(), 2, 1, "ADMIN", "preview");
+        when(clientService.findById(7L, 42L)).thenReturn(clientDto(7L));
         when(service.listAdminThreads(7L)).thenReturn(List.of(dto));
         mvc.perform(get("/api/clients/7/threads").with(authentication(adminAuth())))
            .andExpect(status().isOk())
@@ -91,6 +105,7 @@ class AdminMessageControllerTest {
     @Test
     void createThread_returns201() throws Exception {
         var resp = new MessageThreadDto(100L, 7L, "Tax", LocalDateTime.now(), LocalDateTime.now(), 0, 1, List.of());
+        when(clientService.findById(7L, 42L)).thenReturn(clientDto(7L));
         when(service.createThreadAsAdmin(eq(7L), eq("Tax"), eq("Hi"), anyLong())).thenReturn(resp);
         mvc.perform(post("/api/clients/7/threads")
                 .with(authentication(adminAuth()))
@@ -113,6 +128,7 @@ class AdminMessageControllerTest {
     void getThread_returnsThread() throws Exception {
         var msg = new MessageDto(1L, 50L, SenderType.ADMIN, 42L, "hello", LocalDateTime.now());
         var resp = new MessageThreadDto(50L, 7L, "x", LocalDateTime.now(), LocalDateTime.now(), 0, 0, List.of(msg));
+        when(clientService.findById(7L, 42L)).thenReturn(clientDto(7L));
         when(service.getThreadAsAdmin(7L, 50L)).thenReturn(resp);
         mvc.perform(get("/api/clients/7/threads/50").with(authentication(adminAuth())))
            .andExpect(status().isOk())
@@ -123,6 +139,7 @@ class AdminMessageControllerTest {
     @Test
     void postReply_returns201() throws Exception {
         var resp = new MessageDto(2L, 50L, SenderType.ADMIN, 42L, "follow-up", LocalDateTime.now());
+        when(clientService.findById(7L, 42L)).thenReturn(clientDto(7L));
         when(service.postAdminReply(eq(7L), eq(50L), eq("follow-up"), anyLong())).thenReturn(resp);
         mvc.perform(post("/api/clients/7/threads/50/messages")
                 .with(authentication(adminAuth()))
@@ -134,7 +151,7 @@ class AdminMessageControllerTest {
 
     @Test
     void createThread_whenClientNotFound_returns404() throws Exception {
-        when(service.createThreadAsAdmin(anyLong(), anyString(), anyString(), anyLong()))
+        when(clientService.findById(99L, 42L))
             .thenThrow(new com.gwhaitech.accountingfirm.client.exception.ClientNotFoundException(99L));
         mvc.perform(post("/api/clients/99/threads")
                 .with(authentication(adminAuth()))
@@ -150,5 +167,43 @@ class AdminMessageControllerTest {
            .andExpect(status().isOk())
            .andExpect(jsonPath("$[0].clientId").value(7))
            .andExpect(jsonPath("$[0].unreadCount").value(3));
+    }
+
+    @Test
+    void listThreads_whenAdminDoesNotOwnClient_returns403() throws Exception {
+        doThrow(new ClientAccessDeniedException(99L))
+            .when(clientService).findById(99L, 42L);
+        mvc.perform(get("/api/clients/99/threads").with(authentication(adminAuth())))
+           .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void getThread_whenAdminDoesNotOwnClient_returns403() throws Exception {
+        doThrow(new ClientAccessDeniedException(99L))
+            .when(clientService).findById(99L, 42L);
+        mvc.perform(get("/api/clients/99/threads/50").with(authentication(adminAuth())))
+           .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void createThread_whenAdminDoesNotOwnClient_returns403() throws Exception {
+        doThrow(new ClientAccessDeniedException(99L))
+            .when(clientService).findById(99L, 42L);
+        mvc.perform(post("/api/clients/99/threads")
+                .with(authentication(adminAuth()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.writeValueAsString(new NewThreadRequest("Tax", "Hi"))))
+           .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void postReply_whenAdminDoesNotOwnClient_returns403() throws Exception {
+        doThrow(new ClientAccessDeniedException(99L))
+            .when(clientService).findById(99L, 42L);
+        mvc.perform(post("/api/clients/99/threads/50/messages")
+                .with(authentication(adminAuth()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.writeValueAsString(new NewMessageRequest("follow-up"))))
+           .andExpect(status().isForbidden());
     }
 }

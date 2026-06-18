@@ -2,6 +2,7 @@ package com.gwhaitech.accountingfirm.messaging.controller;
 
 import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
 import com.gwhaitech.accountingfirm.auth.service.JwtService;
+import com.gwhaitech.accountingfirm.client.service.ClientService;
 import com.gwhaitech.accountingfirm.messaging.service.MessagingService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,9 @@ class AdminMessageControllerSecurityTest {
 
     @MockitoBean
     UserRepository userRepository;
+
+    @MockitoBean
+    ClientService clientService;
 
     @MockitoBean
     MessagingService service;
