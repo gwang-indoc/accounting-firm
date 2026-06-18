@@ -39,6 +39,12 @@ public class SecurityConfig {
             // Stateless JWT auth with SameSite=Strict is the standard mitigation for CSRF without CSRF tokens.
             .csrf(csrf -> csrf.disable())
             .cors(Customizer.withDefaults())
+            .headers(h -> h
+                .contentSecurityPolicy(csp -> csp.policyDirectives(
+                    "default-src 'self'; script-src 'self'; object-src 'none'"))
+                .frameOptions(f -> f.deny())
+                .contentTypeOptions(Customizer.withDefaults())
+            )
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/oauth2/**", "/login/oauth2/**", "/api/auth/**").permitAll()
