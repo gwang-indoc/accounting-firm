@@ -2,6 +2,7 @@ package com.gwhaitech.accountingfirm.client.controller;
 
 import com.gwhaitech.accountingfirm.auth.filter.JwtAuthFilter;
 import com.gwhaitech.accountingfirm.auth.handler.OAuth2SuccessHandler;
+import com.gwhaitech.accountingfirm.client.service.ClientService;
 import com.gwhaitech.accountingfirm.client.service.DocumentService;
 import com.gwhaitech.accountingfirm.config.SecurityConfig;
 import org.junit.jupiter.api.Test;
@@ -50,6 +51,7 @@ class DocumentControllerSecurityTest {
     @MockitoBean private JwtAuthFilter jwtAuthFilter;
     @MockitoBean private OAuth2SuccessHandler oAuth2SuccessHandler;
     @MockitoBean private DocumentService documentService;
+    @MockitoBean private ClientService clientService;
 
     @Autowired
     private MockMvc mockMvc;

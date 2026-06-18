@@ -3,6 +3,7 @@ package com.gwhaitech.accountingfirm.client.controller;
 import com.gwhaitech.accountingfirm.auth.domain.User;
 import com.gwhaitech.accountingfirm.client.dto.DocumentDto;
 import com.gwhaitech.accountingfirm.client.dto.DocumentUploadResult;
+import com.gwhaitech.accountingfirm.client.service.ClientService;
 import com.gwhaitech.accountingfirm.client.service.DocumentService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
@@ -21,9 +22,11 @@ import java.util.List;
 public class DocumentController {
 
     private final DocumentService documentService;
+    private final ClientService clientService;
 
-    public DocumentController(DocumentService documentService) {
+    public DocumentController(DocumentService documentService, ClientService clientService) {
         this.documentService = documentService;
+        this.clientService = clientService;
     }
 
     @PostMapping
@@ -31,21 +34,26 @@ public class DocumentController {
                                               @RequestParam("year") int year,
                                               @RequestParam("file") MultipartFile file,
                                               Authentication authentication) {
-        long uploadedBy = resolveUserId(authentication);
-        DocumentUploadResult result = documentService.upload(clientId, year, file, uploadedBy);
+        long userId = resolveUserId(authentication);
+        clientService.findById(clientId, userId);
+        DocumentUploadResult result = documentService.upload(clientId, year, file, userId);
         int status = result.isNew() ? 201 : 200;
         return ResponseEntity.status(status).body(result.document());
     }
 
     @GetMapping
     public ResponseEntity<List<DocumentDto>> list(@PathVariable Long clientId,
-                                                  @RequestParam("year") int year) {
+                                                  @RequestParam("year") int year,
+                                                  Authentication authentication) {
+        clientService.findById(clientId, resolveUserId(authentication));
         return ResponseEntity.ok(documentService.listDocuments(clientId, year));
     }
 
     @GetMapping("/{docId}/download")
     public ResponseEntity<Resource> download(@PathVariable Long clientId,
-                                             @PathVariable Long docId) {
+                                             @PathVariable Long docId,
+                                             Authentication authentication) {
+        clientService.findById(clientId, resolveUserId(authentication));
         DocumentDto dto = documentService.getDocument(docId);
         Resource resource = documentService.getDocumentForDownload(docId);
         String contentType = dto.mimeType() != null
@@ -63,7 +71,9 @@ public class DocumentController {
 
     @DeleteMapping("/{docId}")
     public ResponseEntity<Void> delete(@PathVariable Long clientId,
-                                       @PathVariable Long docId) {
+                                       @PathVariable Long docId,
+                                       Authentication authentication) {
+        clientService.findById(clientId, resolveUserId(authentication));
         documentService.deleteDocument(docId);
         return ResponseEntity.noContent().build();
     }
