@@ -132,7 +132,9 @@ openspec status --change <name>
 
 If all tasks are `- [x]`:
 
-> "Apply complete. Next: ship (e.g. `git push`, plus any project-specific deploy — see CLAUDE.md), then `/opsx:archive <name>`."
+> "Apply complete. Ready to archive? Run `/opsx:archive <name>`, or I can run it — let me know."
+
+**Do NOT auto-invoke `/opsx:archive`.** Archive moves files and modifies the canonical capability spec. Always wait for explicit user confirmation before proceeding.
 
 If paused (blocker, error, ambiguity, user interrupt):
 
