@@ -206,6 +206,9 @@ When using `HttpClient` with `responseType: 'blob'`, Angular wraps the error bod
 ### `mat-checkbox (change)` does not fire in JSDOM on host element click
 Clicking the `<mat-checkbox>` host element in Angular tests (JSDOM) does not trigger the `(change)` output binding. Use `checkboxHost.querySelector('input[type="checkbox"]').click()` to fire the native change event that Angular picks up. This affects all component specs that test checkbox-driven selection logic.
 
+### OpenSpec delta spec: MODIFIED headers must match the main spec exactly; new requirements need ADDED
+`openspec archive` matches each `### Requirement:` header in a `## MODIFIED Requirements` block against the exact text in the main spec. A header that doesn't exist yet causes `MODIFIED failed for header "..." - not found` and aborts with no changes applied. Use `## ADDED Requirements` for any requirement that doesn't yet exist in the canonical spec, even when the surrounding block looks like a modification.
+
 ## Lessons Learned
 
 Lessons from archived changes live in `docs/lessons/` — one file per archive, named `YYYY-MM-DD-<change-name>.md`.

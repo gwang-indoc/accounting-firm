@@ -21,25 +21,8 @@ The admin client list UI SHALL display a checkbox column allowing selection of i
 
 ---
 
-### Requirement: Export button is always visible in the page header
-The admin client list page SHALL display an Export button in the page header at all times. The Export button SHALL be disabled when no clients are selected and SHALL become enabled when at least one client is selected. Clicking the enabled Export button SHALL open the export configuration dialog.
-
-#### Scenario: Export button visible with no selection
-- **WHEN** an admin views the client list with no clients selected
-- **THEN** the Export button is visible in the page header but is disabled
-
-#### Scenario: Export button enabled after selection
-- **WHEN** an admin selects at least one client
-- **THEN** the Export button in the page header becomes enabled
-
-#### Scenario: Export button opens dialog when clicked
-- **WHEN** an admin clicks the enabled Export button in the page header
-- **THEN** the export configuration dialog opens
-
----
-
-### Requirement: Export toolbar shows selection count and clear only
-When ≥1 client is selected, the admin client list SHALL display an export toolbar showing the count of selected clients, a label, and a "Clear" button. The export toolbar SHALL NOT contain an Export button (the Export button is in the page header). The toolbar disappears when no clients are selected.
+### Requirement: Export toolbar and dialog appear when clients are selected
+When ≥1 client is selected, the admin client list SHALL display an export toolbar showing the count of selected clients, a label, and a "Clear" button. The export toolbar SHALL NOT contain an Export button (the Export button is in the page header). The toolbar disappears when no clients are selected. Clicking the Export button in the page header SHALL open the export configuration dialog.
 
 #### Scenario: Export toolbar appears on selection
 - **WHEN** an admin selects at least one client
@@ -56,3 +39,22 @@ When ≥1 client is selected, the admin client list SHALL display an export tool
 #### Scenario: Clear selection button deselects all clients
 - **WHEN** the admin clicks the "Clear" button in the export toolbar
 - **THEN** all selected clients are deselected, the export toolbar is hidden, and any cap message is dismissed
+
+---
+
+## ADDED Requirements
+
+### Requirement: Export button is always visible in the page header
+The admin client list page SHALL display an Export button in the page header at all times. The Export button SHALL be disabled when no clients are selected and SHALL become enabled when at least one client is selected. Clicking the enabled Export button SHALL open the export configuration dialog.
+
+#### Scenario: Export button visible with no selection
+- **WHEN** an admin views the client list with no clients selected
+- **THEN** the Export button is visible in the page header but is disabled
+
+#### Scenario: Export button enabled after selection
+- **WHEN** an admin selects at least one client
+- **THEN** the Export button in the page header becomes enabled
+
+#### Scenario: Export button opens dialog when clicked
+- **WHEN** an admin clicks the enabled Export button in the page header
+- **THEN** the export configuration dialog opens
