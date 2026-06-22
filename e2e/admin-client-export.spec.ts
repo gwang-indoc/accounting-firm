@@ -35,14 +35,17 @@ test.describe('admin client export', () => {
     // Export toolbar should be hidden initially
     await expect(page.getByTestId('export-toolbar')).not.toBeVisible();
 
+    // Export button in header: disabled before selection
+    await expect(page.getByTestId('export-btn')).toBeDisabled();
+
     // Click first client checkbox
     const firstCheckbox = page.getByTestId('client-select-cb').first().locator('input[type="checkbox"]');
     await firstCheckbox.click();
 
-    // Export toolbar should appear with count
+    // Export toolbar should appear with count; export button now enabled
     await expect(page.getByTestId('export-toolbar')).toBeVisible();
     await expect(page.getByTestId('export-toolbar')).toContainText('1');
-    await expect(page.getByTestId('export-btn')).toBeVisible();
+    await expect(page.getByTestId('export-btn')).toBeEnabled();
   });
 
   test('select all fetches IDs and selects all clients', async ({ page }) => {

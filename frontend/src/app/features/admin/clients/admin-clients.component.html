@@ -4,6 +4,20 @@
       <h1 class="page-title">{{ 'clients.title' | translate }}</h1>
       <p class="page-subtitle">{{ clients().length }} {{ clients().length === 1 ? ('clients.clientSingular' | translate) : ('clients.clientPlural' | translate) }}</p>
     </div>
+    <button class="header-export-btn" data-testid="export-btn"
+            [disabled]="selectedClientIds().size === 0 || isExporting()"
+            (click)="openExportDialog()">
+      @if (isExporting()) {
+        <mat-spinner diameter="14" class="export-spinner"></mat-spinner>
+        <span>Exporting…</span>
+      } @else {
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M7 1v8M7 9l-3-3M7 9l3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span>Export</span>
+      }
+    </button>
   </div>
 
   <div class="filters">
@@ -30,15 +44,6 @@
       {{ filteredClients().length }} {{ 'clients.recordPlural' | translate: {from: 'of', count: clients().length} }}
     </span>
     <div class="toolbar-actions">
-      <button class="select-all-btn" data-testid="select-all-btn" (click)="selectAll()">
-        <svg class="select-all-icon" width="13" height="13" viewBox="0 0 13 13" fill="none">
-          <rect x="0.5" y="0.5" width="5" height="5" rx="1" stroke="currentColor"/>
-          <rect x="7.5" y="0.5" width="5" height="5" rx="1" stroke="currentColor"/>
-          <rect x="0.5" y="7.5" width="5" height="5" rx="1" stroke="currentColor"/>
-          <rect x="7.5" y="7.5" width="5" height="5" rx="1" fill="currentColor"/>
-        </svg>
-        Select all
-      </button>
       <button mat-flat-button color="primary" class="add-btn" data-testid="add-client-btn" (click)="openAddDialog()">
         <span class="add-icon">+</span> {{ 'clients.addClient' | translate }}
       </button>
@@ -61,20 +66,6 @@
           Clear
         </button>
       </div>
-      <button class="export-action-btn" data-testid="export-btn"
-              [disabled]="isExporting()"
-              (click)="openExportDialog()">
-        @if (isExporting()) {
-          <mat-spinner diameter="14" class="export-spinner"></mat-spinner>
-          <span>Exporting…</span>
-        } @else {
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M7 1v8M7 9l-3-3M7 9l3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-          <span>Export</span>
-        }
-      </button>
     </div>
   }
 
@@ -82,7 +73,17 @@
     <table class="clients-table">
       <thead>
         <tr>
-          <th class="select-col"></th>
+          <th class="select-col">
+            <button class="select-all-btn" data-testid="select-all-btn" (click)="selectAll()">
+              <svg class="select-all-icon" width="13" height="13" viewBox="0 0 13 13" fill="none">
+                <rect x="0.5" y="0.5" width="5" height="5" rx="1" stroke="currentColor"/>
+                <rect x="7.5" y="0.5" width="5" height="5" rx="1" stroke="currentColor"/>
+                <rect x="0.5" y="7.5" width="5" height="5" rx="1" stroke="currentColor"/>
+                <rect x="7.5" y="7.5" width="5" height="5" rx="1" fill="currentColor"/>
+              </svg>
+              Select all
+            </button>
+          </th>
           <th>{{ 'clients.name' | translate }}</th>
           <th>{{ 'clients.email' | translate }}</th>
           <th>{{ 'clients.phone' | translate }}</th>

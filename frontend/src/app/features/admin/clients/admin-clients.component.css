@@ -13,7 +13,43 @@
 /* ── Page header ───────────────────────────────── */
 
 .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 28px;
+}
+
+.header-export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 16px;
+  background: #10b981;
+  border: none;
+  border-radius: 7px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.header-export-btn:hover:not([disabled]) {
+  background: #34d399;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.header-export-btn:active:not([disabled]) {
+  transform: translateY(1px);
+}
+
+.header-export-btn[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .page-title {
@@ -337,37 +373,6 @@
   background: rgba(248, 113, 113, 0.06);
 }
 
-.export-action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 34px;
-  padding: 0 16px;
-  background: #10b981;
-  border: none;
-  border-radius: 7px;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.2px;
-  cursor: pointer;
-  transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
-  white-space: nowrap;
-}
-
-.export-action-btn:hover:not([disabled]) {
-  background: #34d399;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
-}
-
-.export-action-btn:active:not([disabled]) {
-  transform: translateY(1px);
-}
-
-.export-action-btn[disabled] {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
 
 .export-spinner {
   --mdc-circular-progress-active-indicator-color: #fff;
@@ -389,9 +394,17 @@
 /* ── Select column ─────────────────────────────── */
 
 .select-col {
-  width: 40px;
   padding-left: 12px !important;
   padding-right: 4px !important;
+}
+
+.clients-table td.select-col {
+  width: 40px;
+}
+
+.clients-table th.select-col {
+  min-width: 140px;
+  padding: 6px 10px !important;
 }
 
 /* ── Empty state ───────────────────────────────── */

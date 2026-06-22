@@ -343,6 +343,25 @@ describe('AdminClientsComponent', () => {
     });
   });
 
+  describe('export button header', () => {
+    it('export-btn is present in DOM with no selection (always-visible header button)', async () => {
+      const { fixture } = await setupForExport(sampleClients);
+      const exportBtn = fixture.nativeElement.querySelector('[data-testid="export-btn"]');
+      expect(exportBtn).not.toBeNull();
+    });
+
+    it('export-btn is disabled when 0 clients selected and enabled after selecting 1', async () => {
+      const { fixture } = await setupForExport(sampleClients);
+      const exportBtn: HTMLButtonElement = fixture.nativeElement.querySelector('[data-testid="export-btn"]');
+      expect(exportBtn.disabled).toBe(true);
+      fixture.componentInstance.toggleSelection(sampleClients[0].id);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      expect(exportBtn.disabled).toBe(false);
+    });
+  });
+
   describe('export toolbar', () => {
     it('export toolbar is hidden when no clients are selected', async () => {
       const { fixture } = await setupForExport(sampleClients);
@@ -373,14 +392,15 @@ describe('AdminClientsComponent', () => {
       expect(toolbar.textContent).toContain('2');
     });
 
-    it('export toolbar has an Export button', async () => {
+    it('export-btn is enabled and present when a client is selected', async () => {
       const { fixture } = await setupForExport(sampleClients);
       fixture.componentInstance.toggleSelection(sampleClients[0].id);
       fixture.detectChanges();
       await fixture.whenStable();
       fixture.detectChanges();
-      const exportBtn = fixture.nativeElement.querySelector('[data-testid="export-btn"]');
+      const exportBtn: HTMLButtonElement = fixture.nativeElement.querySelector('[data-testid="export-btn"]');
       expect(exportBtn).not.toBeNull();
+      expect(exportBtn.disabled).toBe(false);
     });
   });
 
