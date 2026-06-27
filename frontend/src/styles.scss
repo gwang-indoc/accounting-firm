@@ -69,3 +69,18 @@ app-root {
   text-align: center;
   margin: 0 16px 8px;
 }
+
+// Dark dialog panels used by admin workflow dialogs.
+// CDK overlays render in a portal appended to <body>, outside the component DOM,
+// so component-scoped CSS cannot reach them. panelClass is the correct approach.
+.dark-dialog {
+  --mdc-dialog-container-color: #1e293b;
+  --mdc-dialog-subhead-color: #f1f5f9;
+  --mdc-dialog-supporting-text-color: #94a3b8;
+
+  .mdc-dialog__surface {
+    border: 1px solid #334155 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.55) !important;
+  }
+}

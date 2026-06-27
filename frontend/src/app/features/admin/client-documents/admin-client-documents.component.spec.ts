@@ -20,7 +20,7 @@ const sampleDocs: AdminDocumentDto[] = [
 const sampleClient: ClientDto = {
   id: 7, name: 'Test Client', email: 'test@example.com', phone: null,
   createdAt: '2026-01-01T00:00:00', linkedUserId: null, adminId: 1,
-  businessType: 'PERSONAL', fiscalYearEndMonth: 12, fiscalYearEndDay: 31,
+  businessType: 'PERSONAL', fiscalYearEndMonth: 12, fiscalYearEndDay: 31, activeEngagementStatus: null,
 };
 
 async function setup(opts: {

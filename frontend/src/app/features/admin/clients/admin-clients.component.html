@@ -37,6 +37,20 @@
              [value]="emailFilter()"
              (input)="onEmailFilterInput($any($event.target).value)" />
     </div>
+    <div class="filter-field">
+      <select data-testid="filter-workflow-state"
+              class="filter-select"
+              [value]="workflowStateFilter()"
+              (change)="onWorkflowStateFilterChange($any($event.target).value)">
+        <option value="">All Workflow States</option>
+        <option value="START">START</option>
+        <option value="IN_PROCESSING">IN_PROCESSING</option>
+        <option value="PENDING_CLIENT_REVIEW">PENDING_CLIENT_REVIEW</option>
+        <option value="SUBMIT_TO_CRA">SUBMIT_TO_CRA</option>
+        <option value="COMPLETED">COMPLETED</option>
+        <option value="__none__">— None —</option>
+      </select>
+    </div>
   </div>
 
   <div class="table-toolbar">
@@ -87,6 +101,7 @@
           <th>{{ 'clients.name' | translate }}</th>
           <th>{{ 'clients.email' | translate }}</th>
           <th>{{ 'clients.phone' | translate }}</th>
+          <th>Workflow State</th>
           <th>{{ 'clients.actions' | translate }}</th>
         </tr>
       </thead>
@@ -102,6 +117,7 @@
             <td class="name-cell">{{ client.name }}</td>
             <td class="muted-cell">{{ client.email ?? '—' }}</td>
             <td class="muted-cell">{{ client.phone ?? '—' }}</td>
+            <td class="muted-cell" data-testid="client-workflow-state">{{ client.activeEngagementStatus ?? '—' }}</td>
             <td class="actions-cell">
               <button mat-button class="action-btn action-edit" (click)="openEditDialog(client)">{{ 'clients.edit' | translate }}</button>
               <button mat-button class="action-btn action-delete" (click)="confirmDelete(client)">{{ 'clients.delete' | translate }}</button>
@@ -114,11 +130,12 @@
                   <span class="messages-badge" data-testid="client-messages-badge">{{ unreadFor(client.id) }}</span>
                 }
               </button>
+              <button mat-button class="action-btn action-workflow" data-testid="client-workflow-btn" (click)="openWorkflow(client)">Workflow</button>
             </td>
           </tr>
         } @empty {
           <tr>
-            <td colspan="5" class="empty-cell">
+            <td colspan="6" class="empty-cell">
               @if (clients().length === 0) {
                 {{ 'clients.empty' | translate }}
               } @else {

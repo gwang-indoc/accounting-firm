@@ -52,5 +52,29 @@
   "clients.clientSingular": "client",
   "clients.clientPlural": "clients",
   "documents.documentSingular": "document",
-  "documents.documentPlural": "documents"
+  "documents.documentPlural": "documents",
+
+  "workflow.backToClients": "← Clients",
+  "workflow.pageTitle": "Client Workflow",
+  "workflow.newEngagementBtn": "+ New Engagement",
+  "workflow.taxYearCol": "Tax Year",
+  "workflow.changeStatus": "Change Status",
+  "workflow.emptyState": "No engagements found for this client.",
+  "workflow.duplicateError": "An engagement for that tax year already exists for this client.",
+  "workflow.history": "History",
+
+  "workflow.newEngDialog.title": "New Engagement",
+  "workflow.newEngDialog.subtitle": "Begin tracking a new tax year for this client.",
+  "workflow.newEngDialog.taxYearLabel": "Tax Year",
+  "workflow.newEngDialog.cancel": "Cancel",
+  "workflow.newEngDialog.create": "Create Engagement",
+
+  "workflow.changeStatusDialog.title": "Change Status",
+  "workflow.changeStatusDialog.currentLabel": "Current",
+  "workflow.changeStatusDialog.selectLabel": "Select New Status",
+  "workflow.changeStatusDialog.noteLabel": "Note",
+  "workflow.changeStatusDialog.noteOptional": "(optional)",
+  "workflow.changeStatusDialog.notePlaceholder": "Add a note about this transition…",
+  "workflow.changeStatusDialog.cancel": "Cancel",
+  "workflow.changeStatusDialog.confirm": "Confirm"
 }

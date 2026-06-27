@@ -22,6 +22,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.gwhaitech.accountingfirm.client.domain.EngagementStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -79,7 +80,7 @@ class ClientControllerTest {
     private ClientDto sampleDto() {
         return new ClientDto(1L, "Acme Corp", "contact@acme.com", "555-1234",
                 LocalDateTime.of(2026, 1, 1, 0, 0), null, ADMIN_ID,
-                com.gwhaitech.accountingfirm.client.domain.BusinessType.PERSONAL, 12, 31);
+                com.gwhaitech.accountingfirm.client.domain.BusinessType.PERSONAL, 12, 31, null);
     }
 
     @Test
@@ -244,6 +245,30 @@ class ClientControllerTest {
                         {"name":"Corp","email":"corp@example.com","businessType":"CORPORATE"}
                         """))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getClients_includesActiveEngagementStatusInResponse() throws Exception {
+        ClientDto dtoWithStatus = new ClientDto(1L, "Acme Corp", "contact@acme.com", "555-1234",
+                LocalDateTime.of(2026, 1, 1, 0, 0), null, ADMIN_ID,
+                com.gwhaitech.accountingfirm.client.domain.BusinessType.PERSONAL, 12, 31,
+                EngagementStatus.IN_PROCESSING);
+        when(clientService.findAll(ADMIN_ID)).thenReturn(List.of(dtoWithStatus));
+
+        mockMvc.perform(get("/api/clients")
+                .with(authentication(adminAuth())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].activeEngagementStatus").value("IN_PROCESSING"));
+    }
+
+    @Test
+    void getClients_activeEngagementStatusIsNullWhenNoEngagements() throws Exception {
+        when(clientService.findAll(ADMIN_ID)).thenReturn(List.of(sampleDto()));
+
+        mockMvc.perform(get("/api/clients")
+                .with(authentication(adminAuth())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].activeEngagementStatus").doesNotExist());
     }
 
     @Test

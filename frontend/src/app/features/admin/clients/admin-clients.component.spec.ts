@@ -13,8 +13,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { of } from 'rxjs';
 
 const sampleClients: ClientDto[] = [
-  { id: 1, name: 'Jane Smith', email: 'jane@gmail.com', phone: '555-1234', createdAt: '2026-01-01T00:00:00', linkedUserId: 42, adminId: 1, businessType: 'PERSONAL', fiscalYearEndMonth: 12, fiscalYearEndDay: 31 },
-  { id: 2, name: 'Bob Lee',    email: 'bob@work.com',   phone: null,        createdAt: '2026-01-02T00:00:00', linkedUserId: null, adminId: 1, businessType: 'CORPORATE', fiscalYearEndMonth: 3, fiscalYearEndDay: 31 },
+  { id: 1, name: 'Jane Smith', email: 'jane@gmail.com', phone: '555-1234', createdAt: '2026-01-01T00:00:00', linkedUserId: 42, adminId: 1, businessType: 'PERSONAL', fiscalYearEndMonth: 12, fiscalYearEndDay: 31, activeEngagementStatus: 'IN_PROCESSING' },
+  { id: 2, name: 'Bob Lee',    email: 'bob@work.com',   phone: null,        createdAt: '2026-01-02T00:00:00', linkedUserId: null, adminId: 1, businessType: 'CORPORATE', fiscalYearEndMonth: 3, fiscalYearEndDay: 31, activeEngagementStatus: null },
 ];
 
 function makeClients(n: number): ClientDto[] {
@@ -29,6 +29,7 @@ function makeClients(n: number): ClientDto[] {
     businessType: 'PERSONAL' as const,
     fiscalYearEndMonth: 12,
     fiscalYearEndDay: 31,
+    activeEngagementStatus: null,
   }));
 }
 
@@ -434,6 +435,103 @@ describe('AdminClientsComponent', () => {
     });
   });
 });
+
+  describe('Workflow State column', () => {
+    it('renders status string for client with activeEngagementStatus', async () => {
+      const fixture = await setup(sampleClients);
+      const rows = fixture.nativeElement.querySelectorAll('[data-testid="client-row"]');
+      const stateCell = rows[0].querySelector('[data-testid="client-workflow-state"]');
+      expect(stateCell).not.toBeNull();
+      expect(stateCell.textContent.trim()).toBe('IN_PROCESSING');
+    });
+
+    it('renders "—" for client with null activeEngagementStatus', async () => {
+      const fixture = await setup(sampleClients);
+      const rows = fixture.nativeElement.querySelectorAll('[data-testid="client-row"]');
+      const stateCell = rows[1].querySelector('[data-testid="client-workflow-state"]');
+      expect(stateCell).not.toBeNull();
+      expect(stateCell.textContent.trim()).toBe('—');
+    });
+  });
+
+  describe('Workflow State filter', () => {
+    it('filters by status shows only matching clients', async () => {
+      const fixture = await setup(sampleClients);
+      const select: HTMLSelectElement = fixture.nativeElement.querySelector('[data-testid="filter-workflow-state"]');
+      expect(select).not.toBeNull();
+      select.value = 'IN_PROCESSING';
+      select.dispatchEvent(new Event('change'));
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      const rows = fixture.nativeElement.querySelectorAll('[data-testid="client-row"]');
+      expect(rows.length).toBe(1);
+      expect(rows[0].textContent).toContain('Jane Smith');
+    });
+
+    it('filters by __none__ shows only null-status clients', async () => {
+      const fixture = await setup(sampleClients);
+      const select: HTMLSelectElement = fixture.nativeElement.querySelector('[data-testid="filter-workflow-state"]');
+      expect(select).not.toBeNull();
+      select.value = '__none__';
+      select.dispatchEvent(new Event('change'));
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      const rows = fixture.nativeElement.querySelectorAll('[data-testid="client-row"]');
+      expect(rows.length).toBe(1);
+      expect(rows[0].textContent).toContain('Bob Lee');
+    });
+
+    it('filter by empty string (All) shows all clients', async () => {
+      const fixture = await setup(sampleClients);
+      const select: HTMLSelectElement = fixture.nativeElement.querySelector('[data-testid="filter-workflow-state"]');
+      expect(select).not.toBeNull();
+      select.value = 'IN_PROCESSING';
+      select.dispatchEvent(new Event('change'));
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      select.value = '';
+      select.dispatchEvent(new Event('change'));
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      const rows = fixture.nativeElement.querySelectorAll('[data-testid="client-row"]');
+      expect(rows.length).toBe(2);
+    });
+
+    it('changing workflow state filter resets page to 1', async () => {
+      const fixture = await setup(makeClients(25));
+      fixture.componentInstance.nextPage();
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      expect(fixture.componentInstance.page()).toBe(2);
+
+      const select: HTMLSelectElement = fixture.nativeElement.querySelector('[data-testid="filter-workflow-state"]');
+      expect(select).not.toBeNull();
+      select.value = '__none__';
+      select.dispatchEvent(new Event('change'));
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+
+      expect(fixture.componentInstance.page()).toBe(1);
+    });
+  });
+
+  describe('Workflow action', () => {
+    it('clicking Workflow button navigates to /admin/clients/:id/workflow', async () => {
+      const fixture = await setup(sampleClients);
+      const router = TestBed.inject(Router);
+      const navSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+      const btn: HTMLButtonElement = fixture.nativeElement.querySelector('[data-testid="client-workflow-btn"]');
+      expect(btn).not.toBeNull();
+      btn.click();
+      expect(navSpy).toHaveBeenCalledWith(['/admin/clients', sampleClients[0].id, 'workflow']);
+    });
+  });
 
 async function setupWithMessages(
   clients: ClientDto[],

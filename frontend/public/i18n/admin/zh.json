@@ -52,5 +52,29 @@
   "clients.clientSingular": "位客户",
   "clients.clientPlural": "位客户",
   "documents.documentSingular": "份文档",
-  "documents.documentPlural": "份文档"
+  "documents.documentPlural": "份文档",
+
+  "workflow.backToClients": "← 返回客户",
+  "workflow.pageTitle": "客户工作流",
+  "workflow.newEngagementBtn": "+ 新业务",
+  "workflow.taxYearCol": "税务年度",
+  "workflow.changeStatus": "更改状态",
+  "workflow.emptyState": "该客户尚无业务记录。",
+  "workflow.duplicateError": "该税务年度的业务记录已存在。",
+  "workflow.history": "历史记录",
+
+  "workflow.newEngDialog.title": "新业务",
+  "workflow.newEngDialog.subtitle": "为该客户开始跟踪新的税务年度。",
+  "workflow.newEngDialog.taxYearLabel": "税务年度",
+  "workflow.newEngDialog.cancel": "取消",
+  "workflow.newEngDialog.create": "创建业务",
+
+  "workflow.changeStatusDialog.title": "更改状态",
+  "workflow.changeStatusDialog.currentLabel": "当前",
+  "workflow.changeStatusDialog.selectLabel": "选择新状态",
+  "workflow.changeStatusDialog.noteLabel": "备注",
+  "workflow.changeStatusDialog.noteOptional": "（可选）",
+  "workflow.changeStatusDialog.notePlaceholder": "添加关于此状态变更的备注…",
+  "workflow.changeStatusDialog.cancel": "取消",
+  "workflow.changeStatusDialog.confirm": "确认"
 }

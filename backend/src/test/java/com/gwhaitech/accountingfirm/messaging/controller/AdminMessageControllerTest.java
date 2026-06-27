@@ -77,7 +77,7 @@ class AdminMessageControllerTest {
     }
 
     private ClientDto clientDto(long id) {
-        return new ClientDto(id, "ACME", "acme@example.com", null, null, null, 42L, null, null, null);
+        return new ClientDto(id, "ACME", "acme@example.com", null, null, null, 42L, null, null, null, null);
     }
 
     @Test

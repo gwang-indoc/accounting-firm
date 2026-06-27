@@ -18,7 +18,7 @@ const mockThread: MessageThreadDto = {
     { id: 2, threadId: 42, senderType: 'CLIENT', senderUserId: 20, body: 'Hi there', sentAt: '2026-01-01T11:00:00' },
   ]
 };
-const mockClient: ClientDto = { id: 1, name: 'Jane Smith', email: 'jane@test.com', phone: null, createdAt: '2026-01-01T00:00:00', linkedUserId: 20, adminId: 1, businessType: 'PERSONAL', fiscalYearEndMonth: 12, fiscalYearEndDay: 31 };
+const mockClient: ClientDto = { id: 1, name: 'Jane Smith', email: 'jane@test.com', phone: null, createdAt: '2026-01-01T00:00:00', linkedUserId: 20, adminId: 1, businessType: 'PERSONAL', fiscalYearEndMonth: 12, fiscalYearEndDay: 31, activeEngagementStatus: null };
 
 async function setup(): Promise<{ fx: ComponentFixture<AdminClientThreadViewComponent>; mockService: any; mockClientsService: any }> {
   const mockService = {

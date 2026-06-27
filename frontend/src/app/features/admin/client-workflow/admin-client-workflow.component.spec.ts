@@ -7,6 +7,7 @@ import { provideRouter, ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { of, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
+import { TranslateModule } from '@ngx-translate/core';
 import { AdminClientWorkflowComponent } from './admin-client-workflow.component';
 import { EngagementService } from '../../../core/services/engagement.service';
 import { EngagementDto, EngagementHistoryDto } from '../../../core/models/engagement.model';
@@ -33,7 +34,7 @@ function makeEngagementService(overrides: Partial<EngagementService> = {}): Part
 
 async function setup(engagementSvc: Partial<EngagementService> = makeEngagementService()): Promise<ComponentFixture<AdminClientWorkflowComponent>> {
   await TestBed.configureTestingModule({
-    imports: [AdminClientWorkflowComponent],
+    imports: [AdminClientWorkflowComponent, TranslateModule.forRoot()],
     providers: [
       provideZonelessChangeDetection(),
       provideHttpClient(),

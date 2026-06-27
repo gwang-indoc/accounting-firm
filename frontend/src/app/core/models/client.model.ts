@@ -1,3 +1,5 @@
+export type EngagementStatus = 'START' | 'IN_PROCESSING' | 'PENDING_CLIENT_REVIEW' | 'SUBMIT_TO_CRA' | 'COMPLETED';
+
 export interface ClientDto {
   id: number;
   name: string;
@@ -9,4 +11,5 @@ export interface ClientDto {
   businessType: 'PERSONAL' | 'CORPORATE' | 'SELF_EMPLOYED' | null;
   fiscalYearEndMonth: number | null;
   fiscalYearEndDay: number | null;
+  activeEngagementStatus: EngagementStatus | null;
 }

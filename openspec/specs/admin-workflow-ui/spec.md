@@ -4,11 +4,7 @@
 Provides the admin-facing surfaces for managing client engagement workflows. Includes a `/admin/workflow` dashboard showing all engagements across all clients with status and business-type filters, and a per-client Workflow tab where admins can create engagements, change status with an optional note, and review the full transition history.
 ## Requirements
 ### Requirement: Admin workflow dashboard page
-The system SHALL provide a `/admin/workflow` page accessible only to authenticated admins. The page SHALL display a table of all client engagements across all tax years. Table columns: Client Name, Business Type, Tax Year, Status, Last Updated, Last Updated By. The table SHALL support filtering by Status and by Business Type. The page SHALL be linked in the admin sidebar navigation.
-
-#### Scenario: Workflow link visible to admins
-- **WHEN** an authenticated admin views any page in the admin portal
-- **THEN** the sidebar includes a "Workflow" navigation link pointing to `/admin/workflow`
+The system SHALL provide a `/admin/workflow` page accessible only to authenticated admins. The page SHALL display a table of all client engagements across all tax years. Table columns: Client Name, Business Type, Tax Year, Status, Last Updated, Last Updated By. The table SHALL support filtering by Status and by Business Type. The page SHALL NOT be linked in the admin navbar.
 
 #### Scenario: Workflow dashboard loads all engagements
 - **WHEN** an authenticated admin navigates to `/admin/workflow`
@@ -26,7 +22,9 @@ The system SHALL provide a `/admin/workflow` page accessible only to authenticat
 - **WHEN** a non-admin authenticated user navigates to `/admin/workflow`
 - **THEN** the admin guard redirects them away from the page
 
----
+#### Scenario: Workflow nav link absent for admins
+- **WHEN** an authenticated admin views any page in the admin portal
+- **THEN** the navbar does NOT include a "Workflow" navigation link
 
 ### Requirement: Client detail — Workflow tab
 The system SHALL add a "Workflow" tab to the admin client detail view. The tab SHALL list all engagements for the client ordered by tax year descending. Each engagement row shows the tax year and current status. Each engagement SHALL be expandable to reveal its full transition history (from status, to status, changed by, changed at, note).

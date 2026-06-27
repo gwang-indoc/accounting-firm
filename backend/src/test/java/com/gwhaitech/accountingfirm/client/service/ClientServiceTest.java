@@ -27,6 +27,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 
+import com.gwhaitech.accountingfirm.client.domain.ClientEngagement;
+import com.gwhaitech.accountingfirm.client.domain.ClientEngagementRepository;
+import com.gwhaitech.accountingfirm.client.domain.EngagementStatus;
 import com.gwhaitech.accountingfirm.client.dto.UpdateClientRequest;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,6 +40,9 @@ class ClientServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private ClientEngagementRepository engagementRepository;
 
     @InjectMocks
     private ClientService clientService;
@@ -189,5 +195,64 @@ class ClientServiceTest {
 
         assertThatThrownBy(() -> clientService.deleteClient(99L, 1L))
                 .isInstanceOf(ClientNotFoundException.class);
+    }
+
+    // --- activeEngagementStatus tests ---
+
+    private ClientEngagement engagement(EngagementStatus status, int taxYear) {
+        ClientEngagement e = new ClientEngagement();
+        e.setClientId(1L);
+        e.setStatus(status);
+        e.setTaxYear((short) taxYear);
+        return e;
+    }
+
+    @Test
+    void findAll_activeEngagementStatus_isNullWhenNoEngagements() {
+        when(clientRepository.findByAdminId(99L)).thenReturn(List.of(sampleClient()));
+        when(engagementRepository.findFirstByClientIdAndStatusNotOrderByTaxYearDesc(1L, EngagementStatus.COMPLETED))
+                .thenReturn(Optional.empty());
+        when(engagementRepository.findFirstByClientIdOrderByTaxYearDesc(1L))
+                .thenReturn(Optional.empty());
+
+        List<ClientDto> result = clientService.findAll(99L);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).activeEngagementStatus()).isNull();
+    }
+
+    @Test
+    void findAll_activeEngagementStatus_returnsLatestNonCompleted() {
+        when(clientRepository.findByAdminId(99L)).thenReturn(List.of(sampleClient()));
+        when(engagementRepository.findFirstByClientIdAndStatusNotOrderByTaxYearDesc(1L, EngagementStatus.COMPLETED))
+                .thenReturn(Optional.of(engagement(EngagementStatus.IN_PROCESSING, 2024)));
+
+        List<ClientDto> result = clientService.findAll(99L);
+
+        assertThat(result.get(0).activeEngagementStatus()).isEqualTo(EngagementStatus.IN_PROCESSING);
+    }
+
+    @Test
+    void findAll_activeEngagementStatus_isCompletedWhenAllCompleted() {
+        when(clientRepository.findByAdminId(99L)).thenReturn(List.of(sampleClient()));
+        when(engagementRepository.findFirstByClientIdAndStatusNotOrderByTaxYearDesc(1L, EngagementStatus.COMPLETED))
+                .thenReturn(Optional.empty());
+        when(engagementRepository.findFirstByClientIdOrderByTaxYearDesc(1L))
+                .thenReturn(Optional.of(engagement(EngagementStatus.COMPLETED, 2023)));
+
+        List<ClientDto> result = clientService.findAll(99L);
+
+        assertThat(result.get(0).activeEngagementStatus()).isEqualTo(EngagementStatus.COMPLETED);
+    }
+
+    @Test
+    void findAll_activeEngagementStatus_returnsLatestNonCompletedWhenMixed() {
+        when(clientRepository.findByAdminId(99L)).thenReturn(List.of(sampleClient()));
+        when(engagementRepository.findFirstByClientIdAndStatusNotOrderByTaxYearDesc(1L, EngagementStatus.COMPLETED))
+                .thenReturn(Optional.of(engagement(EngagementStatus.PENDING_CLIENT_REVIEW, 2025)));
+
+        List<ClientDto> result = clientService.findAll(99L);
+
+        assertThat(result.get(0).activeEngagementStatus()).isEqualTo(EngagementStatus.PENDING_CLIENT_REVIEW);
     }
 }

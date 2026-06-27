@@ -36,6 +36,7 @@ export class AdminClientsComponent implements OnInit {
   unreadCounts = signal<Record<number, number>>({});
   nameFilter = signal<string>('');
   emailFilter = signal<string>('');
+  workflowStateFilter = signal<string>('');
   page = signal<number>(1);
   readonly pageSize = PAGE_SIZE;
 
@@ -47,6 +48,7 @@ export class AdminClientsComponent implements OnInit {
     effect(() => {
       this.nameFilter();
       this.emailFilter();
+      this.workflowStateFilter();
       this.selectedClientIds.set(new Set());
       this.capMessage.set('');
     });
@@ -55,10 +57,13 @@ export class AdminClientsComponent implements OnInit {
   filteredClients = computed<ClientDto[]>(() => {
     const name = this.nameFilter().trim().toLowerCase();
     const email = this.emailFilter().trim().toLowerCase();
+    const workflow = this.workflowStateFilter();
     return this.clients().filter(c => {
       const nameOk = !name || c.name.toLowerCase().includes(name);
       const emailOk = !email || (c.email ?? '').toLowerCase().includes(email);
-      return nameOk && emailOk;
+      const workflowOk = !workflow ||
+        (workflow === '__none__' ? c.activeEngagementStatus === null : c.activeEngagementStatus === workflow);
+      return nameOk && emailOk && workflowOk;
     });
   });
 
@@ -143,6 +148,15 @@ export class AdminClientsComponent implements OnInit {
 
   openDocuments(client: ClientDto): void {
     this.router.navigate(['/admin/clients', client.id, 'documents']);
+  }
+
+  openWorkflow(client: ClientDto): void {
+    this.router.navigate(['/admin/clients', client.id, 'workflow']);
+  }
+
+  onWorkflowStateFilterChange(value: string): void {
+    this.workflowStateFilter.set(value);
+    this.page.set(1);
   }
 
   toggleSelection(id: number): void {

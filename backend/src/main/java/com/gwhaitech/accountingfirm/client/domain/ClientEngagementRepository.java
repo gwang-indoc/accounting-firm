@@ -10,4 +10,8 @@ public interface ClientEngagementRepository extends JpaRepository<ClientEngageme
     List<ClientEngagement> findByClientIdOrderByTaxYearDesc(Long clientId);
 
     Optional<ClientEngagement> findByClientIdAndTaxYear(Long clientId, Short taxYear);
+
+    Optional<ClientEngagement> findFirstByClientIdAndStatusNotOrderByTaxYearDesc(Long clientId, EngagementStatus status);
+
+    Optional<ClientEngagement> findFirstByClientIdOrderByTaxYearDesc(Long clientId);
 }

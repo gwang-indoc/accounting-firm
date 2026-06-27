@@ -253,4 +253,9 @@ describe('Navigation links', () => {
     const brand = fixture.nativeElement.querySelector('[data-testid="brand-link"]');
     expect(brand.getAttribute('ng-reflect-router-link')).toBe('/');
   });
+
+  it('does not render admin-workflow-nav-link for ADMIN', () => {
+    setup('ADMIN');
+    expect(fixture.nativeElement.querySelector('[data-testid="admin-workflow-nav-link"]')).toBeNull();
+  });
 });

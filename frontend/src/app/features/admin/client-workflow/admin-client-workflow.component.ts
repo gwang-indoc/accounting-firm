@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { HttpErrorResponse } from '@angular/common/http';
 import { filter, switchMap, take, tap } from 'rxjs/operators';
+import { TranslateModule } from '@ngx-translate/core';
 import { EngagementService } from '../../../core/services/engagement.service';
 import { EngagementDto, EngagementHistoryDto, EngagementStatus } from '../../../core/models/engagement.model';
 import { AdminNewEngagementDialogComponent } from './admin-new-engagement-dialog.component';
@@ -14,8 +15,9 @@ import { AdminTransitionDialogComponent } from './admin-transition-dialog.compon
 @Component({
   selector: 'app-admin-client-workflow',
   standalone: true,
-  imports: [RouterLink, MatButtonModule, MatFormFieldModule],
+  imports: [RouterLink, MatButtonModule, MatFormFieldModule, TranslateModule],
   templateUrl: './admin-client-workflow.component.html',
+  styleUrl: './admin-client-workflow.component.css',
 })
 export class AdminClientWorkflowComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -23,11 +25,27 @@ export class AdminClientWorkflowComponent implements OnInit {
   private dialog = inject(MatDialog);
   private destroyRef = inject(DestroyRef);
 
+  readonly pipelineSteps: EngagementStatus[] = [
+    'START', 'IN_PROCESSING', 'PENDING_CLIENT_REVIEW', 'SUBMIT_TO_CRA', 'COMPLETED',
+  ];
+
   clientId = signal<number>(0);
   engagements = signal<EngagementDto[]>([]);
   expandedId = signal<number | null>(null);
   expandedHistory = signal<EngagementHistoryDto[]>([]);
   duplicateError = signal<boolean>(false);
+
+  isStepReached(engStatus: EngagementStatus, stepIndex: number): boolean {
+    return this.pipelineSteps.indexOf(engStatus) >= stepIndex;
+  }
+
+  isStepDone(engStatus: EngagementStatus, stepIndex: number): boolean {
+    return this.pipelineSteps.indexOf(engStatus) > stepIndex;
+  }
+
+  formatDate(iso: string): string {
+    return new Date(iso).toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' });
+  }
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -55,7 +73,7 @@ export class AdminClientWorkflowComponent implements OnInit {
   }
 
   openNewEngagementDialog(): void {
-    this.dialog.open(AdminNewEngagementDialogComponent, { width: '380px' })
+    this.dialog.open(AdminNewEngagementDialogComponent, { width: '380px', panelClass: 'dark-dialog' })
       .afterClosed()
       .pipe(
         take(1),
@@ -90,7 +108,8 @@ export class AdminClientWorkflowComponent implements OnInit {
   openTransitionDialog(engagement: EngagementDto): void {
     this.dialog.open(AdminTransitionDialogComponent, {
       data: { currentStatus: engagement.status },
-      width: '420px',
+      width: '460px',
+      panelClass: 'dark-dialog',
     })
       .afterClosed()
       .pipe(

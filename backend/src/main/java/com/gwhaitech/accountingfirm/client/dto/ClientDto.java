@@ -1,6 +1,7 @@
 package com.gwhaitech.accountingfirm.client.dto;
 
 import com.gwhaitech.accountingfirm.client.domain.BusinessType;
+import com.gwhaitech.accountingfirm.client.domain.EngagementStatus;
 
 import java.time.LocalDateTime;
 
@@ -14,5 +15,6 @@ public record ClientDto(
         Long adminId,
         BusinessType businessType,
         Integer fiscalYearEndMonth,
-        Integer fiscalYearEndDay
+        Integer fiscalYearEndDay,
+        EngagementStatus activeEngagementStatus
 ) {}

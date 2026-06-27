@@ -82,7 +82,7 @@ class DocumentControllerTest {
 
     private ClientDto clientDto() {
         return new ClientDto(1L, "ACME", "acme@example.com", null, null, null, 1L,
-                com.gwhaitech.accountingfirm.client.domain.BusinessType.PERSONAL, 12, 31);
+                com.gwhaitech.accountingfirm.client.domain.BusinessType.PERSONAL, 12, 31, null);
     }
 
     private Authentication mockAuth() {

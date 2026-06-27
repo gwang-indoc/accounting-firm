@@ -3,7 +3,9 @@ package com.gwhaitech.accountingfirm.client.service;
 import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
 import com.gwhaitech.accountingfirm.client.domain.BusinessType;
 import com.gwhaitech.accountingfirm.client.domain.Client;
+import com.gwhaitech.accountingfirm.client.domain.ClientEngagementRepository;
 import com.gwhaitech.accountingfirm.client.domain.ClientRepository;
+import com.gwhaitech.accountingfirm.client.domain.EngagementStatus;
 import com.gwhaitech.accountingfirm.client.dto.ClientDto;
 import com.gwhaitech.accountingfirm.client.dto.CreateClientRequest;
 import com.gwhaitech.accountingfirm.client.dto.UpdateClientRequest;
@@ -22,10 +24,13 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
     private final UserRepository userRepository;
+    private final ClientEngagementRepository engagementRepository;
 
-    public ClientService(ClientRepository clientRepository, UserRepository userRepository) {
+    public ClientService(ClientRepository clientRepository, UserRepository userRepository,
+                         ClientEngagementRepository engagementRepository) {
         this.clientRepository = clientRepository;
         this.userRepository = userRepository;
+        this.engagementRepository = engagementRepository;
     }
 
     public ClientDto createClient(CreateClientRequest request, Long adminId) {
@@ -47,8 +52,18 @@ public class ClientService {
 
     public List<ClientDto> findAll(Long adminId) {
         return clientRepository.findByAdminId(adminId).stream()
-                .map(this::toDto)
+                .map(c -> toDto(c, activeEngagementStatus(c.getId())))
                 .toList();
+    }
+
+    private EngagementStatus activeEngagementStatus(Long clientId) {
+        return engagementRepository
+                .findFirstByClientIdAndStatusNotOrderByTaxYearDesc(clientId, EngagementStatus.COMPLETED)
+                .map(e -> e.getStatus())
+                .orElseGet(() -> engagementRepository
+                        .findFirstByClientIdOrderByTaxYearDesc(clientId)
+                        .map(e -> e.getStatus())
+                        .orElse(null));
     }
 
     public ClientDto findById(Long id, Long adminId) {
@@ -102,9 +117,14 @@ public class ClientService {
     }
 
     private ClientDto toDto(Client c) {
+        return toDto(c, null);
+    }
+
+    private ClientDto toDto(Client c, EngagementStatus activeEngagementStatus) {
         return new ClientDto(c.getId(), c.getName(), c.getEmail(), c.getPhone(), c.getCreatedAt(),
                 c.getUserId(), c.getAdminId(), c.getBusinessType(),
                 c.getFiscalYearEndMonth() != null ? c.getFiscalYearEndMonth().intValue() : null,
-                c.getFiscalYearEndDay() != null ? c.getFiscalYearEndDay().intValue() : null);
+                c.getFiscalYearEndDay() != null ? c.getFiscalYearEndDay().intValue() : null,
+                activeEngagementStatus);
     }
 }
