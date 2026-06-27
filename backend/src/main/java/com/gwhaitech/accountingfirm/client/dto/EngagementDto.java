@@ -8,6 +8,8 @@ public record EngagementDto(
         Long id,
         Long clientId,
         Short taxYear,
+        String name,
+        String note,
         EngagementStatus status,
         Long updatedBy,
         LocalDateTime updatedAt

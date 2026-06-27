@@ -77,36 +77,37 @@ class ClientEngagementControllerTest {
     }
 
     private EngagementDto sampleEngagementDto() {
-        return new EngagementDto(1L, 10L, (short) 2024, EngagementStatus.START,
+        return new EngagementDto(1L, 10L, (short) 2024, "John Smith", null, EngagementStatus.START,
                 ADMIN_ID, LocalDateTime.of(2026, 1, 1, 0, 0));
     }
 
     @Test
     void createEngagement_returns201WithStartStatus() throws Exception {
-        when(engagementService.createEngagement(eq(10L), eq(2024), eq(ADMIN_ID)))
+        when(engagementService.createEngagement(eq(10L), eq(2024), eq("John Smith"), eq(ADMIN_ID)))
                 .thenReturn(sampleEngagementDto());
 
         mockMvc.perform(post("/api/admin/clients/10/engagements")
                 .with(authentication(adminAuth()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                        {"taxYear":2024}
+                        {"taxYear":2024,"name":"John Smith"}
                         """))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("START"))
-                .andExpect(jsonPath("$.taxYear").value(2024));
+                .andExpect(jsonPath("$.taxYear").value(2024))
+                .andExpect(jsonPath("$.name").value("John Smith"));
     }
 
     @Test
     void createEngagement_duplicateTaxYear_returns409() throws Exception {
-        when(engagementService.createEngagement(eq(10L), eq(2024), eq(ADMIN_ID)))
+        when(engagementService.createEngagement(eq(10L), eq(2024), eq("John Smith"), eq(ADMIN_ID)))
                 .thenThrow(new DataIntegrityViolationException("duplicate"));
 
         mockMvc.perform(post("/api/admin/clients/10/engagements")
                 .with(authentication(adminAuth()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                        {"taxYear":2024}
+                        {"taxYear":2024,"name":"John Smith"}
                         """))
                 .andExpect(status().isConflict());
     }
@@ -123,27 +124,38 @@ class ClientEngagementControllerTest {
     }
 
     @Test
+    void createEngagement_blankName_returns400() throws Exception {
+        mockMvc.perform(post("/api/admin/clients/10/engagements")
+                .with(authentication(adminAuth()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"taxYear":2024,"name":"  "}
+                        """))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void createEngagement_clientNotFound_returns404() throws Exception {
-        when(engagementService.createEngagement(eq(999L), eq(2024), eq(ADMIN_ID)))
+        when(engagementService.createEngagement(eq(999L), eq(2024), eq("John Smith"), eq(ADMIN_ID)))
                 .thenThrow(new ClientNotFoundException(999L));
 
         mockMvc.perform(post("/api/admin/clients/999/engagements")
                 .with(authentication(adminAuth()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                        {"taxYear":2024}
+                        {"taxYear":2024,"name":"John Smith"}
                         """))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void patchStatus_returns200WithNewStatus() throws Exception {
-        EngagementDto updated = new EngagementDto(1L, 10L, (short) 2024, EngagementStatus.IN_PROCESSING,
+        EngagementDto updated = new EngagementDto(1L, 10L, (short) 2024, "John Smith", null, EngagementStatus.IN_PROCESSING,
                 ADMIN_ID, LocalDateTime.of(2026, 1, 2, 0, 0));
-        when(engagementService.transitionStatus(eq(10L), eq(2024), eq(EngagementStatus.IN_PROCESSING), isNull(), eq(ADMIN_ID)))
+        when(engagementService.transitionStatus(eq(10L), eq(1L), eq(EngagementStatus.IN_PROCESSING), isNull(), eq(ADMIN_ID)))
                 .thenReturn(updated);
 
-        mockMvc.perform(patch("/api/admin/clients/10/engagements/2024/status")
+        mockMvc.perform(patch("/api/admin/clients/10/engagements/1/status")
                 .with(authentication(adminAuth()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -154,24 +166,25 @@ class ClientEngagementControllerTest {
     }
 
     @Test
-    void patchStatus_withNote_returns200() throws Exception {
-        EngagementDto updated = new EngagementDto(1L, 10L, (short) 2024, EngagementStatus.IN_PROCESSING,
+    void patchStatus_withNote_returns200WithNoteInResponse() throws Exception {
+        EngagementDto updated = new EngagementDto(1L, 10L, (short) 2024, "John Smith", "Started review", EngagementStatus.IN_PROCESSING,
                 ADMIN_ID, LocalDateTime.of(2026, 1, 2, 0, 0));
-        when(engagementService.transitionStatus(eq(10L), eq(2024), eq(EngagementStatus.IN_PROCESSING), eq("Started review"), eq(ADMIN_ID)))
+        when(engagementService.transitionStatus(eq(10L), eq(1L), eq(EngagementStatus.IN_PROCESSING), eq("Started review"), eq(ADMIN_ID)))
                 .thenReturn(updated);
 
-        mockMvc.perform(patch("/api/admin/clients/10/engagements/2024/status")
+        mockMvc.perform(patch("/api/admin/clients/10/engagements/1/status")
                 .with(authentication(adminAuth()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {"status":"IN_PROCESSING","note":"Started review"}
                         """))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.note").value("Started review"));
     }
 
     @Test
     void patchStatus_invalidStatusString_returns400() throws Exception {
-        mockMvc.perform(patch("/api/admin/clients/10/engagements/2024/status")
+        mockMvc.perform(patch("/api/admin/clients/10/engagements/1/status")
                 .with(authentication(adminAuth()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -182,8 +195,8 @@ class ClientEngagementControllerTest {
 
     @Test
     void patchStatus_engagementNotFound_returns404() throws Exception {
-        when(engagementService.transitionStatus(eq(10L), eq(9999), eq(EngagementStatus.IN_PROCESSING), isNull(), eq(ADMIN_ID)))
-                .thenThrow(new EngagementNotFoundException(10L, 9999));
+        when(engagementService.transitionStatus(eq(10L), eq(9999L), eq(EngagementStatus.IN_PROCESSING), isNull(), eq(ADMIN_ID)))
+                .thenThrow(new EngagementNotFoundException(9999L));
 
         mockMvc.perform(patch("/api/admin/clients/10/engagements/9999/status")
                 .with(authentication(adminAuth()))
@@ -197,8 +210,8 @@ class ClientEngagementControllerTest {
     @Test
     void getEngagementsForClient_returnsListOrderedByTaxYearDesc() throws Exception {
         List<EngagementDto> engagements = List.of(
-                new EngagementDto(2L, 10L, (short) 2025, EngagementStatus.START, ADMIN_ID, LocalDateTime.now()),
-                new EngagementDto(1L, 10L, (short) 2024, EngagementStatus.COMPLETED, ADMIN_ID, LocalDateTime.now())
+                new EngagementDto(2L, 10L, (short) 2025, "John Smith", null, EngagementStatus.START, ADMIN_ID, LocalDateTime.now()),
+                new EngagementDto(1L, 10L, (short) 2024, "Smith Holdings Inc.", null, EngagementStatus.COMPLETED, ADMIN_ID, LocalDateTime.now())
         );
         when(engagementService.listForClient(eq(10L), eq(ADMIN_ID))).thenReturn(engagements);
 
@@ -211,14 +224,14 @@ class ClientEngagementControllerTest {
     }
 
     @Test
-    void getEngagementHistory_returnsOldestFirst() throws Exception {
+    void getEngagementHistory_byId_returnsOldestFirst() throws Exception {
         List<EngagementHistoryDto> history = List.of(
                 new EngagementHistoryDto(1L, null, EngagementStatus.START, ADMIN_ID, LocalDateTime.of(2026, 1, 1, 0, 0), null),
                 new EngagementHistoryDto(2L, EngagementStatus.START, EngagementStatus.IN_PROCESSING, ADMIN_ID, LocalDateTime.of(2026, 1, 2, 0, 0), "started")
         );
-        when(engagementService.getHistory(eq(10L), eq(2024), eq(ADMIN_ID))).thenReturn(history);
+        when(engagementService.getHistory(eq(10L), eq(1L), eq(ADMIN_ID))).thenReturn(history);
 
-        mockMvc.perform(get("/api/admin/clients/10/engagements/2024/history")
+        mockMvc.perform(get("/api/admin/clients/10/engagements/1/history")
                 .with(authentication(adminAuth())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
@@ -227,10 +240,20 @@ class ClientEngagementControllerTest {
     }
 
     @Test
+    void getEngagementHistory_unknownId_returns404() throws Exception {
+        when(engagementService.getHistory(eq(10L), eq(9999L), eq(ADMIN_ID)))
+                .thenThrow(new EngagementNotFoundException(9999L));
+
+        mockMvc.perform(get("/api/admin/clients/10/engagements/9999/history")
+                .with(authentication(adminAuth())))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void getAllEngagements_includesClientNameAndBusinessType() throws Exception {
         List<EngagementDashboardDto> all = List.of(
                 new EngagementDashboardDto(1L, 10L, "Acme Corp", BusinessType.PERSONAL,
-                        (short) 2024, EngagementStatus.IN_PROCESSING, LocalDateTime.now(), "Admin User")
+                        (short) 2024, "John Smith", EngagementStatus.IN_PROCESSING, LocalDateTime.now(), "Admin User")
         );
         when(engagementService.listAll(eq(ADMIN_ID))).thenReturn(all);
 

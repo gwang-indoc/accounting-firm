@@ -35,7 +35,7 @@ class ClientEngagementEmailTest {
     private static final Long CLIENT_ID = 10L;
     private static final Long USER_ID = 5L;
     private static final Long ADMIN_ID = 99L;
-    private static final int TAX_YEAR = 2024;
+    private static final Long ENGAGEMENT_ID = 1L;
 
     @BeforeEach
     void setUp() {
@@ -46,13 +46,13 @@ class ClientEngagementEmailTest {
 
     private ClientEngagement stubEngagement(EngagementStatus current) {
         ClientEngagement e = new ClientEngagement();
-        e.setId(1L);
+        e.setId(ENGAGEMENT_ID);
         e.setClientId(CLIENT_ID);
-        e.setTaxYear((short) TAX_YEAR);
+        e.setTaxYear((short) 2024);
+        e.setName("Test Client");
         e.setStatus(current);
         e.setUpdatedAt(LocalDateTime.now());
-        when(engagementRepository.findByClientIdAndTaxYear(eq(CLIENT_ID), eq((short) TAX_YEAR)))
-                .thenReturn(Optional.of(e));
+        when(engagementRepository.findById(ENGAGEMENT_ID)).thenReturn(Optional.of(e));
         when(engagementRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(historyRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         return e;
@@ -87,7 +87,7 @@ class ClientEngagementEmailTest {
         when(clientRepository.findById(CLIENT_ID)).thenReturn(Optional.of(client));
         when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user("en")));
 
-        service.transitionStatus(CLIENT_ID, TAX_YEAR, EngagementStatus.IN_PROCESSING, null, ADMIN_ID);
+        service.transitionStatus(CLIENT_ID, ENGAGEMENT_ID, EngagementStatus.IN_PROCESSING, null, ADMIN_ID);
 
         ArgumentCaptor<SimpleMailMessage> captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
         verify(mailSender).send(captor.capture());
@@ -106,7 +106,7 @@ class ClientEngagementEmailTest {
         when(clientRepository.findById(CLIENT_ID)).thenReturn(Optional.of(client));
         when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user("zh")));
 
-        service.transitionStatus(CLIENT_ID, TAX_YEAR, EngagementStatus.IN_PROCESSING, null, ADMIN_ID);
+        service.transitionStatus(CLIENT_ID, ENGAGEMENT_ID, EngagementStatus.IN_PROCESSING, null, ADMIN_ID);
 
         ArgumentCaptor<SimpleMailMessage> captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
         verify(mailSender).send(captor.capture());
@@ -123,7 +123,7 @@ class ClientEngagementEmailTest {
         Client client = clientWithLinkedUser();
         when(clientRepository.findById(CLIENT_ID)).thenReturn(Optional.of(client));
 
-        service.transitionStatus(CLIENT_ID, TAX_YEAR, EngagementStatus.START, null, ADMIN_ID);
+        service.transitionStatus(CLIENT_ID, ENGAGEMENT_ID, EngagementStatus.START, null, ADMIN_ID);
 
         verify(mailSender, never()).send(any(SimpleMailMessage.class));
     }
@@ -136,7 +136,7 @@ class ClientEngagementEmailTest {
         when(clientRepository.findById(CLIENT_ID)).thenReturn(Optional.of(client));
 
         assertDoesNotThrow(() ->
-                service.transitionStatus(CLIENT_ID, TAX_YEAR, EngagementStatus.IN_PROCESSING, null, ADMIN_ID));
+                service.transitionStatus(CLIENT_ID, ENGAGEMENT_ID, EngagementStatus.IN_PROCESSING, null, ADMIN_ID));
         verify(mailSender, never()).send(any(SimpleMailMessage.class));
     }
 
@@ -147,7 +147,7 @@ class ClientEngagementEmailTest {
         when(clientRepository.findById(CLIENT_ID)).thenReturn(Optional.of(client));
         when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user("en")));
 
-        service.transitionStatus(CLIENT_ID, TAX_YEAR, EngagementStatus.PENDING_CLIENT_REVIEW, null, ADMIN_ID);
+        service.transitionStatus(CLIENT_ID, ENGAGEMENT_ID, EngagementStatus.PENDING_CLIENT_REVIEW, null, ADMIN_ID);
 
         ArgumentCaptor<SimpleMailMessage> captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
         verify(mailSender).send(captor.capture());
@@ -163,7 +163,7 @@ class ClientEngagementEmailTest {
         when(clientRepository.findById(CLIENT_ID)).thenReturn(Optional.of(client));
         when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user("zh")));
 
-        service.transitionStatus(CLIENT_ID, TAX_YEAR, EngagementStatus.PENDING_CLIENT_REVIEW, null, ADMIN_ID);
+        service.transitionStatus(CLIENT_ID, ENGAGEMENT_ID, EngagementStatus.PENDING_CLIENT_REVIEW, null, ADMIN_ID);
 
         ArgumentCaptor<SimpleMailMessage> captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
         verify(mailSender).send(captor.capture());
@@ -178,7 +178,7 @@ class ClientEngagementEmailTest {
         when(clientRepository.findById(CLIENT_ID)).thenReturn(Optional.of(client));
         when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user("en")));
 
-        service.transitionStatus(CLIENT_ID, TAX_YEAR, EngagementStatus.SUBMIT_TO_CRA, null, ADMIN_ID);
+        service.transitionStatus(CLIENT_ID, ENGAGEMENT_ID, EngagementStatus.SUBMIT_TO_CRA, null, ADMIN_ID);
 
         ArgumentCaptor<SimpleMailMessage> captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
         verify(mailSender).send(captor.capture());
@@ -193,7 +193,7 @@ class ClientEngagementEmailTest {
         when(clientRepository.findById(CLIENT_ID)).thenReturn(Optional.of(client));
         when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user("zh")));
 
-        service.transitionStatus(CLIENT_ID, TAX_YEAR, EngagementStatus.SUBMIT_TO_CRA, null, ADMIN_ID);
+        service.transitionStatus(CLIENT_ID, ENGAGEMENT_ID, EngagementStatus.SUBMIT_TO_CRA, null, ADMIN_ID);
 
         ArgumentCaptor<SimpleMailMessage> captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
         verify(mailSender).send(captor.capture());
@@ -208,7 +208,7 @@ class ClientEngagementEmailTest {
         when(clientRepository.findById(CLIENT_ID)).thenReturn(Optional.of(client));
         when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user("en")));
 
-        service.transitionStatus(CLIENT_ID, TAX_YEAR, EngagementStatus.COMPLETED, null, ADMIN_ID);
+        service.transitionStatus(CLIENT_ID, ENGAGEMENT_ID, EngagementStatus.COMPLETED, null, ADMIN_ID);
 
         ArgumentCaptor<SimpleMailMessage> captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
         verify(mailSender).send(captor.capture());
@@ -223,7 +223,7 @@ class ClientEngagementEmailTest {
         when(clientRepository.findById(CLIENT_ID)).thenReturn(Optional.of(client));
         when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user("zh")));
 
-        service.transitionStatus(CLIENT_ID, TAX_YEAR, EngagementStatus.COMPLETED, null, ADMIN_ID);
+        service.transitionStatus(CLIENT_ID, ENGAGEMENT_ID, EngagementStatus.COMPLETED, null, ADMIN_ID);
 
         ArgumentCaptor<SimpleMailMessage> captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
         verify(mailSender).send(captor.capture());
@@ -240,7 +240,7 @@ class ClientEngagementEmailTest {
         doThrow(new org.springframework.mail.MailSendException("SMTP error")).when(mailSender).send(any(SimpleMailMessage.class));
 
         EngagementDto result = assertDoesNotThrow(() ->
-                service.transitionStatus(CLIENT_ID, TAX_YEAR, EngagementStatus.IN_PROCESSING, null, ADMIN_ID));
+                service.transitionStatus(CLIENT_ID, ENGAGEMENT_ID, EngagementStatus.IN_PROCESSING, null, ADMIN_ID));
 
         assertNotNull(result);
         verify(engagementRepository).save(any());

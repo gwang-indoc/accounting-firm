@@ -53,12 +53,13 @@ public class ClientEngagementService {
     }
 
     @Transactional
-    public EngagementDto createEngagement(Long clientId, Integer taxYear, Long adminId) {
+    public EngagementDto createEngagement(Long clientId, Integer taxYear, String name, Long adminId) {
         findClientForAdmin(clientId, adminId);
 
         ClientEngagement engagement = new ClientEngagement();
         engagement.setClientId(clientId);
         engagement.setTaxYear(taxYear.shortValue());
+        engagement.setName(name);
         engagement.setStatus(EngagementStatus.START);
         engagement.setUpdatedBy(adminId);
         engagement.setUpdatedAt(LocalDateTime.now());
@@ -76,15 +77,18 @@ public class ClientEngagementService {
     }
 
     @Transactional
-    public EngagementDto transitionStatus(Long clientId, int taxYear, EngagementStatus newStatus,
+    public EngagementDto transitionStatus(Long clientId, Long engagementId, EngagementStatus newStatus,
                                           String note, Long adminId) {
         findClientForAdmin(clientId, adminId);
-        ClientEngagement engagement = engagementRepository
-                .findByClientIdAndTaxYear(clientId, (short) taxYear)
-                .orElseThrow(() -> new EngagementNotFoundException(clientId, taxYear));
+        ClientEngagement engagement = engagementRepository.findById(engagementId)
+                .orElseThrow(() -> new EngagementNotFoundException(engagementId));
+        if (!engagement.getClientId().equals(clientId)) {
+            throw new EngagementNotFoundException(engagementId);
+        }
 
         EngagementStatus previous = engagement.getStatus();
         engagement.setStatus(newStatus);
+        engagement.setNote(note);
         engagement.setUpdatedBy(adminId);
         engagement.setUpdatedAt(LocalDateTime.now());
         ClientEngagement saved = engagementRepository.save(engagement);
@@ -167,11 +171,13 @@ public class ClientEngagementService {
                 .stream().map(this::toDto).toList();
     }
 
-    public List<EngagementHistoryDto> getHistory(Long clientId, int taxYear, Long adminId) {
+    public List<EngagementHistoryDto> getHistory(Long clientId, Long engagementId, Long adminId) {
         findClientForAdmin(clientId, adminId);
-        ClientEngagement engagement = engagementRepository
-                .findByClientIdAndTaxYear(clientId, (short) taxYear)
-                .orElseThrow(() -> new EngagementNotFoundException(clientId, taxYear));
+        ClientEngagement engagement = engagementRepository.findById(engagementId)
+                .orElseThrow(() -> new EngagementNotFoundException(engagementId));
+        if (!engagement.getClientId().equals(clientId)) {
+            throw new EngagementNotFoundException(engagementId);
+        }
         return historyRepository.findByEngagementIdOrderByChangedAtAsc(engagement.getId())
                 .stream().map(this::toHistoryDto).toList();
     }
@@ -190,13 +196,13 @@ public class ClientEngagementService {
                             ? userRepository.findById(e.getUpdatedBy()).map(u -> u.getName()).orElse(null)
                             : null;
                     return new EngagementDashboardDto(e.getId(), e.getClientId(), clientName, businessType,
-                            e.getTaxYear(), e.getStatus(), e.getUpdatedAt(), updatedByName);
+                            e.getTaxYear(), e.getName(), e.getStatus(), e.getUpdatedAt(), updatedByName);
                 }).toList();
     }
 
     private EngagementDto toDto(ClientEngagement e) {
         return new EngagementDto(e.getId(), e.getClientId(), e.getTaxYear(),
-                e.getStatus(), e.getUpdatedBy(), e.getUpdatedAt());
+                e.getName(), e.getNote(), e.getStatus(), e.getUpdatedBy(), e.getUpdatedAt());
     }
 
     private EngagementHistoryDto toHistoryDto(ClientEngagementHistory h) {

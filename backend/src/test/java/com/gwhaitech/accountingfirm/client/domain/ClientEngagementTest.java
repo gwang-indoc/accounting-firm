@@ -72,6 +72,7 @@ class ClientEngagementTest {
         ClientEngagement engagement = new ClientEngagement();
         engagement.setClientId(client.getId());
         engagement.setTaxYear((short) 2024);
+        engagement.setName("John Smith");
         engagement.setStatus(EngagementStatus.START);
         engagement.setUpdatedBy(admin.getId());
         engagement.setUpdatedAt(LocalDateTime.now());
@@ -99,10 +100,11 @@ class ClientEngagementTest {
     }
 
     @Test
-    void rejectsDuplicateClientAndTaxYear() {
+    void rejectsDuplicateClientYearAndName() {
         ClientEngagement first = new ClientEngagement();
         first.setClientId(client.getId());
         first.setTaxYear((short) 2025);
+        first.setName("John Smith");
         first.setStatus(EngagementStatus.START);
         first.setUpdatedBy(admin.getId());
         first.setUpdatedAt(LocalDateTime.now());
@@ -113,11 +115,37 @@ class ClientEngagementTest {
         ClientEngagement second = new ClientEngagement();
         second.setClientId(client.getId());
         second.setTaxYear((short) 2025);
+        second.setName("John Smith");
         second.setStatus(EngagementStatus.START);
         second.setUpdatedBy(admin.getId());
         second.setUpdatedAt(LocalDateTime.now());
 
         assertThatThrownBy(() -> { engagementRepo.save(second); em.flush(); })
                 .isInstanceOf(Exception.class);
+    }
+
+    @Test
+    void allowsTwoEngagementsForSameClientYearWithDifferentNames() {
+        ClientEngagement first = new ClientEngagement();
+        first.setClientId(client.getId());
+        first.setTaxYear((short) 2025);
+        first.setName("John Smith");
+        first.setStatus(EngagementStatus.START);
+        first.setUpdatedBy(admin.getId());
+        first.setUpdatedAt(LocalDateTime.now());
+        engagementRepo.save(first);
+        em.flush();
+
+        ClientEngagement second = new ClientEngagement();
+        second.setClientId(client.getId());
+        second.setTaxYear((short) 2025);
+        second.setName("Smith Holdings Inc.");
+        second.setStatus(EngagementStatus.START);
+        second.setUpdatedBy(admin.getId());
+        second.setUpdatedAt(LocalDateTime.now());
+        engagementRepo.save(second);
+        em.flush();
+
+        assertThat(engagementRepo.findByClientIdOrderByTaxYearDesc(client.getId())).hasSize(2);
     }
 }

@@ -27,7 +27,7 @@ public class ClientEngagementController {
     public ResponseEntity<EngagementDto> create(@PathVariable Long clientId,
                                                 @Valid @RequestBody CreateEngagementRequest request,
                                                 Authentication authentication) {
-        EngagementDto dto = engagementService.createEngagement(clientId, request.taxYear(), adminId(authentication));
+        EngagementDto dto = engagementService.createEngagement(clientId, request.taxYear(), request.name(), adminId(authentication));
         return ResponseEntity.status(201).body(dto);
     }
 
@@ -37,20 +37,20 @@ public class ClientEngagementController {
         return ResponseEntity.ok(engagementService.listForClient(clientId, adminId(authentication)));
     }
 
-    @GetMapping("/{taxYear}/history")
+    @GetMapping("/{id}/history")
     public ResponseEntity<List<EngagementHistoryDto>> history(@PathVariable Long clientId,
-                                                              @PathVariable int taxYear,
+                                                              @PathVariable Long id,
                                                               Authentication authentication) {
-        return ResponseEntity.ok(engagementService.getHistory(clientId, taxYear, adminId(authentication)));
+        return ResponseEntity.ok(engagementService.getHistory(clientId, id, adminId(authentication)));
     }
 
-    @PatchMapping("/{taxYear}/status")
+    @PatchMapping("/{id}/status")
     public ResponseEntity<EngagementDto> transition(@PathVariable Long clientId,
-                                                    @PathVariable int taxYear,
+                                                    @PathVariable Long id,
                                                     @Valid @RequestBody TransitionStatusRequest request,
                                                     Authentication authentication) {
         EngagementDto dto = engagementService.transitionStatus(
-                clientId, taxYear, request.status(), request.note(), adminId(authentication));
+                clientId, id, request.status(), request.note(), adminId(authentication));
         return ResponseEntity.ok(dto);
     }
 

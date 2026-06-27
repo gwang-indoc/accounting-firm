@@ -6,12 +6,13 @@
 - **Code**: Use `DEFAULT ''` temporarily for NOT NULL `name` column so existing rows are satisfied; drop default after adding constraint. New unique constraint is `(client_id, tax_year, name)`. `note` is nullable TEXT — no max length.
 - **Threshold**: 80
 
-- [ ] 1.0 CONTRACT — write openspec/changes/engagement-name-note/contracts/group-1.md with the ### Contract block above; confirm all three fields (Spec, Runtime, Code) are non-empty before proceeding
-- [ ] 1.1 Write `V15__add_name_note_to_engagements.sql`: drop old unique constraint, add `name VARCHAR(255) NOT NULL DEFAULT ''`, add `note TEXT`, add new unique constraint `(client_id, tax_year, name)`, drop the default
-- [ ] 1.2 Add `name` (String, `@Column(nullable = false)`) and `note` (String, nullable) to `ClientEngagement` entity
-- [ ] 1.3 Add `name` and `note` fields to `EngagementDto`; update any projection/mapping that builds `EngagementDto` to include both fields
-- [ ] 1.4 Run `cd backend && ./mvnw test` — confirm Flyway applies cleanly and all existing tests pass
-- [ ] 1.E EVAL — spawn evaluator subagent (haiku); reads contracts/group-1.md + spec + design + group diff; invokes superpowers:requesting-code-review (CRITICAL/HIGH = BLOCK); scores Spec/Runtime/Code; total ≥ 80 → PASS; < 80 → append FIX tasks + retry (max 3 attempts, plateau < 5pt = escalate)
+- [x] 1.0 CONTRACT — write openspec/changes/engagement-name-note/contracts/group-1.md with the ### Contract block above; confirm all three fields (Spec, Runtime, Code) are non-empty before proceeding
+- [x] 1.1 Write `V15__add_name_note_to_engagements.sql`: drop old unique constraint, add `name VARCHAR(255) NOT NULL DEFAULT ''`, add `note TEXT`, add new unique constraint `(client_id, tax_year, name)`, drop the default
+- [x] 1.2 Add `name` (String, `@Column(nullable = false)`) and `note` (String, nullable) to `ClientEngagement` entity
+- [x] 1.3 Add `name` and `note` fields to `EngagementDto`; update any projection/mapping that builds `EngagementDto` to include both fields
+- [x] 1.4 Run `cd backend && ./mvnw test` — confirm Flyway applies cleanly and all existing tests pass
+- [x] 1.F1 FIX — add `@NotBlank String name` to `CreateEngagementRequest`; update `ClientEngagementService.createEngagement()` to accept and set name; update controller to pass `request.name()`; update controller test mock to include name
+- [x] 1.E EVAL — spawn evaluator subagent (haiku); reads contracts/group-1.md + spec + design + group diff; invokes superpowers:requesting-code-review (CRITICAL/HIGH = BLOCK); scores Spec/Runtime/Code; total ≥ 80 → PASS; < 80 → append FIX tasks + retry (max 3 attempts, plateau < 5pt = escalate)
 
 ---
 
@@ -23,19 +24,19 @@
 - **Code**: `CreateEngagementRequest` gains `@NotBlank String name`. `ClientEngagementService.createEngagement()` receives name, sets it on entity. `transitionStatus()` looks up by engagementId (not taxYear), persists `request.note()` to `ClientEngagement.note`. Controller switches `{taxYear}` path param to `{id}` on history and status endpoints. Ownership check: verify `engagement.getClientId()` belongs to the authenticated admin's client set.
 - **Threshold**: 80
 
-- [ ] 2.0 CONTRACT — write openspec/changes/engagement-name-note/contracts/group-2.md with the ### Contract block above; confirm all three fields are non-empty before proceeding
-- [ ] 2.1 RED — add `@NotBlank String name` to `CreateEngagementRequest`; write test asserting `POST /engagements` with blank name returns 400
-- [ ] 2.2 GREEN — update `CreateEngagementRequest` with `@NotBlank String name`; update `ClientEngagementService.createEngagement()` to accept and persist name
-- [ ] 2.3 RED — write test asserting `POST /engagements` with valid name returns 201 with `name` in response body
-- [ ] 2.4 GREEN — update controller to pass name from request to service; update `EngagementDto` mapping to include name
-- [ ] 2.5 RED — write test asserting duplicate `(clientId, taxYear, name)` returns 409; write test asserting same year with different name returns 201
-- [ ] 2.6 GREEN — handle `DataIntegrityViolationException` from duplicate unique constraint → 409 in controller or exception handler
-- [ ] 2.7 RED — write test asserting `PATCH /engagements/{id}/status` updates `ClientEngagement.note` to the provided value
-- [ ] 2.8 GREEN — update `ClientEngagementService.transitionStatus()` to accept engagementId (Long), look up by ID, persist `request.note()` to `ClientEngagement.note`
-- [ ] 2.9 RED — write test asserting `GET /engagements/{id}/history` returns 200 (route uses id, not taxYear); write test asserting unknown id returns 404
-- [ ] 2.10 GREEN — update `ClientEngagementController`: change `{taxYear}` path variable to `{id}` on history and status endpoints; look up engagement by ID with ownership check
-- [ ] 2.11 Run `cd backend && ./mvnw test` — all tests pass
-- [ ] 2.E EVAL — spawn evaluator subagent (haiku); reads contracts/group-2.md + spec + design + group diff; invokes superpowers:requesting-code-review (CRITICAL/HIGH = BLOCK); scores Spec/Runtime/Code; total ≥ 80 → PASS; < 80 → append FIX tasks + retry (max 3 attempts, plateau < 5pt = escalate)
+- [x] 2.0 CONTRACT — write openspec/changes/engagement-name-note/contracts/group-2.md with the ### Contract block above; confirm all three fields are non-empty before proceeding
+- [x] 2.1 RED — add `@NotBlank String name` to `CreateEngagementRequest`; write test asserting `POST /engagements` with blank name returns 400
+- [x] 2.2 GREEN — update `CreateEngagementRequest` with `@NotBlank String name`; update `ClientEngagementService.createEngagement()` to accept and persist name
+- [x] 2.3 RED — write test asserting `POST /engagements` with valid name returns 201 with `name` in response body
+- [x] 2.4 GREEN — update controller to pass name from request to service; update `EngagementDto` mapping to include name
+- [x] 2.5 RED — write test asserting duplicate `(clientId, taxYear, name)` returns 409; write test asserting same year with different name returns 201
+- [x] 2.6 GREEN — handle `DataIntegrityViolationException` from duplicate unique constraint → 409 in controller or exception handler
+- [x] 2.7 RED — write test asserting `PATCH /engagements/{id}/status` updates `ClientEngagement.note` to the provided value
+- [x] 2.8 GREEN — update `ClientEngagementService.transitionStatus()` to accept engagementId (Long), look up by ID, persist `request.note()` to `ClientEngagement.note`
+- [x] 2.9 RED — write test asserting `GET /engagements/{id}/history` returns 200 (route uses id, not taxYear); write test asserting unknown id returns 404
+- [x] 2.10 GREEN — update `ClientEngagementController`: change `{taxYear}` path variable to `{id}` on history and status endpoints; look up engagement by ID with ownership check
+- [x] 2.11 Run `cd backend && ./mvnw test` — all tests pass
+- [x] 2.E EVAL — spawn evaluator subagent (haiku); reads contracts/group-2.md + spec + design + group diff; invokes superpowers:requesting-code-review (CRITICAL/HIGH = BLOCK); scores Spec/Runtime/Code; total ≥ 80 → PASS; < 80 → append FIX tasks + retry (max 3 attempts, plateau < 5pt = escalate)
 
 ---
 

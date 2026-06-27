@@ -11,6 +11,7 @@ public record EngagementDashboardDto(
         String clientName,
         BusinessType businessType,
         Short taxYear,
+        String name,
         EngagementStatus status,
         LocalDateTime updatedAt,
         String updatedByName
