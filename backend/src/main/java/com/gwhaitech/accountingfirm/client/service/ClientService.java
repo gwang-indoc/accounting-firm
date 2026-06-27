@@ -1,6 +1,7 @@
 package com.gwhaitech.accountingfirm.client.service;
 
 import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
+import com.gwhaitech.accountingfirm.client.domain.BusinessType;
 import com.gwhaitech.accountingfirm.client.domain.Client;
 import com.gwhaitech.accountingfirm.client.domain.ClientRepository;
 import com.gwhaitech.accountingfirm.client.dto.ClientDto;
@@ -12,6 +13,8 @@ import com.gwhaitech.accountingfirm.client.exception.ClientEmailNotRegisteredExc
 import com.gwhaitech.accountingfirm.client.exception.ClientNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.DateTimeException;
+import java.time.MonthDay;
 import java.util.List;
 
 @Service
@@ -38,6 +41,7 @@ public class ClientService {
         client.setEmail(email);
         client.setPhone(request.phone());
         client.setAdminId(adminId);
+        applyBusinessTypeAndFye(client, request.businessType(), request.fiscalYearEndMonth(), request.fiscalYearEndDay());
         return toDto(clientRepository.save(client));
     }
 
@@ -65,7 +69,27 @@ public class ClientService {
         client.setName(request.name());
         client.setEmail(request.email());
         client.setPhone(request.phone());
+        applyBusinessTypeAndFye(client, request.businessType(), request.fiscalYearEndMonth(), request.fiscalYearEndDay());
         return toDto(clientRepository.save(client));
+    }
+
+    private void applyBusinessTypeAndFye(Client client, BusinessType businessType, Integer month, Integer day) {
+        client.setBusinessType(businessType);
+        if (businessType == BusinessType.PERSONAL) {
+            client.setFiscalYearEndMonth((short) 12);
+            client.setFiscalYearEndDay((short) 31);
+        } else {
+            if (month == null || day == null) {
+                throw new IllegalArgumentException("fiscalYearEndMonth and fiscalYearEndDay are required for " + businessType);
+            }
+            try {
+                MonthDay.of(month, day);
+            } catch (DateTimeException e) {
+                throw new IllegalArgumentException("Invalid fiscal year end date: month=" + month + ", day=" + day);
+            }
+            client.setFiscalYearEndMonth(month.shortValue());
+            client.setFiscalYearEndDay(day.shortValue());
+        }
     }
 
     public void deleteClient(Long id, Long adminId) {
@@ -78,6 +102,9 @@ public class ClientService {
     }
 
     private ClientDto toDto(Client c) {
-        return new ClientDto(c.getId(), c.getName(), c.getEmail(), c.getPhone(), c.getCreatedAt(), c.getUserId(), c.getAdminId());
+        return new ClientDto(c.getId(), c.getName(), c.getEmail(), c.getPhone(), c.getCreatedAt(),
+                c.getUserId(), c.getAdminId(), c.getBusinessType(),
+                c.getFiscalYearEndMonth() != null ? c.getFiscalYearEndMonth().intValue() : null,
+                c.getFiscalYearEndDay() != null ? c.getFiscalYearEndDay().intValue() : null);
     }
 }

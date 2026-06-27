@@ -58,6 +58,12 @@ export const routes: Routes = [
       import('./features/auth/login/login.component').then(m => m.LoginComponent),
   },
   {
+    path: 'admin/workflow',
+    loadComponent: () =>
+      import('./features/admin/workflow/admin-workflow.component').then(m => m.AdminWorkflowComponent),
+    canActivate: [authGuard, adminGuard],
+  },
+  {
     path: 'admin/clients',
     loadComponent: () =>
       import('./features/admin/clients/admin-clients.component').then(m => m.AdminClientsComponent),
@@ -73,6 +79,12 @@ export const routes: Routes = [
     path: 'admin/clients/:id/messages',
     loadComponent: () =>
       import('./features/admin/client-messages/admin-client-threads.component').then(m => m.AdminClientThreadsComponent),
+    canActivate: [authGuard, adminGuard],
+  },
+  {
+    path: 'admin/clients/:id/workflow',
+    loadComponent: () =>
+      import('./features/admin/client-workflow/admin-client-workflow.component').then(m => m.AdminClientWorkflowComponent),
     canActivate: [authGuard, adminGuard],
   },
   {

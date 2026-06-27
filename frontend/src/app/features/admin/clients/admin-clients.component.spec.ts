@@ -13,8 +13,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { of } from 'rxjs';
 
 const sampleClients: ClientDto[] = [
-  { id: 1, name: 'Jane Smith', email: 'jane@gmail.com', phone: '555-1234', createdAt: '2026-01-01T00:00:00', linkedUserId: 42, adminId: 1 },
-  { id: 2, name: 'Bob Lee',    email: 'bob@work.com',   phone: null,        createdAt: '2026-01-02T00:00:00', linkedUserId: null, adminId: 1 },
+  { id: 1, name: 'Jane Smith', email: 'jane@gmail.com', phone: '555-1234', createdAt: '2026-01-01T00:00:00', linkedUserId: 42, adminId: 1, businessType: 'PERSONAL', fiscalYearEndMonth: 12, fiscalYearEndDay: 31 },
+  { id: 2, name: 'Bob Lee',    email: 'bob@work.com',   phone: null,        createdAt: '2026-01-02T00:00:00', linkedUserId: null, adminId: 1, businessType: 'CORPORATE', fiscalYearEndMonth: 3, fiscalYearEndDay: 31 },
 ];
 
 function makeClients(n: number): ClientDto[] {
@@ -25,7 +25,10 @@ function makeClients(n: number): ClientDto[] {
     phone: null,
     createdAt: '2026-01-01T00:00:00',
     linkedUserId: null,
-    adminId: 1
+    adminId: 1,
+    businessType: 'PERSONAL' as const,
+    fiscalYearEndMonth: 12,
+    fiscalYearEndDay: 31,
   }));
 }
 

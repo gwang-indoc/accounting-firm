@@ -6,4 +6,7 @@ export interface ClientDto {
   createdAt: string;
   linkedUserId: number | null;
   adminId: number | null;
+  businessType: 'PERSONAL' | 'CORPORATE' | 'SELF_EMPLOYED' | null;
+  fiscalYearEndMonth: number | null;
+  fiscalYearEndDay: number | null;
 }

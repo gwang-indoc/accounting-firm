@@ -1,5 +1,7 @@
 package com.gwhaitech.accountingfirm.client.dto;
 
+import com.gwhaitech.accountingfirm.client.domain.BusinessType;
+
 import java.time.LocalDateTime;
 
 public record ClientDto(
@@ -9,5 +11,8 @@ public record ClientDto(
         String phone,
         LocalDateTime createdAt,
         Long linkedUserId,
-        Long adminId
+        Long adminId,
+        BusinessType businessType,
+        Integer fiscalYearEndMonth,
+        Integer fiscalYearEndDay
 ) {}

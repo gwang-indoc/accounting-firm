@@ -206,6 +206,12 @@ When using `HttpClient` with `responseType: 'blob'`, Angular wraps the error bod
 ### `mat-checkbox (change)` does not fire in JSDOM on host element click
 Clicking the `<mat-checkbox>` host element in Angular tests (JSDOM) does not trigger the `(change)` output binding. Use `checkboxHost.querySelector('input[type="checkbox"]').click()` to fire the native change event that Angular picks up. This affects all component specs that test checkbox-driven selection logic.
 
+### `provideRouter([])` must come BEFORE a custom `ActivatedRoute` mock in TestBed
+`provideRouter([])` registers its own `ActivatedRoute` provider. If placed **after** a custom `ActivatedRoute` mock in the `providers` array, the router's provider wins and the mock is ignored — `paramMap.get('id')` returns `null` and `Number(null) === 0`. Always put `provideRouter([])` first, then the `{ provide: ActivatedRoute, useValue: ... }` override. Use a plain object `{ get: (key) => key === 'id' ? '10' : null }` for the paramMap — `convertToParamMap({ id: '10' })` from `@angular/router` has been seen to return null for the id key in JSDOM.
+
+### Service ownership checks break unit tests that omit the client repository mock
+When a service method gains a `findClientForAdmin(clientId, adminId)` guard at its start (which calls `clientRepository.findById(clientId)` and checks `client.getAdminId().equals(adminId)`), any existing unit test that doesn't mock `clientRepository.findById()` will throw NPE on the null adminId. After adding ownership checks to a service, grep `src/test` for all tests of that service and ensure each one: (1) mocks `clientRepository.findById(clientId)` to return a `Client`, and (2) sets `client.setAdminId(adminId)` matching the admin ID used in the call.
+
 ### OpenSpec delta spec: MODIFIED headers must match the main spec exactly; new requirements need ADDED
 `openspec archive` matches each `### Requirement:` header in a `## MODIFIED Requirements` block against the exact text in the main spec. A header that doesn't exist yet causes `MODIFIED failed for header "..." - not found` and aborts with no changes applied. Use `## ADDED Requirements` for any requirement that doesn't yet exist in the canonical spec, even when the surrounding block looks like a modification.
 

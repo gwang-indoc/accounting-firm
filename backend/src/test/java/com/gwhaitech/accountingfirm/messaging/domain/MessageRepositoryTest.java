@@ -56,7 +56,7 @@ class MessageRepositoryTest {
                 .createNativeQuery("INSERT INTO users (email, name, role) VALUES ('seed-msg@test.com', 'Seed', 'ADMIN') ON CONFLICT (email) DO UPDATE SET name=EXCLUDED.name RETURNING id")
                 .getSingleResult();
         Object cid = em.getEntityManager()
-                .createNativeQuery("INSERT INTO clients (name, email, admin_id, created_at) VALUES ('X', gen_random_uuid()::text || '@test.com', " + ((Number) uid).longValue() + ", now()) RETURNING id")
+                .createNativeQuery("INSERT INTO clients (name, email, admin_id, created_at, business_type, fiscal_year_end_month, fiscal_year_end_day) VALUES ('X', gen_random_uuid()::text || '@test.com', " + ((Number) uid).longValue() + ", now(), 'PERSONAL', 12, 31) RETURNING id")
                 .getSingleResult();
         MessageThread t = new MessageThread();
         t.setClientId(((Number) cid).longValue());

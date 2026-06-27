@@ -23,14 +23,14 @@ describe('AdminClientsService', () => {
   });
 
   it('create calls POST /api/clients', () => {
-    service.create({ name: 'Jane', email: 'j@j.com', phone: '' }).subscribe();
+    service.create({ name: 'Jane', email: 'j@j.com', phone: '', businessType: 'PERSONAL', fiscalYearEndMonth: 12, fiscalYearEndDay: 31 }).subscribe();
     const req = httpMock.expectOne('/api/clients');
     expect(req.request.method).toBe('POST');
     req.flush({});
   });
 
   it('update calls PUT /api/clients/1', () => {
-    service.update(1, { name: 'Jane', email: 'j@j.com', phone: '' }).subscribe();
+    service.update(1, { name: 'Jane', email: 'j@j.com', phone: '', businessType: 'PERSONAL', fiscalYearEndMonth: 12, fiscalYearEndDay: 31 }).subscribe();
     const req = httpMock.expectOne('/api/clients/1');
     expect(req.request.method).toBe('PUT');
     req.flush({});

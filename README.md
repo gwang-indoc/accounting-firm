@@ -105,8 +105,16 @@ Home → Client Login → Google OAuth2 → Portal Dashboard
 Login → /admin/clients (client list)
       → Client row → Documents tab (upload signed return)
       → Client row → Messages tab → Thread (reply to client query)
+      → Client row → Workflow tab (/admin/clients/:id/workflow)
+            → Create engagement (tax year)
+            → Change status with optional note (START / IN_PROCESSING / PENDING_CLIENT_REVIEW / SUBMIT_TO_CRA / COMPLETED)
+            → Expand engagement row → view full transition history
       → Select clients (checkbox) → Export → CSV / ZIP download
+      → /admin/workflow (dashboard — all engagements across all clients)
+            → Filter by Status or Business Type
 ```
+
+**Engagement email notifications**: when an admin transitions a client engagement to IN_PROCESSING, PENDING_CLIENT_REVIEW, SUBMIT_TO_CRA, or COMPLETED, the system automatically sends a notification email to the client's linked account in their preferred language (EN or ZH).
 
 ---
 

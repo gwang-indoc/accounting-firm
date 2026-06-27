@@ -12,7 +12,7 @@ import { AdminClientsService } from '../../../core/services/admin-clients.servic
 function makeService(lookupFn: (email: string) => unknown): Partial<AdminClientsService> {
   return {
     lookupUserByEmail: vi.fn().mockImplementation(lookupFn),
-    create: vi.fn().mockReturnValue(of({ id: 1, name: 'Jane', email: 'jane@a.com', phone: null, createdAt: '', linkedUserId: null, adminId: 99 })),
+    create: vi.fn().mockReturnValue(of({ id: 1, name: 'Jane', email: 'jane@a.com', phone: null, createdAt: '', linkedUserId: null, adminId: 99, businessType: 'PERSONAL', fiscalYearEndMonth: 12, fiscalYearEndDay: 31 })),
     update: vi.fn(),
     getAll: vi.fn().mockReturnValue(of([])),
     delete: vi.fn(),
@@ -97,5 +97,59 @@ describe('AdminClientDialogComponent email validator', () => {
     comp.submit();
     // throwError is synchronous — error handler runs inline
     expect(comp.form.get('email').errors?.['duplicateClient']).toBe(true);
+  });
+});
+
+describe('AdminClientDialogComponent businessType and FYE fields', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  it('has a businessType select in the form', async () => {
+    const svc = makeService(() => of({ name: 'X' }));
+    const fixture = await setup(svc);
+    const comp = fixture.componentInstance as any;
+    expect(comp.form.get('businessType')).not.toBeNull();
+  });
+
+  it('FYE fields are hidden when businessType is PERSONAL', async () => {
+    const svc = makeService(() => of({ name: 'X' }));
+    const fixture = await setup(svc);
+    const comp = fixture.componentInstance as any;
+
+    comp.form.get('businessType').setValue('PERSONAL');
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const fyeFields = fixture.nativeElement.querySelectorAll('[data-testid="fye-field"]');
+    expect(fyeFields.length).toBe(0);
+  });
+
+  it('FYE fields are shown when businessType is CORPORATE', async () => {
+    const svc = makeService(() => of({ name: 'X' }));
+    const fixture = await setup(svc);
+    const comp = fixture.componentInstance as any;
+
+    comp.form.get('businessType').setValue('CORPORATE');
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const fyeFields = fixture.nativeElement.querySelectorAll('[data-testid="fye-field"]');
+    expect(fyeFields.length).toBeGreaterThan(0);
+  });
+
+  it('form is invalid when CORPORATE is selected but FYE is not provided', async () => {
+    const svc = makeService(() => of({ name: 'X' }));
+    const fixture = await setup(svc);
+    const comp = fixture.componentInstance as any;
+
+    comp.form.get('businessType').setValue('CORPORATE');
+    comp.form.get('fiscalYearEndMonth')?.setValue(null);
+    comp.form.get('fiscalYearEndDay')?.setValue(null);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(comp.form.valid).toBe(false);
   });
 });

@@ -78,7 +78,8 @@ class ClientControllerTest {
 
     private ClientDto sampleDto() {
         return new ClientDto(1L, "Acme Corp", "contact@acme.com", "555-1234",
-                LocalDateTime.of(2026, 1, 1, 0, 0), null, ADMIN_ID);
+                LocalDateTime.of(2026, 1, 1, 0, 0), null, ADMIN_ID,
+                com.gwhaitech.accountingfirm.client.domain.BusinessType.PERSONAL, 12, 31);
     }
 
     @Test
@@ -89,7 +90,7 @@ class ClientControllerTest {
                 .with(authentication(adminAuth()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                        {"name":"Acme","email":"contact@acme.com"}
+                        {"name":"Acme","email":"contact@acme.com","businessType":"PERSONAL"}
                         """))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
@@ -155,7 +156,7 @@ class ClientControllerTest {
                         .with(authentication(adminAuth()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"name":"Updated","email":"u@u.com","phone":"111"}
+                                {"name":"Updated","email":"u@u.com","phone":"111","businessType":"PERSONAL"}
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1));
@@ -181,7 +182,7 @@ class ClientControllerTest {
                         .with(authentication(adminAuth()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"name":"X"}
+                                {"name":"X","businessType":"PERSONAL"}
                                 """))
                 .andExpect(status().isNotFound());
     }
@@ -202,5 +203,61 @@ class ClientControllerTest {
         mockMvc.perform(delete("/api/clients/999")
                 .with(authentication(adminAuth())))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void createClient_withoutBusinessType_returns400() throws Exception {
+        mockMvc.perform(post("/api/clients")
+                .with(authentication(adminAuth()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"name":"Acme","email":"contact@acme.com"}
+                        """))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void createClient_personalWithNonDecFye_returns201WithDecThirtyFirst() throws Exception {
+        when(clientService.createClient(any(), eq(ADMIN_ID))).thenReturn(sampleDto());
+
+        mockMvc.perform(post("/api/clients")
+                .with(authentication(adminAuth()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"name":"Jane","email":"jane@example.com","businessType":"PERSONAL",
+                         "fiscalYearEndMonth":3,"fiscalYearEndDay":31}
+                        """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.fiscalYearEndMonth").value(12))
+                .andExpect(jsonPath("$.fiscalYearEndDay").value(31));
+    }
+
+    @Test
+    void createClient_corporateWithoutFye_returns400() throws Exception {
+        when(clientService.createClient(any(), eq(ADMIN_ID)))
+                .thenThrow(new IllegalArgumentException("fiscalYearEndMonth and fiscalYearEndDay are required for CORPORATE"));
+
+        mockMvc.perform(post("/api/clients")
+                .with(authentication(adminAuth()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"name":"Corp","email":"corp@example.com","businessType":"CORPORATE"}
+                        """))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void createClient_corporateWithInvalidFye_returns400() throws Exception {
+        when(clientService.createClient(any(), eq(ADMIN_ID)))
+                .thenThrow(new IllegalArgumentException("Invalid fiscal year end date: month=2, day=30"));
+
+        mockMvc.perform(post("/api/clients")
+                .with(authentication(adminAuth()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"name":"Corp","email":"corp@example.com","businessType":"CORPORATE",
+                         "fiscalYearEndMonth":2,"fiscalYearEndDay":30}
+                        """))
+                .andExpect(status().isBadRequest());
     }
 }

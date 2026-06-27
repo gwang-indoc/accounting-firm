@@ -1,0 +1,66 @@
+<div class="page-container">
+  <div class="page-header">
+    <a mat-button routerLink="/admin/clients" data-testid="back-btn">← Back to Clients</a>
+    <h2>Client Workflow</h2>
+    <button mat-raised-button color="primary" (click)="openNewEngagementDialog()" data-testid="new-engagement-btn">
+      New Engagement
+    </button>
+  </div>
+
+  @if (duplicateError()) {
+    <div class="inline-error" data-testid="duplicate-error">
+      An engagement for that tax year already exists for this client.
+    </div>
+  }
+
+  @if (engagements().length === 0) {
+    <p data-testid="empty-state">No engagements found for this client.</p>
+  } @else {
+    <table class="engagement-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Tax Year</th>
+          <th>Status</th>
+          <th>Last Updated</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (eng of engagements(); track eng.id) {
+          <tr data-testid="engagement-row">
+            <td>
+              <button
+                mat-icon-button
+                (click)="toggleExpand(eng)"
+                data-testid="expand-btn"
+                aria-label="Toggle history"
+              >
+                {{ expandedId() === eng.id ? '▲' : '▼' }}
+              </button>
+            </td>
+            <td>{{ eng.taxYear }}</td>
+            <td>{{ eng.status }}</td>
+            <td>{{ eng.updatedAt }}</td>
+            <td>
+              <button mat-button (click)="openTransitionDialog(eng)" data-testid="transition-btn">
+                Change Status
+              </button>
+            </td>
+          </tr>
+          @if (expandedId() === eng.id) {
+            @for (h of expandedHistory(); track h.id) {
+              <tr data-testid="history-row">
+                <td></td>
+                <td colspan="4">
+                  {{ h.changedAt }} — {{ h.fromStatus ?? 'START' }} → {{ h.toStatus }}
+                  @if (h.note) { <em>({{ h.note }})</em> }
+                </td>
+              </tr>
+            }
+          }
+        }
+      </tbody>
+    </table>
+  }
+</div>

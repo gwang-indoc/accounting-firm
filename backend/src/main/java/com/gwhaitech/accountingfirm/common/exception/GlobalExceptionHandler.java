@@ -6,9 +6,11 @@ import com.gwhaitech.accountingfirm.client.exception.ClientEmailNotRegisteredExc
 import com.gwhaitech.accountingfirm.client.exception.ClientNotFoundException;
 import com.gwhaitech.accountingfirm.client.exception.DocumentNameConflictException;
 import com.gwhaitech.accountingfirm.client.exception.DocumentNotFoundException;
+import com.gwhaitech.accountingfirm.client.exception.EngagementNotFoundException;
 import com.gwhaitech.accountingfirm.client.exception.ExportValidationException;
 import com.gwhaitech.accountingfirm.client.exception.FileValidationException;
 import com.gwhaitech.accountingfirm.client.exception.PortalNotLinkedException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,6 +24,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ClientNotFoundException.class)
     public ResponseEntity<Void> handleClientNotFound(ClientNotFoundException ex) {
+        return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(EngagementNotFoundException.class)
+    public ResponseEntity<Void> handleEngagementNotFound(EngagementNotFoundException ex) {
         return ResponseEntity.notFound().build();
     }
 
@@ -75,5 +82,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
                 "message", ex.getMessage()
         ));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, String>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "A record with this combination already exists"));
     }
 }

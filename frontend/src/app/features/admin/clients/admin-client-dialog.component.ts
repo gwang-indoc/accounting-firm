@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   AsyncValidatorFn,
@@ -13,11 +14,13 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, of, timer } from 'rxjs';
 import { catchError, map, switchMap, take } from 'rxjs/operators';
 import { AdminClientsService } from '../../../core/services/admin-clients.service';
 import { ClientDto } from '../../../core/models/client.model';
+import { BusinessType } from '../../../core/models/engagement.model';
 
 export interface AdminClientDialogData {
   client: ClientDto | null;
@@ -25,7 +28,7 @@ export interface AdminClientDialogData {
 
 @Component({
   standalone: true,
-  imports: [ReactiveFormsModule, MatDialogModule, MatButtonModule, MatFormFieldModule, MatInputModule],
+  imports: [ReactiveFormsModule, MatDialogModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule],
   template: `
     <div class="dlg-header">
       <div class="dlg-icon">{{ isEdit ? '✎' : '+' }}</div>
@@ -69,6 +72,26 @@ export interface AdminClientDialogData {
           <mat-label>Phone</mat-label>
           <input matInput formControlName="phone" placeholder="Optional" />
         </mat-form-field>
+
+        <mat-form-field appearance="outline" class="dlg-field">
+          <mat-label>Business Type</mat-label>
+          <mat-select formControlName="businessType">
+            <mat-option value="PERSONAL">Personal</mat-option>
+            <mat-option value="CORPORATE">Corporate</mat-option>
+            <mat-option value="SELF_EMPLOYED">Self Employed</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        @if (requiresFye()) {
+          <mat-form-field appearance="outline" class="dlg-field" data-testid="fye-field">
+            <mat-label>Fiscal Year End Month</mat-label>
+            <input matInput type="number" formControlName="fiscalYearEndMonth" placeholder="1–12" min="1" max="12" />
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="dlg-field" data-testid="fye-field">
+            <mat-label>Fiscal Year End Day</mat-label>
+            <input matInput type="number" formControlName="fiscalYearEndDay" placeholder="1–31" min="1" max="31" />
+          </mat-form-field>
+        }
       </form>
     </mat-dialog-content>
 
@@ -163,7 +186,37 @@ export class AdminClientDialogComponent {
       this.isEdit ? [] : [this.emailLookupValidator()],
     ),
     phone: new FormControl(this.data.client?.phone ?? ''),
+    businessType: new FormControl<BusinessType>(
+      (this.data.client as any)?.businessType ?? 'PERSONAL',
+      Validators.required
+    ),
+    fiscalYearEndMonth: new FormControl<number | null>(
+      (this.data.client as any)?.fiscalYearEndMonth ?? null
+    ),
+    fiscalYearEndDay: new FormControl<number | null>(
+      (this.data.client as any)?.fiscalYearEndDay ?? null
+    ),
   });
+
+  private businessTypeSignal = toSignal(this.form.get('businessType')!.valueChanges, {
+    initialValue: this.form.get('businessType')!.value,
+  });
+
+  requiresFye = computed(() => {
+    const bt = this.businessTypeSignal();
+    return bt === 'CORPORATE' || bt === 'SELF_EMPLOYED';
+  });
+
+  constructor() {
+    this.form.get('businessType')!.valueChanges.subscribe(bt => {
+      const required = bt === 'CORPORATE' || bt === 'SELF_EMPLOYED';
+      const fyeValidators = required ? [Validators.required, Validators.min(1)] : [];
+      this.form.get('fiscalYearEndMonth')!.setValidators(fyeValidators);
+      this.form.get('fiscalYearEndDay')!.setValidators(fyeValidators);
+      this.form.get('fiscalYearEndMonth')!.updateValueAndValidity({ emitEvent: false });
+      this.form.get('fiscalYearEndDay')!.updateValueAndValidity({ emitEvent: false });
+    });
+  }
 
   private emailLookupValidator(): AsyncValidatorFn {
     return (control: AbstractControl): Observable<ValidationErrors | null> => {
@@ -196,7 +249,14 @@ export class AdminClientDialogComponent {
       return;
     }
     const raw = this.form.getRawValue();
-    const req = { name: raw.name!, email: raw.email!, phone: raw.phone?.trim() || null };
+    const req = {
+      name: raw.name!,
+      email: raw.email!,
+      phone: raw.phone?.trim() || null,
+      businessType: raw.businessType!,
+      fiscalYearEndMonth: raw.fiscalYearEndMonth ?? null,
+      fiscalYearEndDay: raw.fiscalYearEndDay ?? null,
+    };
     const obs$ = this.isEdit
       ? this.adminClientsService.update(this.data.client!.id, req)
       : this.adminClientsService.create(req);

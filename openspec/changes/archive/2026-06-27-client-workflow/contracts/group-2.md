@@ -1,0 +1,6 @@
+### Contract
+
+- **Spec**: (client-engagement-workflow) "The system SHALL allow an authenticated admin to open a new engagement for a client for a specific tax year. Only one engagement per client per tax year is permitted. A new engagement is created at status START." | "The system SHALL allow an authenticated admin to move any engagement from any status to any other status. The transition SHALL be recorded in `client_engagement_history`." | "The system SHALL persist a history entry for every status transition, including the initial creation (from_status = null, to_status = START)." | "The system SHALL provide an endpoint that returns all engagements across all clients and all tax years." | "All engagement endpoints SHALL return `403 Forbidden` for non-admin callers."
+- **Runtime**: `cd backend && ./mvnw test` → all tests pass; ClientEngagementController and ClientEngagementService tests cover create, list, transition, history, list-all, and auth scenarios
+- **Code**: custom enum state machine — any status can transition to any other (no guard logic needed); audit trail in separate `client_engagement_history` table with nullable `from_status`; `GET /api/admin/engagements` joins Client for name/businessType and User for updatedByName; all endpoints secured with `hasRole('ADMIN')`
+- **Threshold**: 80

@@ -43,6 +43,9 @@ class ClientDocumentEntityTest {
         client.setName("Test Corp");
         client.setEmail("testcorp@example.com");
         client.setAdminId(savedUser.getId());
+        client.setBusinessType(BusinessType.PERSONAL);
+        client.setFiscalYearEndMonth((short) 12);
+        client.setFiscalYearEndDay((short) 31);
         Client savedClient = clientRepository.save(client);
 
         ClientDocument doc = new ClientDocument();
@@ -79,6 +82,9 @@ class ClientDocumentEntityTest {
         client.setName("Dupe Corp");
         client.setEmail("dupecorp@example.com");
         client.setAdminId(savedUser.getId());
+        client.setBusinessType(BusinessType.PERSONAL);
+        client.setFiscalYearEndMonth((short) 12);
+        client.setFiscalYearEndDay((short) 31);
         Client savedClient = clientRepository.save(client);
 
         ClientDocument doc1 = new ClientDocument();

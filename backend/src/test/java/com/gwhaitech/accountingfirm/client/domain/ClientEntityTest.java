@@ -40,6 +40,9 @@ class ClientEntityTest {
         client.setEmail("contact@acme.com");
         client.setPhone("555-1234");
         client.setAdminId(savedAdmin.getId());
+        client.setBusinessType(BusinessType.PERSONAL);
+        client.setFiscalYearEndMonth((short) 12);
+        client.setFiscalYearEndDay((short) 31);
 
         Client saved = em.persistFlushFind(client);
 

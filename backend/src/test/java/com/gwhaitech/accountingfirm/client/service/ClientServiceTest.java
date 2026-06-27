@@ -2,6 +2,7 @@ package com.gwhaitech.accountingfirm.client.service;
 
 import com.gwhaitech.accountingfirm.auth.domain.User;
 import com.gwhaitech.accountingfirm.auth.domain.UserRepository;
+import com.gwhaitech.accountingfirm.client.domain.BusinessType;
 import com.gwhaitech.accountingfirm.client.domain.Client;
 import com.gwhaitech.accountingfirm.client.domain.ClientRepository;
 import com.gwhaitech.accountingfirm.client.dto.ClientDto;
@@ -47,6 +48,9 @@ class ClientServiceTest {
         c.setEmail("contact@acme.com");
         c.setPhone("555-1234");
         c.setAdminId(99L);
+        c.setBusinessType(BusinessType.PERSONAL);
+        c.setFiscalYearEndMonth((short) 12);
+        c.setFiscalYearEndDay((short) 31);
         // simulate @PrePersist
         try {
             var f = Client.class.getDeclaredField("createdAt");
@@ -73,7 +77,7 @@ class ClientServiceTest {
         when(clientRepository.findByEmailIgnoreCaseOrderById("contact@acme.com")).thenReturn(List.of());
         when(clientRepository.save(any(Client.class))).thenReturn(client);
 
-        CreateClientRequest request = new CreateClientRequest("Acme Corp", "contact@acme.com", "555-1234");
+        CreateClientRequest request = new CreateClientRequest("Acme Corp", "contact@acme.com", "555-1234", BusinessType.PERSONAL, null, null);
         ClientDto dto = clientService.createClient(request, 99L);
 
         assertThat(dto.id()).isEqualTo(1L);
@@ -88,7 +92,7 @@ class ClientServiceTest {
     void createClient_throws400WhenEmailNotRegistered() {
         when(userRepository.findByEmail("ghost@example.com")).thenReturn(Optional.empty());
 
-        CreateClientRequest request = new CreateClientRequest("Ghost", "ghost@example.com", null);
+        CreateClientRequest request = new CreateClientRequest("Ghost", "ghost@example.com", null, BusinessType.PERSONAL, null, null);
         assertThatThrownBy(() -> clientService.createClient(request, 1L))
                 .isInstanceOf(ClientEmailNotRegisteredException.class);
     }
@@ -98,7 +102,7 @@ class ClientServiceTest {
         when(userRepository.findByEmail("dup@example.com")).thenReturn(Optional.of(registeredUser("dup@example.com")));
         when(clientRepository.findByEmailIgnoreCaseOrderById("dup@example.com")).thenReturn(List.of(sampleClient()));
 
-        CreateClientRequest request = new CreateClientRequest("Dup", "dup@example.com", null);
+        CreateClientRequest request = new CreateClientRequest("Dup", "dup@example.com", null, BusinessType.PERSONAL, null, null);
         assertThatThrownBy(() -> clientService.createClient(request, 1L))
                 .isInstanceOf(ClientEmailAlreadyExistsException.class);
     }
@@ -112,7 +116,7 @@ class ClientServiceTest {
         saved.setAdminId(42L);
         when(clientRepository.save(captor.capture())).thenReturn(saved);
 
-        clientService.createClient(new CreateClientRequest("New", "new@example.com", null), 42L);
+        clientService.createClient(new CreateClientRequest("New", "new@example.com", null, BusinessType.PERSONAL, null, null), 42L);
 
         assertThat(captor.getValue().getAdminId()).isEqualTo(42L);
     }
@@ -151,7 +155,7 @@ class ClientServiceTest {
         when(clientRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(clientRepository.save(any(Client.class))).thenReturn(existing);
 
-        UpdateClientRequest req = new UpdateClientRequest("New Name", "new@email.com", "999-0000");
+        UpdateClientRequest req = new UpdateClientRequest("New Name", "new@email.com", "999-0000", BusinessType.PERSONAL, null, null);
         ClientDto dto = clientService.updateClient(1L, req, 99L);
 
         assertThat(dto.name()).isEqualTo("New Name");
@@ -164,7 +168,7 @@ class ClientServiceTest {
     void updateClient_throwsClientNotFoundException_whenMissing() {
         when(clientRepository.findById(99L)).thenReturn(Optional.empty());
 
-        UpdateClientRequest req = new UpdateClientRequest("X", null, null);
+        UpdateClientRequest req = new UpdateClientRequest("X", null, null, BusinessType.PERSONAL, null, null);
         assertThatThrownBy(() -> clientService.updateClient(99L, req, 1L))
                 .isInstanceOf(ClientNotFoundException.class);
     }

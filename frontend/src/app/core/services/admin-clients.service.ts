@@ -19,11 +19,11 @@ export class AdminClientsService {
     return this.http.get<UserNameResult>(`/api/admin/users/lookup?email=${encodeURIComponent(email)}`);
   }
 
-  create(req: { name: string; email: string; phone: string | null }): Observable<ClientDto> {
+  create(req: { name: string; email: string; phone: string | null; businessType: string; fiscalYearEndMonth: number | null; fiscalYearEndDay: number | null }): Observable<ClientDto> {
     return this.http.post<ClientDto>('/api/clients', req);
   }
 
-  update(id: number, req: { name: string; email: string; phone: string | null }): Observable<ClientDto> {
+  update(id: number, req: { name: string; email: string; phone: string | null; businessType: string; fiscalYearEndMonth: number | null; fiscalYearEndDay: number | null }): Observable<ClientDto> {
     return this.http.put<ClientDto>(`/api/clients/${id}`, req);
   }
 

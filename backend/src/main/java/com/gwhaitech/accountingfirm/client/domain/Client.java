@@ -25,6 +25,16 @@ public class Client {
 
     private String phone;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "business_type", nullable = false, length = 20)
+    private BusinessType businessType;
+
+    @Column(name = "fiscal_year_end_month", nullable = false)
+    private Short fiscalYearEndMonth;
+
+    @Column(name = "fiscal_year_end_day", nullable = false)
+    private Short fiscalYearEndDay;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -45,5 +55,11 @@ public class Client {
     public void setEmail(String email) { this.email = email; }
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
+    public BusinessType getBusinessType() { return businessType; }
+    public void setBusinessType(BusinessType businessType) { this.businessType = businessType; }
+    public Short getFiscalYearEndMonth() { return fiscalYearEndMonth; }
+    public void setFiscalYearEndMonth(Short fiscalYearEndMonth) { this.fiscalYearEndMonth = fiscalYearEndMonth; }
+    public Short getFiscalYearEndDay() { return fiscalYearEndDay; }
+    public void setFiscalYearEndDay(Short fiscalYearEndDay) { this.fiscalYearEndDay = fiscalYearEndDay; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 }

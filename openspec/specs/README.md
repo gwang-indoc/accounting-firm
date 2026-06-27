@@ -24,11 +24,21 @@ One spec per capability. Each spec is the authoritative record of what the syste
 **Backend**: JWT issued as httpOnly cookie after OAuth2 success; email-code OTP verification endpoint.
 **Frontend**: `LoginComponent` at `/login`; `LoginEmailCodeComponent` multi-step OTP flow; all strings via `| translate`.
 
+### `admin-workflow-ui` ✅ Implemented
+**User Story**: Admins view all client engagements in a dashboard table and manage per-client engagements (create, transition status, view history) from the client detail view.
+**Frontend**: `AdminWorkflowComponent` at `/admin/workflow` — table with Client Name / Business Type / Tax Year / Status / Last Updated / Last Updated By; status and business-type `mat-select` filters using `computed()`. `AdminClientWorkflowComponent` at `/admin/clients/:id/workflow` — expandable engagement rows with lazy history fetch; "New Engagement" and "Change Status" Material dialogs with optional note field. Both routes guarded by `authGuard + adminGuard`.
+**Acceptance Criteria**: Dashboard shows all engagements; filters correctly reduce visible rows; per-client view creates engagements, transitions status with note, and displays full history.
+
+### `client-engagement-workflow` ✅ Implemented
+**User Story**: Admins open a per-tax-year engagement for any client, transition it through a five-state lifecycle, and the system automatically emails the linked client on four key milestones.
+**Backend**: `ClientEngagement` entity (UNIQUE client_id + tax_year) + `ClientEngagementHistory` audit table (V14 migration). `ClientEngagementService` — any-to-any state transitions, history recorded on every change including initial creation (from_status = null). Bilingual (EN/ZH) email via `JavaMailSender` on IN_PROCESSING / PENDING_CLIENT_REVIEW / SUBMIT_TO_CRA / COMPLETED; mail failure swallowed (status still persists). Cross-admin ownership enforced via `findClientForAdmin()` helper; `GET /api/admin/engagements` filtered to calling admin's clients.
+**Acceptance Criteria**: Only one engagement per client per tax year (409 on duplicate); history entry created on every transition; emails sent in user's preferred language; admin cannot see or modify another admin's engagements.
+
 ### `client-management` ✅ Implemented
-**User Story**: Admins create and manage client records scoped to their ownership, with email uniqueness enforced and each client linked to a registered user account.
-**Backend**: `clients.email` NOT NULL + UNIQUE; `clients.admin_id` NOT NULL FK to `users`; CRUD queries filtered by `admin_id`; `POST /api/clients` validates email against users table (400) and duplicate guard (409).
-**Frontend**: Add Client dialog — email field triggers debounced lookup, auto-fills name on match, blocks submission for unregistered/duplicate email.
-**Acceptance Criteria**: Admin can only see and create their own clients; duplicate emails and unregistered emails are rejected at submission time.
+**User Story**: Admins create and manage client records scoped to their ownership, with email uniqueness enforced, each client linked to a registered user account, and business type + fiscal year end tracked.
+**Backend**: `clients.email` NOT NULL + UNIQUE; `clients.admin_id` NOT NULL FK to `users`; CRUD queries filtered by `admin_id`; `POST /api/clients` validates email against users table (400) and duplicate guard (409). `business_type` VARCHAR(20) NOT NULL (PERSONAL/CORPORATE/SELF_EMPLOYED); `fiscal_year_end_month` / `fiscal_year_end_day` SMALLINT NOT NULL (V13 migration); PERSONAL always stores 12/31; CORPORATE/SELF_EMPLOYED require valid `MonthDay`.
+**Frontend**: Add Client dialog — email field triggers debounced lookup, auto-fills name on match, blocks submission for unregistered/duplicate email; business type select; conditional FYE month/day inputs (hidden for PERSONAL).
+**Acceptance Criteria**: Admin can only see and create their own clients; duplicate emails and unregistered emails are rejected; FYE is immutable for PERSONAL clients; invalid calendar dates (e.g. Feb 30) are rejected.
 
 ### `client-portal-ui` ✅ Implemented
 **User Story**: Authenticated clients access a dashboard, documents, and messages through a guarded portal.

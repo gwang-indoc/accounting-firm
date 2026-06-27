@@ -13,7 +13,8 @@ import { MessageThreadSummaryDto } from '../../../core/models/message.model';
 import { ClientDto } from '../../../core/models/client.model';
 
 const sampleClient: ClientDto = {
-  id: 7, name: 'Jane', email: 'j@x.com', phone: null, createdAt: '2026-01-01T00:00:00', linkedUserId: 99, adminId: 1
+  id: 7, name: 'Jane', email: 'j@x.com', phone: null, createdAt: '2026-01-01T00:00:00', linkedUserId: 99, adminId: 1,
+  businessType: 'PERSONAL', fiscalYearEndMonth: 12, fiscalYearEndDay: 31,
 };
 const sampleThreads: MessageThreadSummaryDto[] = [
   { id: 50, clientId: 7, subject: 'Tax filing', lastMessageAt: '2026-05-19T12:00:00', unreadCount: 2, clientUnreadCount: 0, lastSenderType: 'CLIENT', lastMessagePreview: 'I will send the W-2…' },
