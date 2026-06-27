@@ -1,4 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
@@ -91,8 +92,11 @@ export class LoginEmailCodeComponent {
     try {
       await this.auth.requestEmailCode(this.emailValue());
       this.resent.set(true);
-    } catch {
-      this.error.set('emailCode.errorResendCode');
+    } catch (err) {
+      const key = err instanceof HttpErrorResponse && err.status === 429
+        ? 'emailCode.errorResendCooldown'
+        : 'emailCode.errorResendCode';
+      this.error.set(key);
     } finally {
       this.submitting.set(false);
     }

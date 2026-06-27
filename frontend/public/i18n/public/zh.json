@@ -191,6 +191,7 @@
   "emailCode.errorInvalidCode": "该验证码无效或已过期，请检查验证码并重试。",
   "emailCode.errorCreateAccount": "无法完成账户创建，请重试。",
   "emailCode.errorResendCode": "无法重新发送验证码，请稍后重试。",
+  "emailCode.errorResendCooldown": "请等待至少 60 秒后再请求新验证码。",
   "clientPortalLogin.button": "客户登录",
   "clientPortalLogin.heading": "客户门户",
   "clientPortalLogin.desc": "安全访问您的会计文档和报告。",

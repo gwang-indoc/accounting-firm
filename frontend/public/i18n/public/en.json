@@ -191,6 +191,7 @@
   "emailCode.errorInvalidCode": "That code is invalid or has expired. Check the code and try again.",
   "emailCode.errorCreateAccount": "We could not finish creating your account. Please try again.",
   "emailCode.errorResendCode": "We could not resend the code. Please try again shortly.",
+  "emailCode.errorResendCooldown": "Please wait at least 60 seconds before requesting a new code.",
   "clientPortalLogin.button": "Client Login",
   "clientPortalLogin.heading": "Client Portal",
   "clientPortalLogin.desc": "Secure access to your accounting documents and reports.",
