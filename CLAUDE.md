@@ -182,6 +182,9 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 ### NOT NULL migration regressions in test helpers
 When a Flyway migration adds a NOT NULL column (e.g. `users.name`, `clients.admin_id`), raw SQL INSERT helpers in `@DataJpaTest` tests break silently at runtime — the compiler won't catch missing columns. After any NOT NULL migration, grep `src/test` for INSERT statements and audit each one for the new column.
 
+### New required field must be threaded through all four layers — test slices hide gaps
+When adding a mandatory field (e.g. `name`) to an entity: updating the entity + DTO + service is not enough. The full chain is `request DTO (@NotBlank) → controller (pass field to service) → service signature → entity`. Test slices miss cross-layer breaks: `@DataJpaTest` can set the field directly (bypassing the API), and `@WebMvcTest` mocks the service (so the controller→service wiring is never exercised end-to-end). After wiring a new required field, add a controller test that posts a real JSON body with the field present and verifies the service receives it.
+
 ### Playwright e2e: async Angular validators need explicit route mocks
 Angular async validators (`switchMap` + HTTP) fire real requests during e2e tests. Without a `page.route()` mock, the request hits Spring Security unauthenticated → redirect → dialog closes → locator times out. Use a **regex** route (e.g. `/\/api\/admin\/users\/lookup/`) not a glob (`**/api/**`) — glob patterns are less reliable against proxied routes.
 

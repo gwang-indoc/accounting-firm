@@ -1,8 +1,10 @@
-## ADDED Requirements
+## Purpose
 
+The client portal provides authenticated clients with a personalised view of their engagements, documents, and messages. It manages authentication state via Angular signals, enforces route guards for protected pages, and communicates with the backend exclusively through the Angular dev proxy.
+## Requirements
 ### Requirement: Client Portal login entry point is a navbar nav link
 
-The "Client Login" desktop nav link inside `NavbarComponent` is a plain `<a mat-button routerLink="/login">` — there is NO MatMenu. Clicking it navigates to the `/login` page. On mobile, the sidenav renders the same `routerLink="/login"` item.
+The system SHALL render the "Client Login" entry point as a plain `<a mat-button routerLink="/login">` inside `NavbarComponent` — there is NO MatMenu. Clicking it navigates to the `/login` page. On mobile, the sidenav SHALL render the same `routerLink="/login"` item.
 
 #### Scenario: Client Login link navigates to /login
 
@@ -88,3 +90,15 @@ The Angular dev server proxy (`proxy.conf.json`) SHALL forward the following pat
 
 - **WHEN** any `HttpClient` request is made
 - **THEN** the request is sent with `withCredentials: true`
+
+### Requirement: Client portal displays engagement name in engagement list
+The client portal engagement list SHALL display the engagement name alongside the tax year and status for each engagement, so clients can identify which filing each engagement refers to.
+
+#### Scenario: Engagement name visible in portal list
+- **WHEN** an authenticated client views their engagement list in the portal
+- **THEN** each engagement row shows the engagement name, tax year, and current status
+
+#### Scenario: Multiple engagements for same year are distinguishable
+- **WHEN** a client has two engagements for the same tax year (e.g., personal return and corporation)
+- **THEN** both rows appear with distinct names, making them unambiguously identifiable
+

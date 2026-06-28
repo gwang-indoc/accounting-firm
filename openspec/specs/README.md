@@ -25,14 +25,14 @@ One spec per capability. Each spec is the authoritative record of what the syste
 **Frontend**: `LoginComponent` at `/login`; `LoginEmailCodeComponent` multi-step OTP flow; all strings via `| translate`.
 
 ### `admin-workflow-ui` ✅ Implemented
-**User Story**: Admins manage per-client engagements (create, transition status, view history) from the client detail view; a standalone dashboard at `/admin/workflow` exists but is not linked in the navbar.
-**Frontend**: `AdminWorkflowComponent` at `/admin/workflow` — unlisted dashboard (table + status/business-type filters). `AdminClientWorkflowComponent` at `/admin/clients/:id/workflow` — card-per-engagement layout with pipeline-progress dots, expandable history timeline; "New Engagement" dialog (dark surface, year stepper ±); "Change Status" dialog (live from→to preview, semantic status pills, note textarea). Dialogs use `panelClass: 'dark-dialog'` for dark surface on the light Material theme. All strings translated (EN/ZH). Both routes guarded by `authGuard + adminGuard`.
-**Acceptance Criteria**: Per-client view creates engagements, transitions status with optional note, displays full history; Workflow nav link absent from admin navbar.
+**User Story**: Admins manage per-client engagements (create with name, transition status with note, view history) from the client detail view; a standalone dashboard at `/admin/workflow` exists but is not linked in the navbar.
+**Frontend**: `AdminWorkflowComponent` at `/admin/workflow` — unlisted dashboard (table + status/business-type filters). `AdminClientWorkflowComponent` at `/admin/clients/:id/workflow` — card-per-engagement layout showing engagement name + tax year + pipeline-progress dots + expandable history timeline; "New Engagement" dialog (dark surface, year stepper ±, mandatory name field); "Change Status" dialog (live from→to preview, semantic status pills, note textarea pre-filled from current engagement note). Dialogs use `panelClass: 'dark-dialog'`. All strings translated (EN/ZH). Both routes guarded by `authGuard + adminGuard`.
+**Acceptance Criteria**: Per-client view creates named engagements (submit disabled until name entered), transitions status with optional note (saved to engagement), displays engagement name in each row and full history; Workflow nav link absent from admin navbar.
 
 ### `client-engagement-workflow` ✅ Implemented
-**User Story**: Admins open a per-tax-year engagement for any client, transition it through a five-state lifecycle, and the system automatically emails the linked client on four key milestones.
-**Backend**: `ClientEngagement` entity (UNIQUE client_id + tax_year) + `ClientEngagementHistory` audit table (V14 migration). `ClientEngagementService` — any-to-any state transitions, history recorded on every change including initial creation (from_status = null). Bilingual (EN/ZH) email via `JavaMailSender` on IN_PROCESSING / PENDING_CLIENT_REVIEW / SUBMIT_TO_CRA / COMPLETED; mail failure swallowed (status still persists). Cross-admin ownership enforced via `findClientForAdmin()` helper; `GET /api/admin/engagements` filtered to calling admin's clients.
-**Acceptance Criteria**: Only one engagement per client per tax year (409 on duplicate); history entry created on every transition; emails sent in user's preferred language; admin cannot see or modify another admin's engagements.
+**User Story**: Admins open named engagements for any client (multiple per tax year allowed), transition them through a five-state lifecycle with optional notes, and the system automatically emails the linked client on four key milestones.
+**Backend**: `ClientEngagement` entity (UNIQUE `client_id + tax_year + name`; `name` NOT NULL, `note` TEXT nullable) + `ClientEngagementHistory` audit table (V14+V15 migrations). `ClientEngagementService` — any-to-any state transitions, history recorded on every change including initial creation (from_status = null); `transitionStatus()` accepts engagement ID (not tax year) and persists note to engagement. Routes: `POST …/engagements` requires `name`; `GET/PATCH …/engagements/{id}/history|status` use Long ID. Bilingual (EN/ZH) email via `JavaMailSender` on IN_PROCESSING / PENDING_CLIENT_REVIEW / SUBMIT_TO_CRA / COMPLETED; mail failure swallowed. Cross-admin ownership enforced via `findClientForAdmin()`.
+**Acceptance Criteria**: Multiple engagements per client per tax year allowed if names differ (409 on exact `client_id+tax_year+name` duplicate); note persists to engagement on every status transition; history entry created on every transition; emails sent in user's preferred language; admin cannot see or modify another admin's engagements.
 
 ### `client-management` ✅ Implemented
 **User Story**: Admins create and manage client records scoped to their ownership, with email uniqueness enforced, each client linked to a registered user account, and business type + fiscal year end tracked; active engagement status visible and filterable directly in the client list.
@@ -41,7 +41,9 @@ One spec per capability. Each spec is the authoritative record of what the syste
 **Acceptance Criteria**: Admin can only see and create their own clients; duplicate emails and unregistered emails are rejected; FYE is immutable for PERSONAL clients; invalid calendar dates (e.g. Feb 30) are rejected; client list shows active engagement status and supports workflow-state filtering including "— None —".
 
 ### `client-portal-ui` ✅ Implemented
-**User Story**: Authenticated clients access a dashboard, documents, and messages through a guarded portal.
+**User Story**: Authenticated clients access a dashboard, engagement list (with names), documents, and messages through a guarded portal.
+**Frontend**: `AuthGuard` protects `/portal/**`; `AuthService` bootstrapped via `APP_INITIALIZER`; `PortalEngagementsComponent` at `/portal/engagements` lists engagements with name, tax year, and status — disambiguates multiple same-year engagements by name.
+**Acceptance Criteria**: Unauthenticated users redirected to `/`; engagement list shows name + tax year + status per row.
 
 ### `client-registration` ⚠️ Superseded
 **User Story**: New clients register an account linked to their client record.
