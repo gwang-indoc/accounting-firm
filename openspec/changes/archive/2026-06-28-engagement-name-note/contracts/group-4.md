@@ -1,0 +1,4 @@
+- **Spec**: "WHEN an authenticated client views their engagement list in the portal THEN each engagement row shows the engagement name, tax year, and current status." "WHEN a client has two engagements for the same tax year THEN both rows appear with distinct names, making them unambiguously identifiable." — `client-portal-ui` spec
+- **Runtime**: `cd frontend && npx ng test --no-watch` → new test for portal engagement list component passes: each row renders engagement name
+- **Code**: Engagement name sourced from `EngagementDto.name` (already added in group 1). No new API calls required — portal uses the same engagement list endpoint.
+- **Threshold**: 80

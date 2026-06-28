@@ -35,6 +35,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'portal/engagements',
+    loadComponent: () =>
+      import('./features/client-portal/engagements/portal-engagements.component').then(m => m.PortalEngagementsComponent),
+    canActivate: [authGuard],
+  },
+  {
     path: 'portal/documents',
     loadComponent: () =>
       import('./features/client-portal/documents/documents.component').then(m => m.DocumentsComponent),

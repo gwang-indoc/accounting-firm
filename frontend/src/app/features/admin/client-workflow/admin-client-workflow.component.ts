@@ -67,7 +67,7 @@ export class AdminClientWorkflowComponent implements OnInit {
     }
     this.expandedId.set(engagement.id);
     this.engagementService
-      .getEngagementHistory(this.clientId(), engagement.taxYear)
+      .getEngagementHistory(this.clientId(), engagement.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(history => this.expandedHistory.set(history));
   }
@@ -77,9 +77,9 @@ export class AdminClientWorkflowComponent implements OnInit {
       .afterClosed()
       .pipe(
         take(1),
-        filter((taxYear: number | undefined): taxYear is number => taxYear != null),
+        filter((result: { taxYear: number; name: string } | undefined): result is { taxYear: number; name: string } => result != null),
         tap(() => this.duplicateError.set(false)),
-        switchMap(taxYear => this.engagementService.createEngagement(this.clientId(), taxYear))
+        switchMap(result => this.engagementService.createEngagement(this.clientId(), result.taxYear, result.name))
       )
       .subscribe({
         next: () => this.loadEngagements(),
@@ -91,9 +91,9 @@ export class AdminClientWorkflowComponent implements OnInit {
       });
   }
 
-  submitNewEngagement(taxYear: number): void {
+  submitNewEngagement(taxYear: number, name: string): void {
     this.duplicateError.set(false);
-    this.engagementService.createEngagement(this.clientId(), taxYear)
+    this.engagementService.createEngagement(this.clientId(), taxYear, name)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => this.loadEngagements(),
@@ -107,7 +107,7 @@ export class AdminClientWorkflowComponent implements OnInit {
 
   openTransitionDialog(engagement: EngagementDto): void {
     this.dialog.open(AdminTransitionDialogComponent, {
-      data: { currentStatus: engagement.status },
+      data: { engagement },
       width: '460px',
       panelClass: 'dark-dialog',
     })
@@ -117,12 +117,12 @@ export class AdminClientWorkflowComponent implements OnInit {
         filter((result): result is { status: EngagementStatus; note: string | null } => !!result),
         switchMap(result =>
           this.engagementService
-            .transitionStatus(this.clientId(), engagement.taxYear, result.status, result.note)
+            .transitionStatus(this.clientId(), engagement.id, result.status, result.note)
             .pipe(tap(() => {
               this.loadEngagements();
               if (this.expandedId() === engagement.id) {
                 this.engagementService
-                  .getEngagementHistory(this.clientId(), engagement.taxYear)
+                  .getEngagementHistory(this.clientId(), engagement.id)
                   .pipe(takeUntilDestroyed(this.destroyRef))
                   .subscribe(history => this.expandedHistory.set(history));
               }

@@ -66,6 +66,8 @@
   "workflow.newEngDialog.title": "新业务",
   "workflow.newEngDialog.subtitle": "为该客户开始跟踪新的税务年度。",
   "workflow.newEngDialog.taxYearLabel": "税务年度",
+  "workflow.newEngDialog.nameLabel": "名称",
+  "workflow.newEngDialog.namePlaceholder": "例如：张伟 / 张氏控股有限公司",
   "workflow.newEngDialog.cancel": "取消",
   "workflow.newEngDialog.create": "创建业务",
 

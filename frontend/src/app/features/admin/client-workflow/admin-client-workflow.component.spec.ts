@@ -13,8 +13,8 @@ import { EngagementService } from '../../../core/services/engagement.service';
 import { EngagementDto, EngagementHistoryDto } from '../../../core/models/engagement.model';
 
 const sampleEngagements: EngagementDto[] = [
-  { id: 1, clientId: 10, taxYear: 2025, status: 'IN_PROCESSING', updatedBy: 99, updatedAt: '2026-01-02T00:00:00' },
-  { id: 2, clientId: 10, taxYear: 2024, status: 'COMPLETED', updatedBy: 99, updatedAt: '2026-01-01T00:00:00' },
+  { id: 1, clientId: 10, taxYear: 2025, name: 'John Smith', note: null, status: 'IN_PROCESSING', updatedBy: 99, updatedAt: '2026-01-02T00:00:00' },
+  { id: 2, clientId: 10, taxYear: 2024, name: 'Smith Holdings Inc.', note: null, status: 'COMPLETED', updatedBy: 99, updatedAt: '2026-01-01T00:00:00' },
 ];
 
 const sampleHistory: EngagementHistoryDto[] = [
@@ -26,8 +26,8 @@ function makeEngagementService(overrides: Partial<EngagementService> = {}): Part
   return {
     getEngagementsForClient: vi.fn().mockReturnValue(of(sampleEngagements)),
     getEngagementHistory: vi.fn().mockReturnValue(of(sampleHistory)),
-    createEngagement: vi.fn().mockReturnValue(of({ id: 3, clientId: 10, taxYear: 2023, status: 'START', updatedBy: 99, updatedAt: '2026-01-03T00:00:00' })),
-    transitionStatus: vi.fn().mockReturnValue(of({ id: 1, clientId: 10, taxYear: 2025, status: 'COMPLETED', updatedBy: 99, updatedAt: '2026-01-10T00:00:00' })),
+    createEngagement: vi.fn().mockReturnValue(of({ id: 3, clientId: 10, taxYear: 2023, name: 'New Client', note: null, status: 'START', updatedBy: 99, updatedAt: '2026-01-03T00:00:00' })),
+    transitionStatus: vi.fn().mockReturnValue(of({ id: 1, clientId: 10, taxYear: 2025, name: 'John Smith', note: null, status: 'COMPLETED', updatedBy: 99, updatedAt: '2026-01-10T00:00:00' })),
     ...overrides,
   };
 }
@@ -107,13 +107,13 @@ describe('AdminClientWorkflowComponent', () => {
 
   it('calls createEngagement and refreshes list on new engagement dialog confirm', async () => {
     const svc = makeEngagementService();
-    const dialogSpy = vi.fn().mockReturnValue({ afterClosed: () => of(2023) });
+    const dialogSpy = vi.fn().mockReturnValue({ afterClosed: () => of({ taxYear: 2023, name: 'Test Name' }) });
     const fixture = await setup(svc);
     (TestBed.inject(MatDialog) as any).open = dialogSpy;
 
     fixture.componentInstance.openNewEngagementDialog();
     expect(dialogSpy).toHaveBeenCalled();
-    expect(svc.createEngagement).toHaveBeenCalledWith(10, 2023);
+    expect(svc.createEngagement).toHaveBeenCalledWith(10, 2023, 'Test Name');
   });
 
   it('shows inline duplicate error when createEngagement returns 409', async () => {
@@ -125,7 +125,7 @@ describe('AdminClientWorkflowComponent', () => {
     const fixture = await setup(svc);
     const comp = fixture.componentInstance;
 
-    comp.submitNewEngagement(2025);
+    comp.submitNewEngagement(2025, 'John Smith');
     fixture.detectChanges();
     await fixture.whenStable();
     fixture.detectChanges();
@@ -142,6 +142,6 @@ describe('AdminClientWorkflowComponent', () => {
 
     fixture.componentInstance.openTransitionDialog(sampleEngagements[0]);
     expect(dialogSpy).toHaveBeenCalled();
-    expect(svc.transitionStatus).toHaveBeenCalledWith(10, 2025, 'COMPLETED', 'Done');
+    expect(svc.transitionStatus).toHaveBeenCalledWith(10, 1, 'COMPLETED', 'Done');
   });
 });

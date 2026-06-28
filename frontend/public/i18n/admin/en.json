@@ -66,6 +66,8 @@
   "workflow.newEngDialog.title": "New Engagement",
   "workflow.newEngDialog.subtitle": "Begin tracking a new tax year for this client.",
   "workflow.newEngDialog.taxYearLabel": "Tax Year",
+  "workflow.newEngDialog.nameLabel": "Name",
+  "workflow.newEngDialog.namePlaceholder": "e.g. John Smith / Smith Holdings Inc.",
   "workflow.newEngDialog.cancel": "Cancel",
   "workflow.newEngDialog.create": "Create Engagement",
 

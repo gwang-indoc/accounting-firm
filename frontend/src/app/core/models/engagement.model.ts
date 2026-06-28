@@ -7,6 +7,7 @@ export interface EngagementDashboardDto {
   clientName: string | null;
   businessType: BusinessType | null;
   taxYear: number;
+  name: string;
   status: EngagementStatus;
   updatedAt: string;
   updatedByName: string | null;
@@ -16,6 +17,8 @@ export interface EngagementDto {
   id: number;
   clientId: number;
   taxYear: number;
+  name: string;
+  note: string | null;
   status: EngagementStatus;
   updatedBy: number | null;
   updatedAt: string;

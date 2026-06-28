@@ -165,6 +165,13 @@ public class ClientEngagementService {
         };
     }
 
+    public List<EngagementDto> listForPortalUser(Long userId) {
+        return clientRepository.findByUserId(userId)
+                .map(client -> engagementRepository.findByClientIdOrderByTaxYearDesc(client.getId())
+                        .stream().map(this::toDto).toList())
+                .orElse(List.of());
+    }
+
     public List<EngagementDto> listForClient(Long clientId, Long adminId) {
         findClientForAdmin(clientId, adminId);
         return engagementRepository.findByClientIdOrderByTaxYearDesc(clientId)

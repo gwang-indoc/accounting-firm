@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { EngagementStatus } from '../../../core/models/engagement.model';
+import { EngagementDto, EngagementStatus } from '../../../core/models/engagement.model';
 
 const ALL_STATUSES: EngagementStatus[] = [
   'START', 'IN_PROCESSING', 'PENDING_CLIENT_REVIEW', 'SUBMIT_TO_CRA', 'COMPLETED',
@@ -18,7 +18,7 @@ const ALL_STATUSES: EngagementStatus[] = [
         <h2 class="trd__title">{{ 'workflow.changeStatusDialog.title' | translate }}</h2>
         <div class="trd__from-row">
           <span class="from-label">{{ 'workflow.changeStatusDialog.currentLabel' | translate }}</span>
-          <span class="cur-badge" [attr.data-status]="data.currentStatus">{{ data.currentStatus }}</span>
+          <span class="cur-badge" [attr.data-status]="data.engagement.status">{{ data.engagement.status }}</span>
           <span class="from-arrow">→</span>
           <span class="to-preview" [attr.data-status]="selectedStatus">{{ selectedStatus }}</span>
         </div>
@@ -208,11 +208,11 @@ const ALL_STATUSES: EngagementStatus[] = [
 })
 export class AdminTransitionDialogComponent {
   private dialogRef = inject(MatDialogRef<AdminTransitionDialogComponent>);
-  data = inject(MAT_DIALOG_DATA) as { currentStatus: EngagementStatus };
+  data = inject(MAT_DIALOG_DATA) as { engagement: EngagementDto };
 
-  statuses = ALL_STATUSES.filter(s => s !== this.data.currentStatus);
+  statuses = ALL_STATUSES.filter(s => s !== this.data.engagement.status);
   selectedStatus: EngagementStatus = this.statuses[0];
-  note = '';
+  note = this.data.engagement.note ?? '';
 
   submit(): void {
     this.dialogRef.close({ status: this.selectedStatus, note: this.note || null });
